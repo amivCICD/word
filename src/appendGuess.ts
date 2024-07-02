@@ -20,7 +20,7 @@ function checkForCorrectPosition(wordOfTheDayLetters: string[], guessArr: string
     return { aux, correctLetters };
 }
 let keysArray = Array.from(document.querySelectorAll('.kbd'));
-function checkForCorrectLetter(letter, yellowWorthy, correctPositionArr, count) {
+function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPositionArr: string[], count: number) {
     console.log('correctPositionArr\t', correctPositionArr);
 
     // if (yellowWorthy.length) {
