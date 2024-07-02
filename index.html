@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" scroll-behavior="smooth" class="h-screen sm:h-screen bg-white bg-[url('/public/cozy_blanket.webp')] bg-[100%]bg-center bg-no-repeat m-0 p-1 pb-10">
+<html lang="en" scroll-behavior="smooth" class="h-screen sm:h-screen bg-white bg-[url('/cozy_blanket.webp')] bg-[100%]bg-center bg-no-repeat m-0 p-1 pb-10">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -20,7 +20,7 @@
           </div>
           <div class="drawer-side">
             <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-            <ul class="menu bg-[url('/public/cozy_blanket.webp')] text-black font-bold text-xl min-h-full w-64 p-4">
+            <ul class="menu bg-[url('/cozy_blanket.webp')] text-black font-bold text-xl min-h-full w-64 p-4">
               <!-- Sidebar content here -->
               <li class="border border-black btn bg-white bg-opacity-50 text-black font-bold text-xl">Start New Game</li>
             </ul>
@@ -117,17 +117,83 @@
 
 
       document.addEventListener('keydown', e => {
-        let filteredValue = checkInputValues(e)
+        let filteredValue = checkInputValues(e.key.toUpperCase())
         typeOutGuess(filteredValue);
-        console.log('e.key\t', e.key);
-        console.log("e.code\t", e.code);
+        document.querySelectorAll('.kbd').forEach((keys) => {
+          if (filteredValue === keys.innerHTML) {
+            keys.classList.add('bg-pink-200')
+          }
+        });
       });
+      document.addEventListener('keyup', e => {
+        let filteredValue = checkInputValues(e.key.toUpperCase())
+        document.querySelectorAll('.kbd').forEach((keys) => {
+          if (filteredValue === keys.innerHTML) {
+            keys.classList.remove('bg-pink-200')
+          }
+        });
+      });
+      const allKeysExceptBSEnter = Array.from(document.querySelectorAll('.kbd')).filter((key) => {
+        return key.id !== "enter" && key.id !== "backspace";
+      });
+      allKeysExceptBSEnter.forEach((keys) => {
+        keys.addEventListener('click', e => {
+          let letter = e.target.innerHTML;
+          let filteredValue = checkInputValues(letter)
+          typeOutGuess(filteredValue);
+        });
+        keys.addEventListener('mousedown', e => {
+          let letter = e.target.classList.add('bg-pink-200');
+        });
+        keys.addEventListener('mouseup', e => {
+          let letter = e.target.classList.remove('bg-pink-200');
+        });
+      });
+
+
+
       document?.getElementById('backspace').addEventListener('click', e => {
         typeOutGuess("BACKSPACE");
       });
       document?.getElementById('enter').addEventListener('click', e => {
         typeOutGuess("ENTER");
       });
+      document?.getElementById('backspace').addEventListener('mousedown', e => {
+        e.target.classList.add('bg-pink-200');
+      });
+      document?.getElementById('enter').addEventListener('mousedown', e => {
+        e.target.classList.add('bg-pink-200');
+      });
+      document?.getElementById('backspace').addEventListener('mouseup', e => {
+        e.target.classList.remove('bg-pink-200');
+      });
+      document?.getElementById('enter').addEventListener('mouseup', e => {
+        e.target.classList.remove('bg-pink-200');
+      });
+
+      // document.querySelectorAll('.kbd').forEach((keys) => {
+      //   keys.addEventListener('keydown', e => {
+      //     console.log('key.innerHTML', e);
+      //     console.log(e.key);
+      //     console.log(e.key.toUpperCase());
+      //     console.log(key.innerHTML);
+      //     if (e.key.toUpperCase() === keys.innerHTML) {
+      //       key.classList.toggle('bg-red-500')
+      //     }
+      //     // typeOutGuess()
+      //   });
+      //   keys.addEventListener('keyup', e => {
+      //     console.log('key.innerHTML', e);
+      //     if (e.key.toUpperCase() === keys.innerHTML) {
+      //       key.classList.toggle('bg-red-500')
+      //     }
+      //     // typeOutGuess()
+      //   });
+      //   keys.addEventListener('click', e => {
+      //     console.log('key.innerHTML', key.innerHTML);
+      //   });
+      // })
     </script>
+
   </body>
 </html>

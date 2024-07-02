@@ -28,6 +28,4 @@ export function illuminateKeys(letter: string, colorCode: string): void {
         }
         arrayOfKeys = arrayOfKeys.filter((key) => key.innerHTML !== letter);
     });
-    console.log("arrayOfKeysFilter\t", arrayOfKeys);
-
 }

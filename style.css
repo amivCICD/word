@@ -2465,6 +2465,20 @@ html:has(.drawer-toggle:checked) {
   animation: spin 1s linear infinite;
 }
 
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle .15s ease-in-out infinite;
+}
+
 .select-none {
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -2535,9 +2549,14 @@ html:has(.drawer-toggle:checked) {
   background-color: rgb(187 247 208 / var(--tw-bg-opacity));
 }
 
-.bg-green-300 {
+.bg-pink-200 {
   --tw-bg-opacity: 1;
-  background-color: rgb(134 239 172 / var(--tw-bg-opacity));
+  background-color: rgb(251 207 232 / var(--tw-bg-opacity));
+}
+
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
 }
 
 .bg-slate-500 {
@@ -2568,8 +2587,8 @@ html:has(.drawer-toggle:checked) {
   --tw-bg-opacity: 0.5;
 }
 
-.bg-\[url\(\'\/public\/cozy_blanket\.webp\'\)\] {
-  background-image: url('/public/cozy_blanket.webp');
+.bg-\[url\(\'\/cozy_blanket\.webp\'\)\] {
+  background-image: url('/cozy_blanket.webp');
 }
 
 .bg-\[100\%\] {

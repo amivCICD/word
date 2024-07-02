@@ -11,10 +11,17 @@ const arrayOfRowArrays = arrayOfDivRows();
 export async function typeOutGuess(userInput: string): Promise<void> {
     if (userInput === null) return;
     if (letterCount === 5 && userInput === "ENTER") {
-        // if (!checkIfWordInWordList(guess)) {
-        //     console.log('not in word list')
-        //     return;
-        // }
+        if (!checkIfWordInWordList(guess)) {
+            arrayOfRowArrays[row].forEach((row) => {
+                row.classList.add('animate-wiggle');
+            });
+            await new Promise((res) => setTimeout(res, 750));
+            arrayOfRowArrays[row].forEach((row) => {
+                row.classList.remove('animate-wiggle');
+            });
+            console.log('not in word list');
+            return;
+        }
         const newRow = await appendGuess(arrayOfRowArrays[row], guess);
         arrayOfRowArrays[row+1][0].innerHTML = "";
         row = newRow.incRow;
