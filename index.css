@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.box {
+    transform-style: preserve-3d;
+    transition: transform .75s;
+    transform: rotateY(360deg);
+}
+
+

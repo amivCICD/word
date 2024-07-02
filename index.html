@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" scroll-behavior="smooth" class="h-screen sm:h-screen bg-white bg-[url('/public/cozy_blanket.webp')] bg-[100%]bg-center bg-no-repeat m-0 p-1 pb-10">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+    <link rel="stylesheet" href="./index.css" type="text/css" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <div id="app" class="bg-transparent w-full h-full sm:w-1/2 mx-auto">
+      <div class="bg-transparent p-1 sm:p-4 flex flex-row  items-center justify-start">
+
+        <div class="drawer w-fit sm:hidden mb-1">
+          <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+          <div class="drawer-content">
+            <!-- Page content here -->
+            <label for="my-drawer" class="btn bg-transparent text-black font-bold drawer-button rotate-90">|||</label>
+          </div>
+          <div class="drawer-side">
+            <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+            <ul class="menu bg-[url('/public/cozy_blanket.webp')] text-black font-bold text-xl min-h-full w-64 p-4">
+              <!-- Sidebar content here -->
+              <li class="border border-black btn bg-white bg-opacity-50 text-black font-bold text-xl">Start New Game</li>
+            </ul>
+          </div>
+        </div>
+        <h1 class="text-2xl font-bold text-center text-black italic sm:hidden ml-1">WORDLE</h1>
+        <h1 class="text-2xl sm:text-6xl font-bold text-center text-black italic mx-auto pb-2 hidden sm:flex">WORDLE</h1>
+      </div>
+
+      <div class="grid grid-rows-6 grid-cols-5 place-items-center mx-auto gap-none sm:gap-2 w-fit">
+        <div class="word-row bg-black row-start-1 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-1 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-1 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-1 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-1 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+
+        <div class="word-row bg-black row-start-2 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-2 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-2 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-2 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-2 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+
+        <div class="word-row bg-black row-start-3 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-3 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-3 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-3 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-3 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+
+        <div class="word-row bg-black row-start-4 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-4 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-4 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-4 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-4 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+
+        <div class="word-row bg-black row-start-5 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-5 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-5 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-5 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-5 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+
+        <div class="word-row bg-black row-start-6 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-6 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-6 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-6 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+        <div class="word-row bg-black row-start-6 w-16 h-16 sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
+      </div>
+
+
+    </div>
+    <div class="w-full pt-2 sm:mt-10">
+      <div class="my-1 flex justify-center gap-[1px] sm:gap-1 sm:text-xl font-bold select-none">
+        <kbd class="kbd text-pink-200 bg-black h-20">Q</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">W</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">E</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">R</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">T</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">Y</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">U</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">I</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">O</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">P</kbd>
+      </div>
+      <div class="my-1 flex w-full justify-center gap-[1px] sm:gap-1 sm:text-xl font-bold select-none">
+        <kbd class="kbd text-pink-200 bg-black h-20">A</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">S</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">D</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">F</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">G</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">H</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">J</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">K</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">L</kbd>
+      </div>
+      <div class="my-1 flex w-full justify-center gap-[1px] sm:gap-1 sm:text-xl font-bold select-none">
+        <kbd id="enter" class="kbd text-pink-200 bg-black hover:cursor-pointer h-20">Enter</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">Z</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">X</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">C</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">V</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">B</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">N</kbd>
+        <kbd class="kbd text-pink-200 bg-black h-20">M</kbd>
+        <kbd id="backspace" class="kbd text-pink-200 bg-black font-bold w-16 sm:w-[73px] hover:cursor-pointer h-20">&lBarr;</kbd>
+      </div>
+      <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
+        <div id="startNewGame" class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Start New Game</div>
+      </div>
+    </div>
+
+
+    <script type="module">
+      import { typeOutGuess } from "./src/typeOutGuess.ts";
+      import { checkInputValues } from "./src/checkInputValues.ts";
+
+
+      document.addEventListener('keydown', e => {
+        let filteredValue = checkInputValues(e)
+        typeOutGuess(filteredValue);
+        console.log('e.key\t', e.key);
+        console.log("e.code\t", e.code);
+      });
+      document?.getElementById('backspace').addEventListener('click', e => {
+        typeOutGuess("BACKSPACE");
+      });
+      document?.getElementById('enter').addEventListener('click', e => {
+        typeOutGuess("ENTER");
+      });
+    </script>
+  </body>
+</html>
