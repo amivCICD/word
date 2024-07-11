@@ -2429,6 +2429,11 @@ html:has(.drawer-toggle:checked) {
   height: 100vh;
 }
 
+.h-fit {
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
 .min-h-full {
   min-height: 100%;
 }
@@ -2448,6 +2453,10 @@ html:has(.drawer-toggle:checked) {
 
 .w-full {
   width: 100%;
+}
+
+.w-screen {
+  width: 100vw;
 }
 
 .rotate-90 {
@@ -2583,12 +2592,20 @@ html:has(.drawer-toggle:checked) {
   background-color: rgb(253 224 71 / var(--tw-bg-opacity));
 }
 
+.bg-\[screen\] {
+  background-color: screen;
+}
+
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
 
 .bg-\[url\(\'\/cozy_blanket\.webp\'\)\] {
   background-image: url('/cozy_blanket.webp');
+}
+
+.bg-cover {
+  background-size: cover;
 }
 
 .bg-\[100\%\] {

@@ -1,0 +1,9 @@
+07 10 2024
+
+    all incoming inoput via switch is to be if (!abcd...) = null
+
+    fix bg size (larger img or bg-w-screen ?) - check 7/11
+
+    setup reset feature
+
+    ensure mobile fits entire screen
