@@ -9,10 +9,10 @@ let row: number = 0;
 let guess: string = "";
 
 const arrayOfRowArrays = arrayOfDivRows();
-console.log('arrayOfRowArrays\t', arrayOfRowArrays);
+
 
 export async function typeOutGuess(userInput: string, gameState: boolean, wordOfTheDay: string, wordOfTheDayLetters: string[]): Promise<void> {
-    console.log('wordOfTheDay, wordOfTheDayLetters\t', wordOfTheDay, wordOfTheDayLetters);
+    console.log('wordOfTheDay\t', wordOfTheDay);
 
     if (gameState.reset) {
         letterCount = 0;
@@ -31,7 +31,6 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
             arrayOfRowArrays[row].forEach((row) => {
                 row.classList.remove('animate-wiggle');
             });
-            console.log('not in word list');
             return;
         }
         const newRow = await appendGuess(arrayOfRowArrays[row], guess, wordOfTheDay, wordOfTheDayLetters, gameState);
@@ -53,8 +52,6 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
     if (userInput === "BACKSPACE" && letterCount !== 0) {
         arrayOfRowArrays[row][letterCount-1].innerHTML = "";
         guess = guess.slice(0, guess.length - 1);
-        console.log("guess - 1 working");
-
         letterCount--;
         if (letterCount === 0) {
             return;
@@ -62,7 +59,6 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
         return;
     }
     if (letterCount === 5 || letterCount === 0 && userInput === "BACKSPACE") { // boundaries
-        console.log("letterCount is at 5 || 0");
         return;
     }
     guess += userInput;

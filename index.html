@@ -30,7 +30,7 @@
         <h1 class="text-2xl sm:text-4xl font-bold text-center text-black italic mx-auto hidden sm:flex">WORDLE</h1>
       </div>
 
-      <div class="grid grid-rows-6 grid-cols-5 place-items-center mx-auto gap-none sm:gap-2 w-fit">
+      <div class="grid grid-rows-6 grid-cols-5 place-items-center mx-auto gap-none sm:gap-1 w-fit">
         <div class="word-row bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
         <div class="word-row bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
         <div class="word-row bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
@@ -175,7 +175,12 @@
         keys.addEventListener('click', e => {
           let letter = e.target.innerHTML;
           let filteredValue = checkInputValues(letter)
-          typeOutGuess(filteredValue);
+          typeOutGuess(
+            filteredValue,
+            gameState,
+            gameState.wordOfTheDay,
+            gameState.wordOfTheDayLetters
+          );
         });
         keys.addEventListener('mousedown', e => {
           let letter = e.target.classList.add('bg-pink-200');
@@ -188,10 +193,20 @@
 
 
       document?.getElementById('backspace').addEventListener('click', e => {
-        typeOutGuess("BACKSPACE");
+        typeOutGuess(
+          "BACKSPACE",
+          gameState,
+          gameState.wordOfTheDay,
+          gameState.wordOfTheDayLetters
+        );
       });
       document?.getElementById('enter').addEventListener('click', e => {
-        typeOutGuess("ENTER");
+        typeOutGuess(
+          "ENTER",
+          gameState,
+          gameState.wordOfTheDay,
+          gameState.wordOfTheDayLetters
+        );
       });
       document?.getElementById('backspace').addEventListener('mousedown', e => {
         e.target.classList.add('bg-pink-200');

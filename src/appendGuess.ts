@@ -64,15 +64,12 @@ export async function appendGuess(
     gameState
 ): Promise<number> {
     if (gameState.reset) {
-        console.log("HELLO FROM gameStateReset\t", gameState.reset);
         incRow = 0;
         guess = "";
         c = 0;
         illuminateKeys("", "", gameState.reset)
         return;
     }
-    console.log('wordOfTheDay\t', wordOfTheDay);
-    console.log('wordOfTheDayLetters\t', wordOfTheDayLetters);
 
     let restart = false;
     const guessAsArray = guessFromPrev.split("");
