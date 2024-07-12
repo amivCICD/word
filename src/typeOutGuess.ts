@@ -1,6 +1,7 @@
 import { appendGuess } from "./appendGuess";
 import { arrayOfDivRows } from "./arrayOfDivRows";
 import { checkIfWordInWordList } from "./checkIfWordInWordList";
+import { fireOffConfetti } from "./fireOffConfetti";
 
 
 
@@ -44,6 +45,7 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
         if (newRow.restart) {
             gameComplete = true;
             console.log('You can now restart the game...');
+            fireOffConfetti();
         }
         return;
     } else if (letterCount < 5 && userInput === "ENTER") {
