@@ -3,12 +3,24 @@ import { arrayOfDivRows } from "./arrayOfDivRows";
 import { checkIfWordInWordList } from "./checkIfWordInWordList";
 
 
+
 let letterCount: number = 0;
 let row: number = 0;
 let guess: string = "";
-let guessAsArray = [];
+
 const arrayOfRowArrays = arrayOfDivRows();
-export async function typeOutGuess(userInput: string): Promise<void> {
+console.log('arrayOfRowArrays\t', arrayOfRowArrays);
+
+export async function typeOutGuess(userInput: string, gameState: boolean, wordOfTheDay: string, wordOfTheDayLetters: string[]): Promise<void> {
+    console.log('wordOfTheDay, wordOfTheDayLetters\t', wordOfTheDay, wordOfTheDayLetters);
+
+    if (gameState.reset) {
+        letterCount = 0;
+        row = 0;
+        guess = "";
+        await appendGuess(null, null, null, null, gameState);
+    }
+
     if (userInput === null) return;
     if (letterCount === 5 && userInput === "ENTER") {
         if (!checkIfWordInWordList(guess)) {
@@ -22,7 +34,7 @@ export async function typeOutGuess(userInput: string): Promise<void> {
             console.log('not in word list');
             return;
         }
-        const newRow = await appendGuess(arrayOfRowArrays[row], guess);
+        const newRow = await appendGuess(arrayOfRowArrays[row], guess, wordOfTheDay, wordOfTheDayLetters, gameState);
         arrayOfRowArrays[row+1][0].innerHTML = "";
         row = newRow.incRow;
         letterCount = 0;

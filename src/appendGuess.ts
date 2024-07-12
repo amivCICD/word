@@ -7,12 +7,13 @@ let incRow: number = 0;
 let guess: string = "";
 
 function checkForCorrectPosition(wordOfTheDayLetters: string[], guessArr: string[]) {
+    console.log("wordOfTheDayLetters from checkForCorrectPosition\t", wordOfTheDayLetters);
+
     let aux = Array.from({ length: 5 });
     let correctLetters = [];
     for (let i = 0; i < wordOfTheDayLetters.length; i++) {
         const element = wordOfTheDayLetters[i];
         if (element === guessArr[i]) {
-            console.log('Match!')
             aux[i] = element;
             correctLetters.push(element);
         }
@@ -30,7 +31,7 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
             illuminateKeys(letter.innerHTML, "green");
 
             keysArray.filter((key) => key.innerHTML === letter.innerHTML)[0].classList.remove("bg-black")
-            keysArray.filter((key) => key.innerHTML === letter.innerHTML)[0].classList.remove("bg-yellow-300")
+            keysArray.filter((key) => key.innerHTML === letter.innerHTML)[0].classList.remove("bg-yellow-200")
             keysArray.filter((key) => key.innerHTML === letter.innerHTML)[0].classList.add("bg-green-200")
 
             // keysArray = keysArray.filter((key) => key.innerHTML !== letter.innerHTML);
@@ -55,7 +56,23 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
 
 
 let c: number = 0;
-export async function appendGuess(divEl: HTMLDivElement[], guessFromPrev: string): Promise<number> {
+export async function appendGuess(
+    divEl: HTMLDivElement[],
+    guessFromPrev: string,
+    wordOfTheDay: string,
+    wordOfTheDayLetters: string[],
+    gameState
+): Promise<number> {
+    if (gameState.reset) {
+        console.log("HELLO FROM gameStateReset\t", gameState.reset);
+        incRow = 0;
+        guess = "";
+        c = 0;
+        return;
+    }
+    console.log('wordOfTheDay\t', wordOfTheDay);
+    console.log('wordOfTheDayLetters\t', wordOfTheDayLetters);
+
     let restart = false;
     const guessAsArray = guessFromPrev.split("");
     let filt = guessAsArray.filter(letter => wordOfTheDayLetters.includes(letter));

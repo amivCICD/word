@@ -114,11 +114,48 @@
     <script type="module">
       import { typeOutGuess } from "./src/typeOutGuess.ts";
       import { checkInputValues } from "./src/checkInputValues.ts";
+      import { ResetGameState } from "./src/resetGameState.ts";
+      import { sWords } from "./src/sWords";
+
+      let gameState;
+
+      document.getElementById('startNewGame').addEventListener('click', e => {
+        if (e) {
+          gameState = new ResetGameState(true, sWords);
+          console.log("gameState.reset\t", gameState.reset);
+          typeOutGuess(
+            null,
+            gameState,
+            gameState.wordOfTheDay,
+            gameState.wordOfTheDayLetters
+          );
+          gameState.setResetFalse();
+        }
+      });
+
+      // INIT
+      (() => {
+        gameState = new ResetGameState(true, sWords);
+        gameState.setResetFalse();
+        console.log("gameState.reset FROM INIT\t", gameState.reset);
+        typeOutGuess(
+            null,
+            gameState,
+            gameState.wordOfTheDay,
+            gameState.wordOfTheDayLetters
+          );
+      })();
+
 
 
       document.addEventListener('keydown', e => {
-        let filteredValue = checkInputValues(e.key.toUpperCase())
-        typeOutGuess(filteredValue);
+        let filteredValue = checkInputValues(e.key.toUpperCase());
+        typeOutGuess(
+          filteredValue,
+          gameState,
+          gameState.wordOfTheDay,
+          gameState.wordOfTheDayLetters
+        );
         document.querySelectorAll('.kbd').forEach((keys) => {
           if (filteredValue === keys.innerHTML) {
             keys.classList.add('bg-pink-200')

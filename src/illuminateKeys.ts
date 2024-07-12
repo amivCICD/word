@@ -9,13 +9,13 @@ export function illuminateKeys(letter: string, colorCode: string): void {
 
             switch (colorCode) {
                 case "hit":
-                    key.classList.add('bg-yellow-300');
+                    key.classList.add('bg-yellow-200');
                     key.classList.remove('text-pink-200');
                     key.classList.add('text-black');
                     break;
                 case "green":
                     key.classList.add('bg-green-200');
-                    key.classList.remove('bg-yellow-300');
+                    key.classList.remove('bg-yellow-200');
                     key.classList.remove('text-pink-200');
                     key.classList.add('text-black');
                     break;

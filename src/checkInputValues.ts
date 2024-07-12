@@ -29,7 +29,6 @@ export function checkInputValues(e: string) {
         case "Z":
         case "ENTER":
         case "BACKSPACE":
-        case " ":
             inputValue = e.toUpperCase();
             break;
         default:
