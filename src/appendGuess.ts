@@ -63,15 +63,17 @@ export async function appendGuess(
     wordOfTheDayLetters: string[],
     gameState
 ): Promise<number> {
+    let restart = false;
     if (gameState.reset) {
         incRow = 0;
         guess = "";
         c = 0;
-        illuminateKeys("", "", gameState.reset)
+        illuminateKeys("", "", gameState.reset);
+        restart = false;
         return;
     }
 
-    let restart = false;
+
     const guessAsArray = guessFromPrev.split("");
     let filt = guessAsArray.filter(letter => wordOfTheDayLetters.includes(letter));
     let yellowWorthy = [...new Set(filt)];

@@ -11,6 +11,7 @@ let guess: string = "";
 const arrayOfRowArrays = arrayOfDivRows();
 
 
+let gameComplete;
 export async function typeOutGuess(userInput: string, gameState: boolean, wordOfTheDay: string, wordOfTheDayLetters: string[]): Promise<void> {
     console.log('wordOfTheDay\t', wordOfTheDay);
 
@@ -19,8 +20,10 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
         row = 0;
         guess = "";
         await appendGuess(null, null, null, null, gameState);
+        gameComplete = false;
     }
 
+    if (gameComplete) return;
     if (userInput === null) return;
     if (letterCount === 5 && userInput === "ENTER") {
         if (!checkIfWordInWordList(guess)) {
@@ -39,6 +42,7 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
         letterCount = 0;
         guess = "";
         if (newRow.restart) {
+            gameComplete = true;
             console.log('You can now restart the game...');
         }
         return;
