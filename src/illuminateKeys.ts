@@ -1,7 +1,8 @@
 let allKeyboardLetters = document.querySelectorAll('.kbd');
 let arrayOfKeys = Array.from(allKeyboardLetters);
 
-export function illuminateKeys(letter: string, colorCode: string): void {
+
+export function illuminateKeys(letter: string, colorCode: string, reset): void {
 
     arrayOfKeys.forEach((key) => {
         if (key.innerHTML === letter) {
@@ -14,8 +15,8 @@ export function illuminateKeys(letter: string, colorCode: string): void {
                     key.classList.add('text-black');
                     break;
                 case "green":
-                    key.classList.add('bg-green-200');
                     key.classList.remove('bg-yellow-200');
+                    key.classList.add('bg-green-200');
                     key.classList.remove('text-pink-200');
                     key.classList.add('text-black');
                     break;
@@ -27,5 +28,8 @@ export function illuminateKeys(letter: string, colorCode: string): void {
             }
         }
         arrayOfKeys = arrayOfKeys.filter((key) => key.innerHTML !== letter);
+        if (reset) {
+            arrayOfKeys = Array.from(allKeyboardLetters);
+        }
     });
 }

@@ -68,6 +68,7 @@ export async function appendGuess(
         incRow = 0;
         guess = "";
         c = 0;
+        illuminateKeys("", "", gameState.reset)
         return;
     }
     console.log('wordOfTheDay\t', wordOfTheDay);

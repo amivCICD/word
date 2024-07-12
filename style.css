@@ -2533,6 +2533,10 @@ html:has(.drawer-toggle:checked) {
   gap: 1px;
 }
 
+.overflow-y-hidden {
+  overflow-y: hidden;
+}
+
 .rounded-md {
   border-radius: 0.375rem;
 }

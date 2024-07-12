@@ -22,7 +22,7 @@
             <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
             <ul class="menu bg-[url('/cozy_blanket.webp')] text-black font-bold text-xl min-h-full w-64 p-4">
               <!-- Sidebar content here -->
-              <li class="border border-black btn bg-white bg-opacity-50 text-black font-bold text-xl">Start New Game</li>
+              <li class="startNewGame border border-black btn bg-white bg-opacity-50 text-black font-bold text-xl">Start New Game</li>
             </ul>
           </div>
         </div>
@@ -106,7 +106,7 @@
         <kbd id="backspace" class="kbd text-pink-200 bg-black font-bold w-16 sm:w-[73px] hover:cursor-pointer h-20">&lBarr;</kbd>
       </div>
       <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
-        <div id="startNewGame" class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Start New Game</div>
+        <div class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Start New Game</div>
       </div>
     </div>
 
@@ -118,26 +118,10 @@
       import { sWords } from "./src/sWords";
 
       let gameState;
-
-      document.getElementById('startNewGame').addEventListener('click', e => {
-        if (e) {
-          gameState = new ResetGameState(true, sWords);
-          console.log("gameState.reset\t", gameState.reset);
-          typeOutGuess(
-            null,
-            gameState,
-            gameState.wordOfTheDay,
-            gameState.wordOfTheDayLetters
-          );
-          gameState.setResetFalse();
-        }
-      });
-
       // INIT
       (() => {
         gameState = new ResetGameState(true, sWords);
         gameState.setResetFalse();
-        console.log("gameState.reset FROM INIT\t", gameState.reset);
         typeOutGuess(
             null,
             gameState,
@@ -145,6 +129,20 @@
             gameState.wordOfTheDayLetters
           );
       })();
+      document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
+        resetBtn.addEventListener('click', e => {
+          if (e) {
+            gameState = new ResetGameState(true, sWords);
+            typeOutGuess(
+              null,
+              gameState,
+              gameState.wordOfTheDay,
+              gameState.wordOfTheDayLetters
+            );
+            gameState.setResetFalse();
+          }
+        });
+      });
 
 
 
