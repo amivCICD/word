@@ -1,9 +1,15 @@
 07 10 2024
 
-    all incoming inoput via switch is to be if (!abcd...) = null
+    all incoming inoput via switch is to be if (!abcd...) = null - check 7/12
 
     fix bg size (larger img or bg-w-screen ?) - check 7/11
 
-    setup reset feature
+    setup reset feature - check 7/12
 
-    ensure mobile fits entire screen
+    ensure mobile fits entire screen - check? 7/12
+
+    add credit to confetti
+        https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
+        https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
+
+    consider a server with a single word of the day...
