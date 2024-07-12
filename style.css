@@ -2429,9 +2429,12 @@ html:has(.drawer-toggle:checked) {
   height: 100vh;
 }
 
-.h-fit {
-  height: -moz-fit-content;
-  height: fit-content;
+.h-12 {
+  height: 3rem;
+}
+
+.h-\[56px\] {
+  height: 56px;
 }
 
 .min-h-full {
@@ -2455,8 +2458,12 @@ html:has(.drawer-toggle:checked) {
   width: 100%;
 }
 
-.w-screen {
-  width: 100vw;
+.w-12 {
+  width: 3rem;
+}
+
+.w-\[56px\] {
+  width: 56px;
 }
 
 .rotate-90 {
@@ -2592,10 +2599,6 @@ html:has(.drawer-toggle:checked) {
   background-color: rgb(253 224 71 / var(--tw-bg-opacity));
 }
 
-.bg-\[screen\] {
-  background-color: screen;
-}
-
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -2606,14 +2609,6 @@ html:has(.drawer-toggle:checked) {
 
 .bg-cover {
   background-size: cover;
-}
-
-.bg-\[100\%\] {
-  background-position: 100%;
-}
-
-.bg-center {
-  background-position: center;
 }
 
 .bg-no-repeat {
@@ -2634,10 +2629,6 @@ html:has(.drawer-toggle:checked) {
 
 .pb-10 {
   padding-bottom: 2.5rem;
-}
-
-.pb-2 {
-  padding-bottom: 0.5rem;
 }
 
 .pb-24 {
@@ -2759,11 +2750,6 @@ html:has(.drawer-toggle:checked) {
   .sm\:text-4xl {
     font-size: 2.25rem;
     line-height: 2.5rem;
-  }
-
-  .sm\:text-6xl {
-    font-size: 3.75rem;
-    line-height: 1;
   }
 
   .sm\:text-xl {
