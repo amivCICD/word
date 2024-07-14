@@ -1,8 +1,9 @@
 import { wordOfTheDay } from "./getWordOfTheDay";
 import { wordOfTheDayLetters } from "./getWordOfTheDay";
 import { illuminateKeys } from "./illuminateKeys";
+import { GuessStarted } from "./guessStarted.ts";
 
-
+const guessStarted = GuessStarted.getInstance();
 let incRow: number = 0;
 let guess: string = "";
 
@@ -56,6 +57,7 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
 
 
 let c: number = 0;
+let failure: boolean = false;
 export async function appendGuess(
     divEl: HTMLDivElement[],
     guessFromPrev: string,
@@ -64,12 +66,14 @@ export async function appendGuess(
     gameState
 ): Promise<number> {
     let restart = false;
+    guessStarted.setGuessStartedTrue();
     if (gameState.reset) {
         incRow = 0;
         guess = "";
         c = 0;
         illuminateKeys("", "", gameState.reset);
         restart = false;
+        guessStarted.setGuessStartedFalse();
         return;
     }
 
@@ -112,10 +116,13 @@ export async function appendGuess(
     if (guess === wordOfTheDay) {
         console.log('You got it!');
         restart = true;
+    } else if (incRow === 5 && guess !== wordOfTheDay) {
+        failure = true;
     } else {
         guess = "";
     }
     c = 0;
     incRow++;
-    return { incRow, restart };
+    guessStarted.setGuessStartedFalse();
+    return { incRow, restart, failure, wordOfTheDay };
 }

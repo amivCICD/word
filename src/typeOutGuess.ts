@@ -2,9 +2,13 @@ import { appendGuess } from "./appendGuess";
 import { arrayOfDivRows } from "./arrayOfDivRows";
 import { checkIfWordInWordList } from "./checkIfWordInWordList";
 import { fireOffConfetti } from "./fireOffConfetti";
+import { RowGameState } from "./rowGameState.ts";
+import { showFailureModal } from "./showFailureModal.ts";
 
 
 
+
+const rowGameState = RowGameState.getInstance();
 let letterCount: number = 0;
 let row: number = 0;
 let guess: string = "";
@@ -15,6 +19,8 @@ const arrayOfRowArrays = arrayOfDivRows();
 let gameComplete;
 export async function typeOutGuess(userInput: string, gameState: boolean, wordOfTheDay: string, wordOfTheDayLetters: string[]): Promise<void> {
     console.log('wordOfTheDay\t', wordOfTheDay);
+    console.log('rowGameState.getRowLetterCount()\t', rowGameState.getRowLetterCount());
+
 
     if (gameState.reset) {
         letterCount = 0;
@@ -38,14 +44,23 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
             return;
         }
         const newRow = await appendGuess(arrayOfRowArrays[row], guess, wordOfTheDay, wordOfTheDayLetters, gameState);
-        arrayOfRowArrays[row+1][0].innerHTML = "";
-        row = newRow.incRow;
-        letterCount = 0;
-        guess = "";
+        if (row !== 5) {
+            arrayOfRowArrays[row+1][0].innerHTML = "";
+            row = newRow.incRow;
+            letterCount = 0;
+            rowGameState.startFromZero();
+            guess = "";
+        }
         if (newRow.restart) {
             gameComplete = true;
             console.log('You can now restart the game...');
             fireOffConfetti();
+        }
+        if (newRow.failure) {
+            gameComplete = true;
+            console.log("You did not get the word...fire off modal...");
+            showFailureModal(newRow.wordOfTheDay);
+
         }
         return;
     } else if (letterCount < 5 && userInput === "ENTER") {
@@ -59,6 +74,7 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
         arrayOfRowArrays[row][letterCount-1].innerHTML = "";
         guess = guess.slice(0, guess.length - 1);
         letterCount--;
+        rowGameState.decRowLetterCount();
         if (letterCount === 0) {
             return;
         }
@@ -70,4 +86,5 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
     guess += userInput;
     arrayOfRowArrays[row][letterCount].innerHTML = userInput;
     letterCount++;
+    rowGameState.incRowLetterCount();
 }

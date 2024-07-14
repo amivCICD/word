@@ -118,6 +118,13 @@
       import { checkInputValues } from "./src/checkInputValues.ts";
       import { ResetGameState } from "./src/resetGameState.ts";
       import { sWords } from "./src/sWords";
+      import { RowGameState } from "./src/rowGameState.ts";
+      import { GuessStarted } from "./src/guessStarted.ts";
+
+
+      const rowGameState = RowGameState.getInstance(); // rowLetterCount
+      const guessStarted = GuessStarted.getInstance();
+      rowGameState.getMethods();
 
       let gameState;
       // INIT
@@ -146,9 +153,11 @@
         });
       });
 
-
-
-      document.addEventListener('keyup', e => {
+      document.addEventListener('keydown', e => {
+        if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {
+          console.log("rowGameState === 5 && guessStarted".toUpperCase());
+          return;
+        }
         let filteredValue = checkInputValues(e.key.toUpperCase());
         typeOutGuess(
           filteredValue,
@@ -161,7 +170,26 @@
             keys.classList.add('bg-pink-200')
           }
         });
-      });
+      }); // initial listener
+
+
+
+
+      // original logic
+      // document.addEventListener('keydown', e => {
+      //   let filteredValue = checkInputValues(e.key.toUpperCase());
+      //   typeOutGuess(
+      //     filteredValue,
+      //     gameState,
+      //     gameState.wordOfTheDay,
+      //     gameState.wordOfTheDayLetters
+      //   );
+      //   document.querySelectorAll('.kbd').forEach((keys) => {
+      //     if (filteredValue === keys.innerHTML) {
+      //       keys.classList.add('bg-pink-200')
+      //     }
+      //   });
+      // });
       document.addEventListener('keyup', e => {
         let filteredValue = checkInputValues(e.key.toUpperCase())
         document.querySelectorAll('.kbd').forEach((keys) => {
@@ -249,5 +277,18 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     <script src="./src/fireOffConfetti.ts" type="module"></script>
 
+    <dialog id="failureModal" class="modal text-black">
+      <div class="modal-box bg-white border-4 border-pink-200">
+        <h3 class="text-lg font-bold ">Nice try!</h3>
+        <p class="py-4">The word of the day was: <span class="text-2xl text-red-500" id="wordOfTheDay"></span>!</p>
+        <div class="modal-action">
+          <form method="dialog">
+            <!-- if there is a button in form, it will close the modal -->
+            <button class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button>
+            <button class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
   </body>
 </html>
