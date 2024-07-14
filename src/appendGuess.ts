@@ -2,6 +2,8 @@ import { wordOfTheDay } from "./getWordOfTheDay";
 import { wordOfTheDayLetters } from "./getWordOfTheDay";
 import { illuminateKeys } from "./illuminateKeys";
 import { GuessStarted } from "./guessStarted.ts";
+import { GameOver } from "./gameOver.ts";
+
 
 const guessStarted = GuessStarted.getInstance();
 let incRow: number = 0;
@@ -57,7 +59,7 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
 
 
 let c: number = 0;
-let failure: boolean = false;
+const gameOver = GameOver.getInstance();
 export async function appendGuess(
     divEl: HTMLDivElement[],
     guessFromPrev: string,
@@ -74,6 +76,7 @@ export async function appendGuess(
         illuminateKeys("", "", gameState.reset);
         restart = false;
         guessStarted.setGuessStartedFalse();
+        gameOver.setGameOverFalse();
         return;
     }
 
@@ -117,12 +120,12 @@ export async function appendGuess(
         console.log('You got it!');
         restart = true;
     } else if (incRow === 5 && guess !== wordOfTheDay) {
-        failure = true;
+        gameOver.setGameOverTrue();
     } else {
         guess = "";
     }
     c = 0;
     incRow++;
     guessStarted.setGuessStartedFalse();
-    return { incRow, restart, failure, wordOfTheDay };
+    return { incRow, restart, wordOfTheDay };
 }

@@ -4,10 +4,11 @@ import { checkIfWordInWordList } from "./checkIfWordInWordList";
 import { fireOffConfetti } from "./fireOffConfetti";
 import { RowGameState } from "./rowGameState.ts";
 import { showFailureModal } from "./showFailureModal.ts";
+import { GameOver } from "./gameOver.ts";
 
 
 
-
+const gameOver = GameOver.getInstance();
 const rowGameState = RowGameState.getInstance();
 let letterCount: number = 0;
 let row: number = 0;
@@ -56,11 +57,10 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
             console.log('You can now restart the game...');
             fireOffConfetti();
         }
-        if (newRow.failure) {
+        if (gameOver.getGameOverStatus()) {
             gameComplete = true;
             console.log("You did not get the word...fire off modal...");
             showFailureModal(newRow.wordOfTheDay);
-
         }
         return;
     } else if (letterCount < 5 && userInput === "ENTER") {
