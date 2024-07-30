@@ -109,6 +109,7 @@
       </div>
       <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
         <div class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Start New Game</div>
+        <div id="javaWord" class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Word Of THe Day from JAVA</div>
       </div>
     </div>
 
@@ -292,5 +293,30 @@
         </div>
       </div>
     </dialog>
+    <script>
+      let javaBtn = document.getElementById('javaWord');
+      javaBtn.addEventListener('click', e => {
+        if (e) {
+          (async () => {
+            try {
+              const fetchWord = await fetch('http://localhost:8080/javaword', {
+                method: "GET",
+                headers: {
+                  "mode": "cors",
+                  "Content-Type": "application/json",
+                }
+              });
+              if (fetchWord.ok) {
+                const w = await fetchWord.json();
+                console.log('fetchWord\t', w)
+                // console.log(w);
+              }
+            } catch (error) {
+              console.error(error);
+            }
+          })();
+        }
+      });
+    </script>
   </body>
 </html>
