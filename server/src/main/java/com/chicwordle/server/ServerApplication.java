@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.http.MediaType;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import com.chicwordle.server.AllWords;
 
 @SpringBootApplication
 public class ServerApplication {
@@ -22,11 +24,18 @@ public class ServerApplication {
 @RestController
 @CrossOrigin(origins = "http://localhost:1985")
 class ServerController {
-	@GetMapping(value = "/javaword", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, String> word() {
-		WordOfTheDay wordOfTheDay = new WordOfTheDay();
+	private final WordOfTheDay wordOfTheDay = new WordOfTheDay();
+
+	@GetMapping(value = "/wordoftheday", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, String> dailyWordMap() {
 		Map<String, String> response = new HashMap<>();
-		response.put("word", wordOfTheDay.wordOfTheDay());
+		response.put("word", wordOfTheDay.dailyWord());
+		return response;
+	}
+	@GetMapping(value = "/newgameword", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, String> newGameWordMap() {
+		Map<String, String> response = new HashMap<>();
+		response.put("word", wordOfTheDay.newGameWordOfTheDay());
 		return response;
 	}
 	@GetMapping("/error")
@@ -36,12 +45,23 @@ class ServerController {
 }
 
 class WordOfTheDay {
-	private String[] words = {"loves","ghost","music","sings","peach","flows"};
+	// private String[] words = {"loves","ghost","music","sings","peach","flows"};
+	private String dailyWord;
+	private LocalDate lastGeneratedDate;
 
-	public String wordOfTheDay() {
-		return words[randomIndex()];
+	public String dailyWord() {
+		LocalDate today = LocalDate.now();
+		if (lastGeneratedDate == null || !lastGeneratedDate.equals(today)) {
+			dailyWord = AllWords.WORDS[randomIndex()];
+			lastGeneratedDate = today;
+		}
+		return dailyWord;
+	}
+
+	public String newGameWordOfTheDay() {
+		return AllWords.WORDS[randomIndex()];
 	}
 	public int randomIndex() {
-		return (int) (Math.random() * words.length);
+		return (int) (Math.random() * AllWords.WORDS.length);
 	}
 }
