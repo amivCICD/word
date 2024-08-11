@@ -11,12 +11,23 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import com.chicwordle.server.AllWords;
+import com.chicwordle.server.SQLiteCreateTable;
+import com.chicwordle.server.CreateDB;
+import com.chicwordle.server.InsertWordsToDB;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 @SpringBootApplication
 public class ServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ServerApplication.class, args);
+		Connect.connect();
+		// CreateDB.initDB();
+		SQLiteCreateTable.createWordTable("words");
+		InsertWordsToDB.insertManyWords(AllWords.WORDS);
 	}
 
 }
@@ -63,5 +74,28 @@ class WordOfTheDay {
 	}
 	public int randomIndex() {
 		return (int) (Math.random() * AllWords.WORDS.length);
+	}
+}
+
+class Connect {
+
+	public static void connect() {
+			Connection conn = null;
+			try {
+					String url = "jdbc:sqlite:sqlite-sakila.db";
+					conn = DriverManager.getConnection(url);
+					System.out.println("Connection to SQLite successful...");
+			} catch (SQLException e) {
+					System.out.println(e.getMessage());
+			} finally {
+					try {
+							if (conn != null) {
+									conn.close();
+							}
+					} catch(SQLException ex) {
+							System.out.println(ex.getMessage());
+					}
+			}
+
 	}
 }
