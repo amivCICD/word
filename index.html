@@ -109,7 +109,6 @@
       </div>
       <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
         <div class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Start New Game</div>
-        <div id="javaWord" class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Word Of THe Day from JAVA</div>
       </div>
     </div>
 
@@ -130,28 +129,61 @@
 
       let gameState;
       // INIT
-      (() => {
-        gameState = new ResetGameState(true, sWords);
-        gameState.setResetFalse();
-        typeOutGuess(
-            null,
-            gameState,
-            gameState.wordOfTheDay,
-            gameState.wordOfTheDayLetters
-          );
+      (async () => {
+        try {
+          const fetchWord = await fetch('http://localhost:8080/wordoftheday', {
+              method: "GET",
+              headers: {
+                "mode": "cors",
+                "Content-Type": "application/json",
+              }
+            });
+          if (fetchWord.ok) {
+            const wotd = await fetchWord.json();
+            gameState = new ResetGameState(true, wotd.word);
+            gameState.setResetFalse();
+            typeOutGuess(
+                null,
+                gameState,
+                gameState.wordOfTheDay,
+                gameState.wordOfTheDayLetters
+              );
+          }
+        } catch (error) {
+          console.error(error);
+        }
+
       })();
+
       document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
         resetBtn.addEventListener('click', e => {
           if (e) {
-            gameState = new ResetGameState(true, sWords);
-            gameOver.setGameOverFalse();
-            typeOutGuess(
-              null,
-              gameState,
-              gameState.wordOfTheDay,
-              gameState.wordOfTheDayLetters
-            );
-            gameState.setResetFalse();
+            (async () => {
+              try {
+                const fetchWord = await fetch('http://localhost:8080/newgameword', {
+                  method: "GET",
+                  headers: {
+                    "mode": "cors",
+                    "Content-Type": "application/json",
+                  }
+                });
+                if (fetchWord.ok) {
+                  const w = await fetchWord.json();
+                  console.log('fetchWord\t', w)
+                  gameState = new ResetGameState(true, w.word);
+                  gameOver.setGameOverFalse();
+                  typeOutGuess(
+                    null,
+                    gameState,
+                    gameState.wordOfTheDay,
+                    gameState.wordOfTheDayLetters
+                  );
+                  gameState.setResetFalse();
+                }
+              } catch (error) {
+                console.error(error);
+              }
+            })();
           }
         });
       });
@@ -293,30 +325,5 @@
         </div>
       </div>
     </dialog>
-    <script>
-      let javaBtn = document.getElementById('javaWord');
-      javaBtn.addEventListener('click', e => {
-        if (e) {
-          (async () => {
-            try {
-              const fetchWord = await fetch('http://localhost:8080/javaword', {
-                method: "GET",
-                headers: {
-                  "mode": "cors",
-                  "Content-Type": "application/json",
-                }
-              });
-              if (fetchWord.ok) {
-                const w = await fetchWord.json();
-                console.log('fetchWord\t', w)
-                // console.log(w);
-              }
-            } catch (error) {
-              console.error(error);
-            }
-          })();
-        }
-      });
-    </script>
   </body>
 </html>

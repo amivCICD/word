@@ -9,14 +9,27 @@ export const wordOfTheDay = getWordOfTheDay(sWords);
 export const wordOfTheDayLetters = wordOfTheDay.split("");
 // console.log("wordOfTheDay\t", wordOfTheDay);
 
-export class WordOfTheDay {
-    constructor(sWords: string[]) {
-        this.sWords = sWords;
-    }
-    getWordOfTheDayAndLetters(sWords = this.sWords) {
-        const randomIndex: number = Math.floor(Math.random() * sWords.length);
-        const wordOfTheDay: string = sWords[randomIndex];
+// export class WordOfTheDay {
+//     constructor(sWords: string[]) {
+//         this.sWords = sWords;
+//     }
+//     getWordOfTheDayAndLetters(sWords = this.sWords) {
+//         const randomIndex: number = Math.floor(Math.random() * sWords.length);
+//         const wordOfTheDay: string = sWords[randomIndex];
 
-        return { wordOfTheDay: wordOfTheDay.toUpperCase(), wordOfTheDayLetters: wordOfTheDay.toUpperCase().split("") };
+//         return { wordOfTheDay: wordOfTheDay.toUpperCase(), wordOfTheDayLetters: wordOfTheDay.toUpperCase().split("") };
+//     }
+// }
+export class WordOfTheDay {
+    public wotd: string;
+
+    constructor(wotd: string) {
+        this.wotd = wotd;
+    }
+    getWordOfTheDayAndLetters() {
+        // const randomIndex: number = Math.floor(Math.random() * sWords.length);
+        // const wordOfTheDay: string = sWords[randomIndex];
+
+        return { wordOfTheDay: this.wotd.toUpperCase(), wordOfTheDayLetters: this.wotd.toUpperCase().split("") };
     }
 }

@@ -12,4 +12,6 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
-    consider a server with a single word of the day...
+    consider a server with a single word of the day... check 08 10 2024
+
+    change front-end endpoints to query server

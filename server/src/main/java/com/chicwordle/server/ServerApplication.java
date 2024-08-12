@@ -51,7 +51,7 @@ class ServerController {
 	@GetMapping(value = "/newgameword", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Map<String, String> newGameWordMap() {
 		Map<String, String> response = new HashMap<>();
-		response.put("word", wordOfTheDay.newGameWordOfTheDay());
+		response.put("word", wordOfTheDay.newGameWordOfDay());
 		return response;
 	}
 	@GetMapping("/error")

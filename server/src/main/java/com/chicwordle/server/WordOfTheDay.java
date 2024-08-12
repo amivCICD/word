@@ -30,10 +30,19 @@ public class WordOfTheDay {
         }
         return this;
     }
+    public String newGameWordOfDay() {
+        String newGameWord = "";
+        Map<Integer, String> newGameMap = SQLiteSelect.selectWordOfDay();
+        if (!newGameMap.isEmpty()) {
+            int id = newGameMap.keySet().iterator().next();
+            newGameWord = newGameMap.get(id);
+        }
+        return newGameWord;
+    }
 
-	public String newGameWordOfTheDay() {
-		return AllWords.WORDS[randomIndex()];
-	}
+	// public String newGameWordOfTheDay() {
+	// 	return AllWords.WORDS[randomIndex()];
+	// }
 	public int randomIndex() {
 		return (int) (Math.random() * AllWords.WORDS.length);
 	}
