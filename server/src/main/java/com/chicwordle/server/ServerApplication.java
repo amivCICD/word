@@ -7,13 +7,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.http.MediaType;
-import java.time.LocalDate;
+
 import java.util.HashMap;
 import java.util.Map;
 import com.chicwordle.server.AllWords;
 import com.chicwordle.server.SQLiteCreateTable;
 import com.chicwordle.server.CreateDB;
 import com.chicwordle.server.InsertWordsToDB;
+import com.chicwordle.server.SQLiteSelect;
+import com.chicwordle.server.SQLiteUpdate;
+import com.chicwordle.server.WordOfTheDay;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,10 +27,12 @@ public class ServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ServerApplication.class, args);
-		Connect.connect();
+		// Connect.connect();
 		// CreateDB.initDB();
-		SQLiteCreateTable.createWordTable("words");
-		InsertWordsToDB.insertManyWords(AllWords.WORDS);
+		// SQLiteCreateTable.createWordTable("words");
+		// InsertWordsToDB.insertManyWords(AllWords.WORDS);
+		// SQLiteSelect.selectWordOfDay();
+
 	}
 
 }
@@ -40,7 +45,7 @@ class ServerController {
 	@GetMapping(value = "/wordoftheday", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Map<String, String> dailyWordMap() {
 		Map<String, String> response = new HashMap<>();
-		response.put("word", wordOfTheDay.dailyWord());
+		response.put("word", wordOfTheDay.setSQLWordOfDay().dailyWord());
 		return response;
 	}
 	@GetMapping(value = "/newgameword", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,27 +60,27 @@ class ServerController {
 	}
 }
 
-class WordOfTheDay {
-	// private String[] words = {"loves","ghost","music","sings","peach","flows"};
-	private String dailyWord;
-	private LocalDate lastGeneratedDate;
+// class WordOfTheDay {
+// 	// private String[] words = {"loves","ghost","music","sings","peach","flows"};
+// 	private String dailyWord;
+// 	private LocalDate lastGeneratedDate;
 
-	public String dailyWord() {
-		LocalDate today = LocalDate.now();
-		if (lastGeneratedDate == null || !lastGeneratedDate.equals(today)) {
-			dailyWord = AllWords.WORDS[randomIndex()];
-			lastGeneratedDate = today;
-		}
-		return dailyWord;
-	}
+// 	public String dailyWord() {
+// 		LocalDate today = LocalDate.now();
+// 		if (lastGeneratedDate == null || !lastGeneratedDate.equals(today)) {
+// 			dailyWord = AllWords.WORDS[randomIndex()];
+// 			lastGeneratedDate = today;
+// 		}
+// 		return dailyWord;
+// 	}
 
-	public String newGameWordOfTheDay() {
-		return AllWords.WORDS[randomIndex()];
-	}
-	public int randomIndex() {
-		return (int) (Math.random() * AllWords.WORDS.length);
-	}
-}
+// 	public String newGameWordOfTheDay() {
+// 		return AllWords.WORDS[randomIndex()];
+// 	}
+// 	public int randomIndex() {
+// 		return (int) (Math.random() * AllWords.WORDS.length);
+// 	}
+// }
 
 class Connect {
 
@@ -90,7 +95,7 @@ class Connect {
 			} finally {
 					try {
 							if (conn != null) {
-									conn.close();
+								conn.close();
 							}
 					} catch(SQLException ex) {
 							System.out.println(ex.getMessage());
