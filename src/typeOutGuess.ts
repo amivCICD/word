@@ -5,11 +5,12 @@ import { fireOffConfetti } from "./fireOffConfetti";
 import { RowGameState } from "./rowGameState.ts";
 import { showFailureModal } from "./showFailureModal.ts";
 import { GameOver } from "./gameOver.ts";
-
+import { CheckCompletionStatus } from "./checkCompletionStatus.ts";
 
 
 const gameOver = GameOver.getInstance();
 const rowGameState = RowGameState.getInstance();
+const checkCompletionStatus = CheckCompletionStatus.getInstance();
 let letterCount: number = 0;
 let row: number = 0;
 let guess: string = "";
@@ -18,7 +19,13 @@ const arrayOfRowArrays = arrayOfDivRows();
 
 
 let gameComplete;
-export async function typeOutGuess(userInput: string, gameState: boolean, wordOfTheDay: string, wordOfTheDayLetters: string[]): Promise<void> {
+export async function typeOutGuess(
+    userInput: string,
+    gameState: boolean,
+    wordOfTheDay: string,
+    wordOfTheDayLetters: string[]
+): Promise<void> {
+
     console.log('wordOfTheDay\t', wordOfTheDay);
     console.log('rowGameState.getRowLetterCount()\t', rowGameState.getRowLetterCount());
 
@@ -54,11 +61,13 @@ export async function typeOutGuess(userInput: string, gameState: boolean, wordOf
         }
         if (newRow.restart) {
             gameComplete = true;
+            checkCompletionStatus.setCompletedGame();
             console.log('You can now restart the game...');
             fireOffConfetti();
         }
         if (gameOver.getGameOverStatus()) {
             gameComplete = true;
+            checkCompletionStatus.setCompletedGame();
             console.log("You did not get the word...fire off modal...");
             showFailureModal(newRow.wordOfTheDay);
         }

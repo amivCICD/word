@@ -108,7 +108,7 @@
         <kbd id="backspace" class="kbd text-pink-200 bg-black font-bold w-16 sm:w-[73px] hover:cursor-pointer h-20">&lBarr;</kbd>
       </div>
       <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
-        <div class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">Start New Game</div>
+        <div id="startNewGameBtn" class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black hidden">Start New Game</div>
       </div>
     </div>
 
@@ -120,28 +120,47 @@
       import { sWords } from "./src/sWords";
       import { RowGameState } from "./src/rowGameState.ts";
       import { GuessStarted } from "./src/guessStarted.ts";
-      import { GameOver } from "./src/gameOver.ts"
+      import { GameOver } from "./src/gameOver.ts";
+      import { CheckCompletionStatus } from "./src/checkCompletionStatus.ts";
 
+      // my lil singletons
       const gameOver = GameOver.getInstance();
       const rowGameState = RowGameState.getInstance(); // rowLetterCount
       const guessStarted = GuessStarted.getInstance();
+      const checkCompletionStatus = CheckCompletionStatus.getInstance();
       rowGameState.getMethods();
 
       let gameState;
+
       // INIT
       (async () => {
+        let fetchWord;
         try {
-          const fetchWord = await fetch('http://localhost:8080/wordoftheday', {
+          if (checkCompletionStatus.isCompleted()) {
+            fetchWord = await fetch('http://localhost:8080/newgameword', {
+                  method: "GET",
+                  headers: {
+                    "mode": "cors",
+                    "Content-Type": "application/json",
+                  }
+                });
+          } else {
+            fetchWord = await fetch('http://localhost:8080/wordoftheday', {
               method: "GET",
               headers: {
                 "mode": "cors",
                 "Content-Type": "application/json",
               }
             });
+          }
+
           if (fetchWord.ok) {
             const wotd = await fetchWord.json();
             gameState = new ResetGameState(true, wotd.word);
             gameState.setResetFalse();
+            if (checkCompletionStatus.isCompleted()) {
+              checkCompletionStatus.hideRevealStartBtn(false);
+            }
             typeOutGuess(
                 null,
                 gameState,
@@ -171,6 +190,9 @@
                   const w = await fetchWord.json();
                   console.log('fetchWord\t', w)
                   gameState = new ResetGameState(true, w.word);
+                  if (checkCompletionStatus.isCompleted()) {
+                    checkCompletionStatus.setCompletedGame();
+                  }
                   gameOver.setGameOverFalse();
                   typeOutGuess(
                     null,
@@ -190,7 +212,7 @@
 
       document.addEventListener('keydown', e => {
         if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {
-          console.log("rowGameState === 5 && guessStarted".toUpperCase());
+          // console.log("rowGameState === 5 && guessStarted".toUpperCase());
           return;
         }
         let filteredValue = checkInputValues(e.key.toUpperCase());
@@ -255,8 +277,6 @@
         });
       });
 
-
-
       document?.getElementById('backspace').addEventListener('click', e => {
         typeOutGuess(
           "BACKSPACE",
@@ -286,31 +306,10 @@
         e.target.classList.remove('bg-pink-200');
       });
 
-      // document.querySelectorAll('.kbd').forEach((keys) => {
-      //   keys.addEventListener('keydown', e => {
-      //     console.log('key.innerHTML', e);
-      //     console.log(e.key);
-      //     console.log(e.key.toUpperCase());
-      //     console.log(key.innerHTML);
-      //     if (e.key.toUpperCase() === keys.innerHTML) {
-      //       key.classList.toggle('bg-red-500')
-      //     }
-      //     // typeOutGuess()
-      //   });
-      //   keys.addEventListener('keyup', e => {
-      //     console.log('key.innerHTML', e);
-      //     if (e.key.toUpperCase() === keys.innerHTML) {
-      //       key.classList.toggle('bg-red-500')
-      //     }
-      //     // typeOutGuess()
-      //   });
-      //   keys.addEventListener('click', e => {
-      //     console.log('key.innerHTML', key.innerHTML);
-      //   });
-      // })
     </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     <script src="./src/fireOffConfetti.ts" type="module"></script>
+    <!-- <script src="./src/reHideStartGameBtn.ts" type="module"></script> -->
 
     <dialog id="failureModal" class="modal text-black">
       <div class="modal-box bg-white border-4 border-pink-200">
