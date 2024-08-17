@@ -38,7 +38,7 @@ public class ServerApplication {
 }
 
 @RestController
-@CrossOrigin(origins = "http://localhost:1985")
+// @CrossOrigin(origins = "http://localhost:1985") // remove for production
 class ServerController {
 	private final WordOfTheDay wordOfTheDay = new WordOfTheDay();
 

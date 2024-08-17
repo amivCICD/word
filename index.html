@@ -2,7 +2,6 @@
 <html lang="en" scroll-behavior="smooth" class="h-screen sm:h-screen bg-white bg-[url('/cozy_blanket.webp')] bg-cover bg-no-repeat m-0 p-1 pb-10">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./style.css" type="text/css" />
     <link rel="stylesheet" href="./index.css" type="text/css" />
@@ -123,6 +122,10 @@
       import { GameOver } from "./src/gameOver.ts";
       import { CheckCompletionStatus } from "./src/checkCompletionStatus.ts";
 
+      // dev vs production
+      const apiURL = "<%= API_URL %>";
+      console.log(apiURL);
+
       // my lil singletons
       const gameOver = GameOver.getInstance();
       const rowGameState = RowGameState.getInstance(); // rowLetterCount
@@ -137,7 +140,7 @@
         let fetchWord;
         try {
           if (checkCompletionStatus.isCompleted()) {
-            fetchWord = await fetch('http://localhost:8080/newgameword', {
+            fetchWord = await fetch(`${apiURL}/newgameword`, {
                   method: "GET",
                   headers: {
                     "mode": "cors",
@@ -145,7 +148,7 @@
                   }
                 });
           } else {
-            fetchWord = await fetch('http://localhost:8080/wordoftheday', {
+            fetchWord = await fetch(`${apiURL}/wordoftheday`, {
               method: "GET",
               headers: {
                 "mode": "cors",
@@ -179,7 +182,7 @@
           if (e) {
             (async () => {
               try {
-                const fetchWord = await fetch('http://localhost:8080/newgameword', {
+                const fetchWord = await fetch(`${apiURL}/newgameword`, {
                   method: "GET",
                   headers: {
                     "mode": "cors",
