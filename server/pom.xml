@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.chicwordle</groupId>
-	<artifactId>server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>chicwordle_server</artifactId>
+	<version>1.0.0</version>
 	<name>server</name>
 	<description>Server for Chic Wordle</description>
 	<url/>

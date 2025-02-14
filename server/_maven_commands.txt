@@ -1,0 +1,15 @@
+
+TWO IN ONE COMMAND (builds jar file in ./target):
+mvn clean package -DskipTests         // -DskipTests skips tests, useful for CI/CD
+
+mvn clean
+mvn compile
+mvn test
+mvn install
+mvn package
+
+RUN APP:
+mvn spring-boot:run
+
+CREATE JAR FILE:
+mvn clean install (then check /target folder for jar build named from pom.xml)

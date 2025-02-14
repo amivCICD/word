@@ -27,11 +27,11 @@ public class ServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ServerApplication.class, args);
-		// Connect.connect();
-		// CreateDB.initDB();
-		// SQLiteCreateTable.createWordTable("words");
-		// InsertWordsToDB.insertManyWords(AllWords.WORDS);
-		// SQLiteSelect.selectWordOfDay();
+		Connect.connect(); // these were commented out from last build 30-34
+		CreateDB.initDB();
+		SQLiteCreateTable.createWordTable("words");
+		InsertWordsToDB.insertManyWords(AllWords.WORDS);
+		SQLiteSelect.selectWordOfDay();
 
 	}
 

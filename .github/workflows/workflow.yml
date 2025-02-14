@@ -1,0 +1,30 @@
+name: Stop, Build & Run updated container
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  stop_build_run:
+    runs-on: self-hosted
+    env:
+      IMAGE_NAME: chicwordle
+      PORT: 1985
+      DIR: c:\users\server\documents\servedtunnels\word
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Shut down current container
+        run: |
+          $containerIds = docker ps -q | ForEach-Object { 
+            $container = docker inspect --format '{{.Id}} {{.Config.Image}}' $_
+            if ($container -match "artimusmaximus/${{env.IMAGE_NAME}}:latest") { 
+              docker stop $container.Split(" ")[0] 
+              Write-Host "Container found and shutting down..."
+            } else { Write-Host "No container found..." }
+          }
+      - name: pull updated container
+        run: docker pull artimusmaximus/${{env.IMAGE_NAME}}:latest
+      - name: Start new container
+        run: docker run -d -p ${{env.PORT}}:${{env.PORT}} artimusmaximus/${{env.IMAGE_NAME}}:latest

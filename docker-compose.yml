@@ -1,0 +1,11 @@
+version: "3.4"
+
+services:
+  chicwordle:
+    image: chicwordle
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      ports:
+        - 1985:1985
+

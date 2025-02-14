@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "css": "npx tailwindcss --watch ./index.html --output ./style.css",
+    "buildCSS": "npx tailwindcss --output ./style.css",
     "type": "tsc --noEmit"
   },
   "devDependencies": {
