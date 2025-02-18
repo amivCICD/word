@@ -17,13 +17,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Shut down current container
         run: |
-          $containerIds = docker ps -q | ForEach-Object { 
-            $container = docker inspect --format '{{.Id}} {{.Config.Image}}' $_
-            if ($container -match "artimusmaximus/${{env.IMAGE_NAME}}:latest") { 
-              docker stop $container.Split(" ")[0] 
-              Write-Host "Container found and shutting down..."
-            } else { Write-Host "No container found..." }
-          }
+          docker ps -q --filter "ancestor=artimusmaximus/${{env.IMAGE_NAME}}:latest" | xargs -r docker stop
+          echo "Stopping container ${{env.IMAGE_NAME}}" 
       - name: pull updated container
         run: docker pull artimusmaximus/${{env.IMAGE_NAME}}:latest
       - name: Start new container
