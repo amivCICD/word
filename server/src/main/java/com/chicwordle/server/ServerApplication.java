@@ -1,26 +1,17 @@
 package com.chicwordle.server;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.Map;
-import com.chicwordle.server.AllWords;
-import com.chicwordle.server.SQLiteCreateTable;
-import com.chicwordle.server.CreateDB;
-import com.chicwordle.server.InsertWordsToDB;
-import com.chicwordle.server.SQLiteSelect;
-import com.chicwordle.server.SQLiteUpdate;
-import com.chicwordle.server.WordOfTheDay;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class ServerApplication {
@@ -38,7 +29,9 @@ public class ServerApplication {
 }
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173") // use for dev
 // @CrossOrigin(origins = "http://localhost:1985") // remove for production
+
 class ServerController {
 	private final WordOfTheDay wordOfTheDay = new WordOfTheDay();
 

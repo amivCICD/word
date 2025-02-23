@@ -2603,6 +2603,14 @@ html:has(.drawer-toggle:checked) {
   gap: 1px;
 }
 
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
 .rounded-md {
   border-radius: 0.375rem;
 }
@@ -2822,6 +2830,14 @@ html:has(.drawer-toggle:checked) {
 
   .sm\:w-\[73px\] {
     width: 73px;
+  }
+
+  .sm\:flex-row {
+    flex-direction: row;
+  }
+
+  .sm\:flex-col {
+    flex-direction: column;
   }
 
   .sm\:gap-1 {

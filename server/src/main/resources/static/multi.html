@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" type="text/css" />
-    <link rel="stylesheet" href="./index.css" type="text/css" />
-    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="./assets/favicon-yxfIvqst.ico" type="image/x-icon">
+    <link rel="icon" href="./assets/favicon-yxfIvqst.ico" type="image/x-icon">
     <title>Chic Wordle</title>
+    <script type="module" crossorigin src="./assets/multi-BVX4tVMO.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/resetGameState-DJDk3oTc.js">
+    <link rel="stylesheet" crossorigin href="./assets/resetGameState-CcZWy56T.css">
   </head>
   <body>
     <div id="app" class="bg-transparent w-full h-full sm:w-1/2 mx-auto">
@@ -106,226 +107,14 @@
         <kbd class="kbd text-pink-200 bg-black h-20">M</kbd>
         <kbd id="backspace" class="kbd text-pink-200 bg-black font-bold w-16 sm:w-[73px] hover:cursor-pointer h-20">&lBarr;</kbd>
       </div>
-      <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex sm:flex-col gap-4">
+      <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
         <div id="startNewGameBtn" class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black hidden">Start New Game</div>
-        <a href="./multi.html">
-          <div
-            id="multiplayerBtn"
-            class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black"
-            >
-              Play Multiplayer
-          </div>
-        </a>
       </div>
+      <div class="div">I AM THE MULTI PLAYER PAGE!</div>
     </div>
 
 
-
-    <script type="module">
-      import { typeOutGuess } from "./src/typeOutGuess.ts";
-      import { checkInputValues } from "./src/checkInputValues.ts";
-      import { ResetGameState } from "./src/resetGameState.ts";
-      import { sWords } from "./src/sWords";
-      import { RowGameState } from "./src/rowGameState.ts";
-      import { GuessStarted } from "./src/guessStarted.ts";
-      import { GameOver } from "./src/gameOver.ts";
-      import { CheckCompletionStatus } from "./src/checkCompletionStatus.ts";
-      import { windowAPIURL } from "./src/window_api_url.ts"; // set dev or production API_URL here...
-
-      // window.API_URL = ""; // production version
-      // const apiURL = "<%= API_URL %>"; // old - vite config was being a goof, removed and set manually 02/23/2025
-
-      const apiURL = windowAPIURL;
-      // const apiURL = "";
-      console.log('apiURL\t', apiURL);
-      console.log('window.API_URL\t', window.API_URL)
-
-      // my lil singletons
-      const gameOver = GameOver.getInstance();
-      const rowGameState = RowGameState.getInstance(); // rowLetterCount
-      const guessStarted = GuessStarted.getInstance();
-      const checkCompletionStatus = CheckCompletionStatus.getInstance();
-      rowGameState.getMethods();
-
-      let gameState;
-
-      // INIT
-      (async () => {
-        let fetchWord;
-        try {
-          if (checkCompletionStatus.isCompleted()) {
-            fetchWord = await fetch(`${apiURL}/newgameword`, {
-                  method: "GET",
-                  headers: {
-                    "mode": "cors",
-                    "Content-Type": "application/json",
-                  }
-                });
-          } else {
-            fetchWord = await fetch(`${apiURL}/wordoftheday`, {
-              method: "GET",
-              headers: {
-                "mode": "cors",
-                "Content-Type": "application/json",
-              }
-            });
-          }
-
-          if (fetchWord.ok) {
-            const wotd = await fetchWord.json();
-            gameState = new ResetGameState(true, wotd.word);
-            gameState.setResetFalse();
-            if (checkCompletionStatus.isCompleted()) {
-              checkCompletionStatus.hideRevealStartBtn(false);
-            }
-            typeOutGuess(
-                null,
-                gameState,
-                gameState.wordOfTheDay,
-                gameState.wordOfTheDayLetters
-              );
-          }
-        } catch (error) {
-          console.error(error);
-        }
-
-      })();
-
-      document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
-        resetBtn.addEventListener('click', e => {
-          if (e) {
-            (async () => {
-              try {
-                const fetchWord = await fetch(`${apiURL}/newgameword`, {
-                  method: "GET",
-                  headers: {
-                    "mode": "cors",
-                    "Content-Type": "application/json",
-                  }
-                });
-                if (fetchWord.ok) {
-                  const w = await fetchWord.json();
-                  console.log('fetchWord\t', w)
-                  gameState = new ResetGameState(true, w.word);
-                  if (checkCompletionStatus.isCompleted()) {
-                    checkCompletionStatus.setCompletedGame();
-                  }
-                  gameOver.setGameOverFalse();
-                  typeOutGuess(
-                    null,
-                    gameState,
-                    gameState.wordOfTheDay,
-                    gameState.wordOfTheDayLetters
-                  );
-                  gameState.setResetFalse();
-                }
-              } catch (error) {
-                console.error(error);
-              }
-            })();
-          }
-        });
-      });
-
-      document.addEventListener('keydown', e => {
-        if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {
-          // console.log("rowGameState === 5 && guessStarted".toUpperCase());
-          return;
-        }
-        let filteredValue = checkInputValues(e.key.toUpperCase());
-        typeOutGuess(
-          filteredValue,
-          gameState,
-          gameState.wordOfTheDay,
-          gameState.wordOfTheDayLetters
-        );
-        document.querySelectorAll('.kbd').forEach((keys) => {
-          if (filteredValue === keys.innerHTML) {
-            keys.classList.add('bg-pink-200')
-          }
-        });
-      }); // initial listener
-
-
-
-
-      // original logic
-      // document.addEventListener('keydown', e => {
-      //   let filteredValue = checkInputValues(e.key.toUpperCase());
-      //   typeOutGuess(
-      //     filteredValue,
-      //     gameState,
-      //     gameState.wordOfTheDay,
-      //     gameState.wordOfTheDayLetters
-      //   );
-      //   document.querySelectorAll('.kbd').forEach((keys) => {
-      //     if (filteredValue === keys.innerHTML) {
-      //       keys.classList.add('bg-pink-200')
-      //     }
-      //   });
-      // });
-      document.addEventListener('keyup', e => {
-        let filteredValue = checkInputValues(e.key.toUpperCase())
-        document.querySelectorAll('.kbd').forEach((keys) => {
-          if (filteredValue === keys.innerHTML) {
-            keys.classList.remove('bg-pink-200')
-          }
-        });
-      });
-      const allKeysExceptBSEnter = Array.from(document.querySelectorAll('.kbd')).filter((key) => {
-        return key.id !== "enter" && key.id !== "backspace";
-      });
-      allKeysExceptBSEnter.forEach((keys) => {
-        keys.addEventListener('click', e => {
-          let letter = e.target.innerHTML;
-          let filteredValue = checkInputValues(letter)
-          typeOutGuess(
-            filteredValue,
-            gameState,
-            gameState.wordOfTheDay,
-            gameState.wordOfTheDayLetters
-          );
-        });
-        keys.addEventListener('mousedown', e => {
-          let letter = e.target.classList.add('bg-pink-200');
-        });
-        keys.addEventListener('mouseup', e => {
-          let letter = e.target.classList.remove('bg-pink-200');
-        });
-      });
-
-      document?.getElementById('backspace').addEventListener('click', e => {
-        typeOutGuess(
-          "BACKSPACE",
-          gameState,
-          gameState.wordOfTheDay,
-          gameState.wordOfTheDayLetters
-        );
-      });
-      document?.getElementById('enter').addEventListener('click', e => {
-        typeOutGuess(
-          "ENTER",
-          gameState,
-          gameState.wordOfTheDay,
-          gameState.wordOfTheDayLetters
-        );
-      });
-      document?.getElementById('backspace').addEventListener('mousedown', e => {
-        e.target.classList.add('bg-pink-200');
-      });
-      document?.getElementById('enter').addEventListener('mousedown', e => {
-        e.target.classList.add('bg-pink-200');
-      });
-      document?.getElementById('backspace').addEventListener('mouseup', e => {
-        e.target.classList.remove('bg-pink-200');
-      });
-      document?.getElementById('enter').addEventListener('mouseup', e => {
-        e.target.classList.remove('bg-pink-200');
-      });
-
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script src="./src/fireOffConfetti.ts" type="module"></script>
     <!-- <script src="./src/reHideStartGameBtn.ts" type="module"></script> -->
 
     <dialog id="failureModal" class="modal text-black">

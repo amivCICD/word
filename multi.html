@@ -106,19 +106,11 @@
         <kbd class="kbd text-pink-200 bg-black h-20">M</kbd>
         <kbd id="backspace" class="kbd text-pink-200 bg-black font-bold w-16 sm:w-[73px] hover:cursor-pointer h-20">&lBarr;</kbd>
       </div>
-      <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex sm:flex-col gap-4">
+      <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
         <div id="startNewGameBtn" class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black hidden">Start New Game</div>
-        <a href="./multi.html">
-          <div
-            id="multiplayerBtn"
-            class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black"
-            >
-              Play Multiplayer
-          </div>
-        </a>
       </div>
+      <div class="div">I AM THE MULTI PLAYER PAGE!</div>
     </div>
-
 
 
     <script type="module">
@@ -130,15 +122,16 @@
       import { GuessStarted } from "./src/guessStarted.ts";
       import { GameOver } from "./src/gameOver.ts";
       import { CheckCompletionStatus } from "./src/checkCompletionStatus.ts";
-      import { windowAPIURL } from "./src/window_api_url.ts"; // set dev or production API_URL here...
 
-      // window.API_URL = ""; // production version
-      // const apiURL = "<%= API_URL %>"; // old - vite config was being a goof, removed and set manually 02/23/2025
+      // dev vs production
 
-      const apiURL = windowAPIURL;
+
+      // const apiURL = "<%= API_URL %>";
+      const apiURL = window.API_URL;
       // const apiURL = "";
-      console.log('apiURL\t', apiURL);
-      console.log('window.API_URL\t', window.API_URL)
+      // console.log(apiURL);
+      console.log("this is the multi player")
+
 
       // my lil singletons
       const gameOver = GameOver.getInstance();
