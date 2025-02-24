@@ -26,10 +26,34 @@
               <li class="startNewGame border border-black btn bg-white bg-opacity-50 text-black font-bold text-xl">Start New Game</li>
             </ul>
           </div>
+
         </div>
         <h1 class="text-2xl font-bold text-center text-black italic sm:hidden ml-1">WORDLE</h1>
         <h1 class="text-2xl sm:text-4xl font-bold text-center text-black italic mx-auto hidden sm:flex">WORDLE</h1>
+
       </div>
+
+        <div id="chatBar" class="collapse bg-white absolute right-2 top-2 w-80 text-pink-300">
+          <input id="arrowBar" type="checkbox" />
+          <div class="collapse-title text-xl font-medium">
+            <div class="flex flex-row justify-between">
+              <div>Chat</div>
+              <div id="arrowDown" class="text-xl font-bold">&#9660;</div>
+              <div id="arrowUp" class="text-xl font-bold hidden">&#9650;</div>
+            </div>
+          </div>
+          <div class="collapse-content">
+            <!--TEXT MESSAGES BOX-->
+            <div id="textMessages" class="flex w-full pb-2 h-80 flex-col overflow-y-scroll"></div>
+            <div>
+              <input id="textMessageInput" type="text" placeholder="message..." class="input input-bordered w-[220px] bg-transparent" />
+            </div>
+            <div class="">
+              <div id="sendTextBtn" class="btn w-16 bg-white text-pink-300 absolute right-4 bottom-4 border-none hover:btn-pink hover:text-white">Send</div>
+            </div>
+          </div>
+        </div>
+
 
       <div class="grid grid-rows-6 grid-cols-5 place-items-center mx-auto gap-none sm:gap-1 w-fit">
         <div class="word-row bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
@@ -109,7 +133,6 @@
       <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex">
         <div id="startNewGameBtn" class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black hidden">Start New Game</div>
       </div>
-      <div class="div">I AM THE MULTI PLAYER PAGE!</div>
     </div>
 
 
@@ -122,16 +145,15 @@
       import { GuessStarted } from "./src/guessStarted.ts";
       import { GameOver } from "./src/gameOver.ts";
       import { CheckCompletionStatus } from "./src/checkCompletionStatus.ts";
+      import { windowAPIURL } from "./src/window_api_url.ts"; // set dev or production API_URL here...
 
-      // dev vs production
+      // window.API_URL = ""; // production version
+      // const apiURL = "<%= API_URL %>"; // old - vite config was being a goof, removed and set manually 02/23/2025
 
-
-      // const apiURL = "<%= API_URL %>";
-      const apiURL = window.API_URL;
+      const apiURL = windowAPIURL;
       // const apiURL = "";
-      // console.log(apiURL);
-      console.log("this is the multi player")
-
+      console.log('apiURL\t', apiURL);
+      console.log('window.API_URL\t', window.API_URL);
 
       // my lil singletons
       const gameOver = GameOver.getInstance();
@@ -221,6 +243,9 @@
       });
 
       document.addEventListener('keydown', e => {
+        if (window.textMessageOnly || window.usernameInputOnly) {
+          return;
+        }
         if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {
           // console.log("rowGameState === 5 && guessStarted".toUpperCase());
           return;
@@ -319,7 +344,12 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     <script src="./src/fireOffConfetti.ts" type="module"></script>
-    <!-- <script src="./src/reHideStartGameBtn.ts" type="module"></script> -->
+    <script src="./src/sendTextMessage.ts" type="module"></script>
+    <script src="./src/checkTextMessageFocus.ts" type="module"></script>
+    <script src="./src/chat_collapse_listeners.ts" type="module"></script>
+    <script src="./src/checkForUsername.ts" type="module"></script>
+    <script src="./src/chatBarListener.ts" type="module"></script>
+    <script src="./src/checkUsernameInputFocus.ts" type="module"></script>
 
     <dialog id="failureModal" class="modal text-black">
       <div class="modal-box bg-white border-4 border-pink-200">
@@ -330,6 +360,21 @@
             <!-- if there is a button in form, it will close the modal -->
             <button class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button>
             <button class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="usernamePrompt" class="modal text-black">
+      <div class="modal-box bg-white border-4 border-pink-200">
+        <h3 class="text-lg font-bold text-green-400">Welcome!</h3>
+        <p class="py-4 text-green-400 font-bold italic">Please enter a username:</p>
+        <input id="usernameInput" type="text" placeholder="enter chat username" class="input input-bordered w-full bg-transparent text-pink-300 font-bold text-xl" />
+        <div class="modal-action">
+          <form method="dialog">
+            <!-- if there is a button in form, it will close the modal -->
+            <button id="confirmUsernameBtn" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Confirm</button>
+            <button id="cancelUsernameDialog" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button>
           </form>
         </div>
       </div>

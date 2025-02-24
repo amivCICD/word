@@ -46,3 +46,18 @@
     }
 }
 
+.fadeIn {
+    animation: fadein ease 1s;
+}
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 100;
+    }
+}
+
+#sendTextBtn {
+    @apply hover:bg-pink-300 hover:text-white;
+}

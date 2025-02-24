@@ -18,6 +18,12 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       open: true,
+      // proxy: {
+      //   '/chat' : {
+      //     target: 'ws://localhost:1985',
+      //     ws: true
+      //   }
+      // },
       fs: {
         strict: false
       }

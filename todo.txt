@@ -15,3 +15,5 @@
     consider a server with a single word of the day... check 08 10 2024
 
     change front-end endpoints to query server
+
+    02 23 2025 - provide dictionary definition of the word after game end
