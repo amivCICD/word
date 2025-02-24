@@ -10,3 +10,7 @@ confirmUsernameBtn.addEventListener('click', () => {
         usernameInput.value = "";
     }
 });
+
+usernameInput.addEventListener('keyup', e => {
+
+});

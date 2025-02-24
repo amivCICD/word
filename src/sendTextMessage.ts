@@ -3,8 +3,8 @@ socket.onopen = () => console.log("connected to web sockets!");
 socket.onclose = () => console.log("Disconnected...");
 socket.onerror = (error) => console.log("ERROR: \t", error);
 
-let textMessage = "";
 
+let textMessage = "";
 
 (function sendTextMessage() {
     document.getElementById('textMessageInput')?.addEventListener('input', e => {
@@ -52,12 +52,17 @@ let textMessage = "";
 })();
 
 (function sendTextMessageWenter(socket, textMessage) {
-    // let textMessage = "";
-    // document.getElementById('textMessageInput')?.addEventListener('input', e => {
-    //     textMessage = e.target.value;
-    // });
     document.addEventListener('keyup', e => {
-
+        //////////////////let our button click function handle everything////////////////////
+        if (window.usernameInputOnly) {
+            let usernameInput = document.getElementById("usernameInput");
+            if (usernameInput.value !== "" && e.keyCode === 13) {
+                let confirmUsernameBtn = document.getElementById("confirmUsernameBtn");
+                confirmUsernameBtn?.click();
+                return;
+            }
+        }
+        ///////////////////////////////////////////////////////////////////////////////////
         console.log('e.keyCode\t', e.keyCode)
         if (!window.textMessageOnly) return;
         if (e.keyCode !== 13) {
@@ -91,15 +96,9 @@ let textMessage = "";
                     const textMessages = document.getElementById("textMessages");
                     textMessages.scrollTo(0, textMessages.scrollHeight);
                 });
-                // const input = document.getElementById('textMessageInput');
                 input.value = "";
                 textMessage = "";
                 input?.focus();
-
-
-
-                    const expandContent = document.querySelector('.collapse-content')
-
 
             } else {
                 console.warn("Web socket is not open... Current state: ", socket.readyState);
