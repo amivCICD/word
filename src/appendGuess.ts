@@ -3,7 +3,7 @@ import { wordOfTheDayLetters } from "./getWordOfTheDay";
 import { illuminateKeys } from "./illuminateKeys";
 import { GuessStarted } from "./guessStarted.ts";
 import { GameOver } from "./gameOver.ts";
-
+import { sendMessage, onMessage } from "./multiplayer/initialize_web_socket.ts";
 
 const guessStarted = GuessStarted.getInstance();
 let incRow: number = 0;
@@ -52,9 +52,6 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
             letter.classList.add('bg-slate-500');
             illuminateKeys(letter.innerHTML, "miss");
         }
-
-
-
 }
 
 

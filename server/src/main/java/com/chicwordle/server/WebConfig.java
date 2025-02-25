@@ -9,9 +9,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/multi_player/chat")
+                .setViewName("forward:/multi_player/index.html");
         registry.addViewController("/multi_player/")
                 .setViewName("forward:/multi_player/index.html");
-        // registry.addViewController("/multi_player/**")
-        //         .setViewName("forward:/multi_player/index.html");
     }
 }

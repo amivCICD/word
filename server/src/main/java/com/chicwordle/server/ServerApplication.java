@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,7 @@ public class ServerApplication {
 }
 
 @RestController
-// @CrossOrigin(origins = "http://localhost:5173") // use for dev
+@CrossOrigin(origins = "http://localhost:5173") // use for dev
 // @CrossOrigin(origins = "http://localhost:1985") // remove for production
 
 class ServerController {

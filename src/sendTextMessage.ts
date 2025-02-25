@@ -33,10 +33,11 @@ let textMessage = "";
                 username = unameInfo.username;
                 userId = unameInfo.id;
             } else {
-                localStorage.setItem("username", JSON.stringify({ username: "tempname", id: Date.now() }));
+                localStorage.setItem("username", JSON.stringify({ username: "YouNeedAUserName", id: Date.now() }));
                 let unameInfo = JSON.parse(localStorage.getItem("username"));
                 username = unameInfo.username;
                 userId = unameInfo.id;
+                document.getElementById("usernamePrompt").showModal();
             }
             socket.send(JSON.stringify({ type: 'text', username: username, id: userId,  message: textMessage }));
             socket.onmessage = ((e) => {
@@ -44,7 +45,7 @@ let textMessage = "";
 
                 console.log('e.data\t', JSON.parse(e.data));
                 const data = JSON.parse(e.data);
-                if (data.username.id !== username.id) {
+                if (data.id !== userId) {
                     div.innerHTML = `
                     <div class="chat chat-end">
                         <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
@@ -88,7 +89,7 @@ let textMessage = "";
             }
         }
         ///////////////////////////////////////////////////////////////////////////////////
-        console.log('e.keyCode\t', e.keyCode)
+        // console.log('e.keyCode\t', e.keyCode)
         if (!window.textMessageOnly) return;
         if (e.keyCode !== 13) {
             return;
@@ -117,8 +118,8 @@ let textMessage = "";
                     const data = JSON.parse(e.data);
                     console.log("data\t", data);
                     console.log("data?.username\t", data?.username);
-                    console.log("data?.username.id\t", data?.username.id);
-                    if (data.username.id !== username.id) {
+                    console.log("data?.username.id\t", data?.id);
+                    if (data.id !== userId) {
                         div.innerHTML = `
                         <div class="chat chat-end">
                             <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>

@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="../index.css" type="text/css" />
     <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
-    <title>Chic Wordle</title>
+    <title>Chic Wordle MultiPlayer</title>
+
   </head>
   <body>
     <div id="app" class="bg-transparent w-full h-full sm:w-1/2 mx-auto">
@@ -148,6 +149,7 @@
       import { GameOver } from "../src/gameOver.ts";
       import { CheckCompletionStatus } from "../src/checkCompletionStatus.ts";
       import { windowAPIURL } from "../src/window_api_url.ts"; // set dev or production API_URL here...
+      import { sendMessage } from "../src/multiplayer/initialize_web_socket.ts";
 
       console.log("loaded multi_player/index.html");
 
@@ -256,7 +258,7 @@
           filteredValue,
           gameState,
           gameState.wordOfTheDay,
-          gameState.wordOfTheDayLetters
+          gameState.wordOfTheDayLetters,
         );
         document.querySelectorAll('.kbd').forEach((keys) => {
           if (filteredValue === keys.innerHTML) {
@@ -297,7 +299,7 @@
       allKeysExceptBSEnter.forEach((keys) => {
         keys.addEventListener('click', e => {
           let letter = e.target.innerHTML;
-          let filteredValue = checkInputValues(letter)
+          let filteredValue = checkInputValues(letter);
           typeOutGuess(
             filteredValue,
             gameState,

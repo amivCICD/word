@@ -19,62 +19,32 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       open: true,
-      // middlewareMode: false,
-      // configureServer: ({ middlewares }) => {
-      //   middlewares.use((req, res, next) => {
-      //     if (req.url.startsWith('/multi_player')) {
-      //       const filePath = resolve(__dirname, 'multi_player', 'index.html');
-      //       fs.readFile(filePath, (err, data) => {
-      //         if (err) {
-      //           next();
-      //         } else {
-      //           res.setHeader('Content-Type', 'text/html');
-      //           res.send(data)
-      //         }
-      //       })
-      //     } else {
-      //       next();
-      //     }
-      //   });
-      // }
-      // rewrites: [
-      //   {
-      //     from: /\/multi_player\/.*/,
-      //     to: '/multi_player/index.html'
-      //   }
-      // ],
-
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
           const url = req.url || '';
-          console.log("MIDDLEWARE HIT, URL:\t", req.url);
-          if (url.startsWith('/multi_player/')) {
-            console.log("MIDDLEWARE CAUGHT!\t", req.url);
-            req.url = '/multi_player/index.html';
+          console.log("Middleware processing URL:", url);
+          if (url.startsWith('/multi_player/') && !url.endsWith('/multi_player/index.html')) {
+            console.log("Redirecting to /multi_player/index.html for:", url);
+            req.url = `/multi_player/index.html${url.includes('?') ? url.substring(url.indexOf('?')) : ''}`;
           }
           next();
         });
-      },
+        // Fallback for unmatched routes
+        server.middlewares.use((req, res) => {
+          console.log("Fallback hit for:", req.url);
+          res.statusCode = 200;
+          res.end(fs.readFileSync(resolve(__dirname, 'index.html')));
+        });
+      }
 
 
-      // rewrites: [
-      //   {
-      //     // from: /^\/multi_player\/.*/,
-      //     // to: '/multi_player/index.html'
-      //     from: /\/multi_player(\/.*)?$/,
-      //     to: ({ match }) => {
-      //       console.log("Rewrite matched", match[0]);
-      //       return '/multi_player/index.html';
-      //     }
-      //   }
-      // ]
     },
     build: {
       outDir: isProduction ? resolve(__dirname, "./server/src/main/resources/static") : "dist",
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html'),
-          multi_player: resolve(__dirname, 'multi_player/index.html')
+          multi_player: resolve(__dirname, 'multi_player/index.html'),
         }
       },
       define: {
