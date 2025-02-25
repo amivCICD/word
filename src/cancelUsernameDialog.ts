@@ -2,7 +2,6 @@ const cancelUsernameDialog = document.getElementById("cancelUsernameDialog");
 
 cancelUsernameDialog?.addEventListener('click', e => {
     e.preventDefault();
-    console.log("document.getElementById('arrowBar').value\t", document.getElementById("arrowBar").value)
     if (e && localStorage.getItem("username") === null || localStorage.getItem("username") === undefined) {
         document.getElementById("arrowBar").click();
     }
@@ -10,3 +9,5 @@ cancelUsernameDialog?.addEventListener('click', e => {
     input.value = "";
     document.getElementById("usernamePrompt")?.close();
 });
+
+// possibly not using since username

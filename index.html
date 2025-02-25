@@ -108,7 +108,8 @@
       </div>
       <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex sm:flex-col gap-4">
         <div id="startNewGameBtn" class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black hidden">Start New Game</div>
-        <a href="./multi.html">
+
+        <a href="./multi_player/">
           <div
             id="multiplayerBtn"
             class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black"
@@ -116,6 +117,7 @@
               Play Multiplayer
           </div>
         </a>
+
       </div>
     </div>
 
@@ -131,9 +133,6 @@
       import { GameOver } from "./src/gameOver.ts";
       import { CheckCompletionStatus } from "./src/checkCompletionStatus.ts";
       import { windowAPIURL } from "./src/window_api_url.ts"; // set dev or production API_URL here...
-
-      // window.API_URL = ""; // production version
-      // const apiURL = "<%= API_URL %>"; // old - vite config was being a goof, removed and set manually 02/23/2025
 
       const apiURL = windowAPIURL;
       // const apiURL = "";
@@ -326,6 +325,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     <script src="./src/fireOffConfetti.ts" type="module"></script>
+    <!-- <script src="./src/multiplayer/createsocket_changeroom.ts" type="module"></script> -->
     <!-- <script src="./src/reHideStartGameBtn.ts" type="module"></script> -->
 
     <dialog id="failureModal" class="modal text-black">

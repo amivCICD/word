@@ -9,4 +9,7 @@ chatBar?.addEventListener('click', e => {
             document.getElementById("usernamePrompt").showModal();
         }
     }
-})
+});
+
+// no longer needed since we prompt on page load - handled in ./multiplayer/initprompt
+

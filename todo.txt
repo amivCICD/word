@@ -17,3 +17,4 @@
     change front-end endpoints to query server
 
     02 23 2025 - provide dictionary definition of the word after game end
+    02 25 2025 - cannot use enter to confirm name change // quick fixed with setting input val to current name...
