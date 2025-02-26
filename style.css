@@ -916,6 +916,12 @@ html {
   padding-bottom: 0.25rem;
 }
 
+.chat-footer {
+  grid-row-start: 3;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 .chat-bubble {
   position: relative;
   display: block;
@@ -3327,6 +3333,10 @@ html:has(.drawer-toggle:checked) {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.opacity-50 {
+  opacity: 0.5;
 }
 
 .blur {

@@ -6,7 +6,7 @@ import { RowGameState } from "./rowGameState.ts";
 import { showFailureModal } from "./showFailureModal.ts";
 import { GameOver } from "./gameOver.ts";
 import { CheckCompletionStatus } from "./checkCompletionStatus.ts";
-import { sendMessage, onMessage } from "./multiplayer/initialize_web_socket.ts";
+import { sendMessage, onMessage, getGameState } from "./multiplayer/initialize_web_socket.ts";
 
 
 const gameOver = GameOver.getInstance();
@@ -16,7 +16,57 @@ let letterCount: number = 0;
 let row: number = 0;
 let guess: string = "";
 
-const arrayOfRowArrays = arrayOfDivRows();
+let arrayOfRowArrays = arrayOfDivRows();
+let mainTainer = document.getElementById("mainTainer");
+
+onMessage((messageData) => {
+    const state = getGameState();
+    const data = JSON.parse(messageData);
+    console.log("DATA")
+    if (data.userInput === 'BACKSPACE' || data.type === "backspace") {
+        if (state.rowLetterCount > 0) {
+            console.log('arrayOfRowArrays\t', arrayOfRowArrays)
+            arrayOfRowArrays[state.row][state.rowLetterCount-1].innerHTML = "";
+        } else if (state.letterCount === 0) {
+            return;
+        } else if (state.letterCount === 5 || state.letterCount === 0) {
+            return;
+        }
+    }
+
+});
+onMessage((messageData) => {
+    const state = getGameState();
+    const data = JSON.parse(messageData);
+    console.log("DATA TYPE IN APPEND\t", data.type)
+    if (data.type === 'append' && data.userInput !== "BACKSPACE" && data.type !== "backspace") {
+        if (state.letterCount < 5) {
+            // for (let i=0; i<state.userInput.length; i++) {
+            //     let div = document.createElement('div');
+            //     div.textContent = state.userInput;
+            //     div.classList.add('word-row2');
+            //     mainTainer?.replaceChild(div, arrayOfRowArrays[state.row][state.letterCount]);
+            // }
+            arrayOfRowArrays[state.row][state.letterCount].innerHTML = state.userInput;
+        }
+        // arrayOfRowArrays[row][data.letterCount].innerHTML = data.userInput;
+    } else {
+        return;
+    }
+});
+onMessage((messageData) => {
+    const state = getGameState();
+    const data = JSON.parse(messageData);
+    console.log("DATA TYPE IN APPEND\t", data.type)
+    if (data.type !== 'append' && data.userInput !== "BACKSPACE" && data.type !== "backspace" && data.userInput === "ENTER") {
+        if (state.letterCount === 5) {
+
+        }
+
+    } else {
+        return;
+    }
+});
 
 
 let gameComplete;
@@ -83,20 +133,23 @@ export async function typeOutGuess(
     if (userInput === "BACKSPACE" && letterCount !== 0) {
         // arrayOfRowArrays[row][letterCount-1].innerHTML = "";
 
-        guess = guess.slice(0, guess.length - 1);
-        letterCount--;
-        rowGameState.decRowLetterCount();
+        // guess = guess.slice(0, guess.length - 1);
+        // letterCount--;
+        // rowGameState.decRowLetterCount();
+        sendMessage(JSON.stringify({
+            type: 'backspace',
+            userInput: "BACKSPACE",
+            guess: guess.slice(0, guess.length - 1),
+            rowLetterCount: letterCount,
+            row: row,
+            letterCount: letterCount--,
+            arrayOfRowArrays: arrayOfRowArrays,
+            inputId: Math.random().toString().slice(2)
+        }));
 
-        sendMessage(JSON.stringify({ type: 'backspace', backspace: true, value: "", rowLetterCount: rowGameState.getRowLetterCount() + 1, letterCount: letterCount }));
-        onMessage((messageData) => {
-            const data = JSON.parse(messageData);
-            console.log('data.letterCount\t', data.rowLetterCount)
-            if (data.type === 'backspace' && data.rowLetterCount !== 0) {
-                arrayOfRowArrays[row][data.rowLetterCount-1].innerHTML = data.value;
-            } else if (data.letterCount === -1) {
-                return;
-            }
-        });
+
+
+
         if (letterCount === 0) {
             return;
         }
@@ -105,22 +158,31 @@ export async function typeOutGuess(
     if (letterCount === 5 || letterCount === 0 && userInput === "BACKSPACE") { // boundaries
         return;
     }
-    sendMessage(JSON.stringify({ type: 'append', guess: guess, userInput: userInput, letterCount: rowGameState.getRowLetterCount() }));
-    onMessage((messageData) => {
-        const data = JSON.parse(messageData);
-        if (data.type === 'append') {
-            arrayOfRowArrays[row][data.letterCount].innerHTML = data.userInput;
-        } else {
-            return;
-        }
-    });
+
+
+
 
     guess += userInput;
     // arrayOfRowArrays[row][letterCount].innerHTML = userInput;
 
+    sendMessage(JSON.stringify({
+        type: 'append',
+        guess: guess,
+        userInput: userInput,
+        rowLetterCount: rowGameState.getRowLetterCount(),
+        letterCount: letterCount,
+        row: row,
+        arrayOfRowArrays: arrayOfRowArrays,
+        inputId: Math.random().toString().slice(2)
+    }));
+
     // ++letterCount;
     letterCount++;
     rowGameState.incRowLetterCount();
+
+
+
+
 
 
 }

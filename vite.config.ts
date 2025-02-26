@@ -8,6 +8,23 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+function customRoutingPlugin() {
+  return {
+    name: 'custom-routing',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = req.url || '';
+        console.log("Plugin middleware hit, URL:", url);
+        if (url.startsWith('/multi_player/') && !url.endsWith('/multi_player/index.html')) {
+          console.log("Rewriting to /multi_player/index.html for:", url);
+          req.url = `/multi_player/index.html${url.includes('?') ? url.substring(url.indexOf('?')) : ''}`;
+        }
+        next();
+      });
+    }
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   // const isProduction = false;
@@ -19,26 +36,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       open: true,
-      configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          const url = req.url || '';
-          console.log("Middleware processing URL:", url);
-          if (url.startsWith('/multi_player/') && !url.endsWith('/multi_player/index.html')) {
-            console.log("Redirecting to /multi_player/index.html for:", url);
-            req.url = `/multi_player/index.html${url.includes('?') ? url.substring(url.indexOf('?')) : ''}`;
-          }
-          next();
-        });
-        // Fallback for unmatched routes
-        server.middlewares.use((req, res) => {
-          console.log("Fallback hit for:", req.url);
-          res.statusCode = 200;
-          res.end(fs.readFileSync(resolve(__dirname, 'index.html')));
-        });
-      }
-
-
     },
+    plugins: [customRoutingPlugin()],
     build: {
       outDir: isProduction ? resolve(__dirname, "./server/src/main/resources/static") : "dist",
       rollupOptions: {

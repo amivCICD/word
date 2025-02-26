@@ -46,7 +46,7 @@
     }
 }
 
-.fadeIn {
+/* .fadeIn {
     animation: fadein ease 1s;
 }
 @keyframes fadein {
@@ -56,7 +56,7 @@
     100% {
         opacity: 100;
     }
-}
+} */
 
 .fadeOut {
     animation: fadeout ease-in-out 5s;
@@ -73,5 +73,7 @@
 #sendTextBtn {
     @apply hover:bg-pink-300 hover:text-white;
 }
-
+.wr {
+    @apply bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300;
+}
 
