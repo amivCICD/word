@@ -1,18 +1,21 @@
-const devURL = "localhost:1985";
 const prodURL = "localhost:1985";
-const messageCallBacks = [];
 
 let socket = null;
 let currentRoomId = null;
+const messageCallBacks = [];
+window.WEB_SOCKET_READY = false;
 
 let typeOutGuessGameState = {
     row: 0,
-    // type: "",
     guess: "",
     userInput: "",
     letterCount: 0,
+    wordOfTheDay: "",
+    gameComplete: false,
     rowLetterCount: 0,
-    arrayOfRowArrays: []
+    gameStateParam: undefined,
+    arrayOfRowArrays: [],
+    wordOfTheDayLetters: [],
 };
 
 export function initializeSocket(roomId) {
@@ -30,17 +33,17 @@ export function initializeSocket(roomId) {
         console.log("connected to web sockets!");
         const unameInfo = JSON.parse(localStorage.getItem("username"));
         socket.send(JSON.stringify({ type: 'join', ...unameInfo }));
-
-        // socket.onmessage((messageData) => {
-
-        // });
+        window.WEB_SOCKET_READY = true;
     };
     socket.onmessage = e => {
-        console.log('EVENT\t', e);
         let eventData = JSON.parse(e.data);
-        if (eventData.type === "append" || eventData.type === "backspace") {
-            updateGameState(eventData);
-        }
+        updateGameState({ ...typeOutGuessGameState, ...eventData});
+            // const ok = { ...eventData, ...typeOutGuessGameState };
+            // console.log(`EVENT DATA YOU ARE UPDATING TO(VALUES)...${ok.arrayOfRowArrays[0]}`)
+            // console.log(`EVENT DATA YOU ARE UPDATING TO(KEYS)...${Object.keys(ok)}`)
+        // if (eventData.type === "append" || eventData.type === "backspace" || eventData.type === "setWOTD") {
+        //     // updateGameState({ ...eventData, ...typeOutGuessGameState });
+        // }
         messageCallBacks.forEach(callback => callback(e.data));
     }
     socket.onclose = (e) => console.log("Disconnected...\t", e.code, e.reason);
@@ -51,7 +54,6 @@ export function initializeSocket(roomId) {
 
 export function getSocket() {
     if (!socket) {
-        // throw new Error("WebSocket not initialized. Call initializeWebSocket first...");
         console.error("WebSocket not initialized. Call initializeWebSocket first...");
     }
     return socket;
@@ -63,14 +65,6 @@ export function sendMessage(message) {
         console.error("Cannot send: WebSocket not open...");
     }
 }
-// export function onMessage(cb) {
-//     if (socket) {
-//         socket.onmessage = e => {
-//             cb(e.data);
-//             console.log(`Message: ${e.data}`);
-//         }
-//     }
-// }
 export function onMessage(cb) {
     if (!messageCallBacks.includes(cb)) {
         messageCallBacks.push(cb);
@@ -85,14 +79,10 @@ export function getGameState() {
     return typeOutGuessGameState;
 }
 function updateGameState(data) {
-    console.log("gamestate data\t", data.type)
-    // const data = JSON.parse(data);
     if (data.type === "backspace") {
-        console.log("was back space....")
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.guess = data.guess || typeOutGuessGameState.guess.slice(0, -1);
         typeOutGuessGameState.guess = data.guess;
-        // typeOutGuessGameState.type = data.type;
         typeOutGuessGameState.userInput = data.userInput;
         typeOutGuessGameState.letterCount = data.letterCount;
         typeOutGuessGameState.rowLetterCount = data.rowLetterCount;
@@ -111,13 +101,10 @@ function updateGameState(data) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
     }
+    if (data.type === "setWOTD_and_params") {
+        typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
+        typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
+        typeOutGuessGameState.gameState = data.gameState;
+        // typeOutGuessGameState.arrayOfRowArrays = data.typeOutGuessGameState;
+    }
 }
-// sendMessage(JSON.stringify({
-//         type: 'append',
-//         guess: guess,
-//         userInput: userInput,
-//         letterCount: rowGameState.getRowLetterCount(),
-//         row: row,
-//         arrayOfRowArrays: arrayOfRowArrays,
-//         inputId: Math.random().toString().slice(2)
-//     }));

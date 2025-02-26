@@ -15,6 +15,10 @@ export class RowGameState {
     }
     incRowLetterCount(): void {
         this.rowLetterCount += 1;
+        // if (this.rowLetterCount === 6) {
+        //     this.rowLetterCount -= 1;
+        // } else {
+        // }
     }
     decRowLetterCount(): void {
         this.rowLetterCount -= 1;
