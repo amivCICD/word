@@ -58,7 +58,6 @@ onMessage((e) => {
     }
 });
 
-const seenMessages = new Set();
 (function sendTextMessage() {
     let textMessage = "";
     document.getElementById('textMessageInput')?.addEventListener('input', e => {
@@ -84,7 +83,6 @@ const seenMessages = new Set();
 
             sendMessage(JSON.stringify({ type: 'text', username: username, userId: userId,  message: textMessage, messageId: Math.random().toString().slice(2) }));
 
-
             const input = document.getElementById('textMessageInput');
             input.value = "";
             textMessage = "";
@@ -99,7 +97,7 @@ const seenMessages = new Set();
 })();
 
 (function sendTextMessageWenter() {
-
+    let textMessage = "";
     document.addEventListener('keyup', e => {
         //////////////////let our button click function handle usernameInput field////////////////////
         if (window.usernameInputOnly) {
@@ -132,34 +130,7 @@ const seenMessages = new Set();
                     username = unameInfo.username;
                     userId = unameInfo.id;
                 }
-                sendMessage(JSON.stringify({ type: 'text', username: username, id: userId,  message: textMessage, messageId: Math.random().toString().slice(2) }));
-                // onMessage((e) => {
-                //     if (!seenMessages.has(e)) {
-                //         seenMessages.add(e);
-                //         const data = JSON.parse(e);
-                //         if (data.type === "text") {
-                //             let div = document.createElement('div');
-
-                //             if (data.id !== userId) {
-                //                 div.innerHTML = `
-                //                 <div class="chat chat-end">
-                //                     <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
-                //                 </div>
-                //                 `;
-                //             } else {
-                //                 div.innerHTML = `
-                //                 <div class="chat chat-start">
-                //                     <div class="chat-bubble bg-pink-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
-                //                 </div>
-                //                 `;
-                //             }
-
-                //             document.getElementById("textMessages")?.appendChild(div);
-                //             const textMessages = document.getElementById("textMessages");
-                //             textMessages.scrollTo(0, textMessages.scrollHeight);
-                //         }
-                //     }
-                // });
+                sendMessage(JSON.stringify({ type: 'text', username: username, userId: userId,  message: textMessage, messageId: Math.random().toString().slice(2) }));
                 input.value = "";
                 textMessage = "";
                 input?.focus();
