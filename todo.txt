@@ -21,3 +21,4 @@
     02 25 2025 - need to confirm that "Start new game" resets match
     02 25 2025 - see why the first chat message doesnt reach the other end... - check
     02 25 2025 - UI updates on both screens, but it is not synced, need to sync the users to the word count on message....
+    02 27 2025 - add an initial setup window event listener to cancel input on appendGuess.ts when use is going through the modal process, e.g. for enter button on startGameButton, closeModalButton, possibly usernameBtn

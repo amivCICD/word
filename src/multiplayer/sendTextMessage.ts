@@ -1,7 +1,6 @@
-// export const socket = new WebSocket("ws://localhost:1985/chat");
-import { getSocket, sendMessage, onMessage } from "./multiplayer/initialize_web_socket";
 
-
+import { getSocket, sendMessage, onMessage } from "./initialize_web_socket";
+import { getTextMessageState, getAllTextMessageState } from "./initialize_web_socket";
 
 
 // const urlParams = new URLSearchParams(window.location.search);
@@ -11,15 +10,57 @@ import { getSocket, sendMessage, onMessage } from "./multiplayer/initialize_web_
 // export const socket = playMultiPlayer?.socket;
 
 
+let currentUser = JSON.parse(localStorage.getItem("username"));
+let currentUserId = currentUser.id;
 
+const allMessageState = getAllTextMessageState();
+allMessageState.forEach((msg) => {
+    console.log("CURRENT USER ID:\t", currentUserId)
+    let div = document.createElement('div');
+    if (msg.userId !== currentUserId) {
+        div.innerHTML = `
+        <div class="chat chat-end">
+            <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${msg.username}</span>: ${msg.message}</div>
+        </div>
+        `;
+    } else {
+        div.innerHTML = `
+        <div class="chat chat-start">
+            <div class="chat-bubble bg-pink-300 text-white"><span class="font-bold">${msg.username}</span>: ${msg.message}</div>
+        </div>
+        `;
+    }
+});
 
+onMessage((e) => {
+    const data = JSON.parse(e);
+    if (data.type === 'text') {
+        let div = document.createElement('div');
+        console.log('DATA data.userId\t', data.userId)
+        console.log("CURRENT USER ID:\t", currentUserId)
+        if (data.userId !== currentUserId) {
+            div.innerHTML = `
+            <div class="chat chat-end">
+                <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
+            </div>
+            `;
+        } else {
+            div.innerHTML = `
+            <div class="chat chat-start">
+                <div class="chat-bubble bg-pink-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
+            </div>
+            `;
+        }
 
+        document.getElementById("textMessages")?.appendChild(div);
+        const textMessages = document.getElementById("textMessages");
+        textMessages.scrollTo(0, textMessages.scrollHeight);
+    }
+});
 
-
-let textMessage = "";
 const seenMessages = new Set();
-
 (function sendTextMessage() {
+    let textMessage = "";
     document.getElementById('textMessageInput')?.addEventListener('input', e => {
         textMessage = e.target.value;
     });
@@ -40,36 +81,9 @@ const seenMessages = new Set();
                 userId = unameInfo.id;
                 document.getElementById("usernamePrompt").showModal();
             }
-            sendMessage(JSON.stringify({ type: 'text', username: username, id: userId,  message: textMessage, messageId: Math.random().toString().slice(2) }));
 
-            onMessage((e) => {
-                console.log('e\t', e)
-                if (!seenMessages.has(e)) {
-                    seenMessages.add(e);
-                    const data = JSON.parse(e);
+            sendMessage(JSON.stringify({ type: 'text', username: username, userId: userId,  message: textMessage, messageId: Math.random().toString().slice(2) }));
 
-                    if (data.type === 'text') {
-                        let div = document.createElement('div');
-                        if (data.id !== userId) {
-                            div.innerHTML = `
-                            <div class="chat chat-end">
-                                <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
-                            </div>
-                            `;
-                        } else {
-                            div.innerHTML = `
-                            <div class="chat chat-start">
-                                <div class="chat-bubble bg-pink-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
-                            </div>
-                            `;
-                        }
-
-                        document.getElementById("textMessages")?.appendChild(div);
-                        const textMessages = document.getElementById("textMessages");
-                        textMessages.scrollTo(0, textMessages.scrollHeight);
-                    }
-                }
-            });
 
             const input = document.getElementById('textMessageInput');
             input.value = "";
@@ -119,33 +133,33 @@ const seenMessages = new Set();
                     userId = unameInfo.id;
                 }
                 sendMessage(JSON.stringify({ type: 'text', username: username, id: userId,  message: textMessage, messageId: Math.random().toString().slice(2) }));
-                onMessage((e) => {
-                    if (!seenMessages.has(e)) {
-                        seenMessages.add(e);
-                        const data = JSON.parse(e);
-                        if (data.type === "text") {
-                            let div = document.createElement('div');
+                // onMessage((e) => {
+                //     if (!seenMessages.has(e)) {
+                //         seenMessages.add(e);
+                //         const data = JSON.parse(e);
+                //         if (data.type === "text") {
+                //             let div = document.createElement('div');
 
-                            if (data.id !== userId) {
-                                div.innerHTML = `
-                                <div class="chat chat-end">
-                                    <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
-                                </div>
-                                `;
-                            } else {
-                                div.innerHTML = `
-                                <div class="chat chat-start">
-                                    <div class="chat-bubble bg-pink-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
-                                </div>
-                                `;
-                            }
+                //             if (data.id !== userId) {
+                //                 div.innerHTML = `
+                //                 <div class="chat chat-end">
+                //                     <div class="chat-bubble bg-green-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
+                //                 </div>
+                //                 `;
+                //             } else {
+                //                 div.innerHTML = `
+                //                 <div class="chat chat-start">
+                //                     <div class="chat-bubble bg-pink-300 text-white"><span class="font-bold">${data.username}</span>: ${data.message}</div>
+                //                 </div>
+                //                 `;
+                //             }
 
-                            document.getElementById("textMessages")?.appendChild(div);
-                            const textMessages = document.getElementById("textMessages");
-                            textMessages.scrollTo(0, textMessages.scrollHeight);
-                        }
-                    }
-                });
+                //             document.getElementById("textMessages")?.appendChild(div);
+                //             const textMessages = document.getElementById("textMessages");
+                //             textMessages.scrollTo(0, textMessages.scrollHeight);
+                //         }
+                //     }
+                // });
                 input.value = "";
                 textMessage = "";
                 input?.focus();

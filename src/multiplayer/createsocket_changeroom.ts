@@ -1,13 +1,11 @@
-// import { roomId } from "./generateRoomId";
+
 import { initializeSocket } from "./initialize_web_socket";
-import { windowLocationOrigin } from "../window_api_url";
 
 export const roomId = (function generateroomId(){
     return `room_${Math.random().toString(36).substr(2, 9)}`;
 })();
 
 export const playMultiPlayer = (function(roomId) {
-    console.log('roomId from playMultiPlayer event listener\t', roomId);
     document.getElementById("startGameButton")?.addEventListener('click', () => {
         // const urlParams = new URLSearchParams(window.location.search);
         const basePath = '/multi_player/'

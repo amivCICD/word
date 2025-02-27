@@ -17,6 +17,14 @@ let typeOutGuessGameState = {
     arrayOfRowArrays: [],
     wordOfTheDayLetters: [],
 };
+let textMessageState = {
+    userId: "",
+    message: "",
+    username: "",
+    messageId: "",
+};
+
+let allMessagesState = [];
 
 export function initializeSocket(roomId) {
     if (socket && socket.readyState === WebSocket.OPEN && currentRoomId === roomId) {
@@ -34,17 +42,16 @@ export function initializeSocket(roomId) {
         const unameInfo = JSON.parse(localStorage.getItem("username"));
         socket.send(JSON.stringify({ type: 'join', ...unameInfo }));
         window.WEB_SOCKET_READY = true;
-
     };
     socket.onmessage = e => {
         let eventData = JSON.parse(e.data);
-        updateGameState({ ...typeOutGuessGameState, ...eventData});
-            // const ok = { ...eventData, ...typeOutGuessGameState };
-            // console.log(`EVENT DATA YOU ARE UPDATING TO(VALUES)...${ok.arrayOfRowArrays[0]}`)
-            // console.log(`EVENT DATA YOU ARE UPDATING TO(KEYS)...${Object.keys(ok)}`)
-        // if (eventData.type === "append" || eventData.type === "backspace" || eventData.type === "setWOTD") {
-        //     // updateGameState({ ...eventData, ...typeOutGuessGameState });
-        // }
+        if (eventData.type !== "text") {
+            updateGameState({ ...typeOutGuessGameState, ...eventData});
+        } else if (eventData.type === "text") {
+            updateTextState(eventData);
+        } else if (eventData.type === "join") {
+
+        }
         messageCallBacks.forEach(callback => callback(e.data));
     }
     socket.onclose = (e) => console.log("Disconnected...\t", e.code, e.reason);
@@ -79,6 +86,12 @@ export function onClose(cb) {
 export function getGameState() {
     return typeOutGuessGameState;
 }
+export function getTextMessageState() {
+    return textMessageState;
+}
+export function getAllTextMessageState() {
+    return allMessagesState;
+}
 function updateGameState(data) {
     if (data.type === "backspace") {
         typeOutGuessGameState.row = data.row;
@@ -107,5 +120,17 @@ function updateGameState(data) {
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
         typeOutGuessGameState.gameState = data.gameState;
         // typeOutGuessGameState.arrayOfRowArrays = data.typeOutGuessGameState;
+    }
+}
+
+function updateTextState(data) {
+    if (data.type === "text") {
+        textMessageState = {
+            userId: data.userId || "",
+            message: data.message || "",
+            username: data.username || "",
+            messageId: data.messageId || "",
+        };
+        allMessagesState.push({ ...textMessageState });
     }
 }
