@@ -3,7 +3,7 @@ const prodURL = "localhost:1985";
 let socket = null;
 let currentRoomId = null;
 const messageCallBacks = [];
-window.WEB_SOCKET_READY = false;
+window.WEB_SOCKET_READY = false; // so user cannot spam input while websocket is loading (messing with state)
 
 let typeOutGuessGameState = {
     row: 0,
@@ -34,6 +34,7 @@ export function initializeSocket(roomId) {
         const unameInfo = JSON.parse(localStorage.getItem("username"));
         socket.send(JSON.stringify({ type: 'join', ...unameInfo }));
         window.WEB_SOCKET_READY = true;
+
     };
     socket.onmessage = e => {
         let eventData = JSON.parse(e.data);

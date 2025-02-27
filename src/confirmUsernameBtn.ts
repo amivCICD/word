@@ -1,13 +1,20 @@
 import { initializeSocket } from "./multiplayer/initialize_web_socket";
+import { usernameExists } from "./checkForUsername";
+import { unHideRoomId_clipoard_divs } from "./multiplayer/unhide_room_info";
+import { playMultiPlayerAfterUsername } from "./multiplayer/createsocket_changeroom";
+
+
+
 export const roomId = (function generateroomId(){
     return `room_${Math.random().toString(36).substr(2, 9)}`;
 })();
-let confirmUsernameBtn = document.getElementById("confirmUsernameBtn");
-let usernameInput = document.getElementById("usernameInput");
+
+let confirmUsernameBtn = document.getElementById("confirmUsernameBtn") as HTMLElement;
+let usernameInput = document.getElementById("usernameInput") as HTMLInputElement;
 
 
 confirmUsernameBtn.addEventListener('click', () => {
-    console.log("usernameInput.value\t", usernameInput.value);
+    // console.log("usernameInput.value\t", usernameInput?.value);
 
     if (usernameInput.value === "" || usernameInput.value === undefined || usernameInput.value === null) {
         const toolTip = document.getElementById("usernameRequiredToolTip");
@@ -18,13 +25,43 @@ confirmUsernameBtn.addEventListener('click', () => {
         return;
     }
 
-    if (usernameInput.value !== "" || usernameInput.value !== undefined || usernameInput.value !== null) {
-        localStorage.setItem("username", JSON.stringify({ username: usernameInput.value, id: Date.now() }));
-        console.log("usernameInput.value:\t", usernameInput.value);
-        initializeSocket(roomId);
-        const usernameModal = document.getElementById("usernamePrompt");
-        usernameModal?.close();
+    if (usernameInput?.value !== "" || usernameInput?.value !== undefined || usernameInput?.value !== null) {
+        localStorage.setItem("username", JSON.stringify({ username: usernameInput?.value, id: Date.now() }));
+        playMultiPlayerAfterUsername(roomId)
+
+
+        const uname = usernameInput.value;
         usernameInput.value = "";
+        usernameInput.classList.add("hidden");
+
+        let roomIdReadOnly = document.getElementById("roomIdReadOnly");
+        roomIdReadOnly.addEventListener("click", e => {
+            if (e) {
+                e.target.select();
+            }
+        });
+
+        const confirmUsernameBtn = document.getElementById("confirmUsernameBtn");
+        confirmUsernameBtn?.classList.add('hidden');
+
+        const continueUserButton = document.getElementById("startGameButton");
+        continueUserButton?.classList.add('hidden');
+        unHideRoomId_clipoard_divs(window.location.href);
+
+
+        const usernameMessage = document.getElementById("usernameMessage");
+        usernameMessage.innerHTML = `
+            Current username: <span class="text-xl font-extrabold italic text-green-300">${uname}</span>
+        `;
+
+        // direct exit button, no events called
+        const userHasroomID_username = document.getElementById("modalClose");
+        userHasroomID_username?.classList.remove("hidden");
+
+        // const usernameInput = document.getElementById("usernameInput");
+        // usernameInput.value = usernameExists;
+        // usernameInput?.classList.add("hidden");
+
     }
 });
 

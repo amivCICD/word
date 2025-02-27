@@ -20,6 +20,22 @@ export const playMultiPlayer = (function(roomId) {
     });
 })(roomId);
 
+export const playMultiPlayerAfterUsername = function(roomId) {
+        const basePath = '/multi_player/';
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialRoomId = urlParams.get("room");
+        if (initialRoomId && window.location.pathname.includes('/multi_player/chat')) {
+            const url = `${window.location.origin}${basePath}chat?room=${initialRoomId}`;
+            history.pushState({}, '', url);
+            initializeSocket(initialRoomId);
+        } else {
+            const url = `${window.location.origin}${basePath}chat?room=${roomId}`;
+            console.log("url\t", url)
+            history.pushState({}, '', url);
+            initializeSocket(roomId);
+        }
+};
+
 const urlParams = new URLSearchParams(window.location.search);
 const initialRoomId = urlParams.get("room");
 if (initialRoomId && window.location.pathname.includes('/multi_player/chat')) {

@@ -244,7 +244,7 @@
       });
 
       document.addEventListener('keydown', e => {
-        if (window.textMessageOnly || window.usernameInputOnly) {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
           return;
         }
         if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {
@@ -296,6 +296,9 @@
       });
       allKeysExceptBSEnter.forEach((keys) => {
         keys.addEventListener('click', e => {
+          if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
+            return;
+          }
           let letter = e.target.innerHTML;
           let filteredValue = checkInputValues(letter);
           typeOutGuess(
@@ -314,6 +317,9 @@
       });
 
       document?.getElementById('backspace').addEventListener('click', e => {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
+          return;
+        }
         typeOutGuess(
           "BACKSPACE",
           gameState,
@@ -322,6 +328,9 @@
         );
       });
       document?.getElementById('enter').addEventListener('click', e => {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
+          return;
+        }
         typeOutGuess(
           "ENTER",
           gameState,
@@ -360,7 +369,7 @@
     <script src="../src/multiplayer/createsocket_changeroom.ts" type="module"></script>
 
 
-    <dialog id="failureModal" class="modal text-black">
+    <dialog id="failureModal" class="modal text-black"> <!--START NEW GAME-->
       <div class="modal-box bg-white border-4 border-pink-200">
         <h3 class="text-lg font-bold text-green-400">Nice try!</h3>
         <p class="py-4">The word of the day was: <span class="text-2xl sm:text-4xl text-pink-200 font-bold" id="wordOfTheDay"></span>!</p>
@@ -374,32 +383,56 @@
       </div>
     </dialog>
 
-    <dialog id="usernamePrompt" class="modal">
+    <dialog id="usernamePrompt" class="modal"><!--SET USERNAME INITIALLY && CONFIRM GAME CONTENTS-->
       <div class="modal-box bg-white border-4 border-pink-200">
         <h3 class="text-lg font-bold text-pink-300">Welcome!</h3>
-
         <div id="usernameMessage" class="py-4 text-pink-300 font-bold italic">
           Please enter a username:
           <span id="usernameRequiredToolTip" class="hidden border border-red-500 bg-white rounded-md p-1 text-red-500 font-bold italic text-xs h-12 w-fit fadeOut">
             A username is required!
           </span>
         </div>
-
-
         <div class="flex flex-col gap-4">
           <input id="usernameInput" type="text" maxlength="15" placeholder="enter chat username" class="input input-bordered w-full bg-transparent text-green-300 font-bold text-sm italic" />
-          <input id="roomIdInput" type="text" maxlength="15" placeholder="enter room name (optional)" class="input input-bordered w-full bg-transparent text-green-300 font-bold text-sm italic" />
+          <div id="dynamicRoomIdDiv" class="hidden">
+            <textarea id="roomIdReadOnly" type="text" maxlength="15" class="textarea textarea-bordered w-full h-12 bg-transparent text-green-300 font-bold text-md italic resize-none text-center" aria-expanded="false" readonly></textarea>
+            <span class="text-sm italic bold text-green-300">Your game link</span>
+          </div>
         </div>
-        <!-- <span class="text-sm italic font-thin text-pink-300"></span> -->
         <div class="modal-action">
+          <div id="copyGameToClipboard" class="btn bg-green-300 text-black border-4 border-pink-200 hover:text-pink-200 hidden">Copy Game Link</div>
           <form method="dialog">
             <!-- if there is a button in form, it will close the modal -->
-                <div id="confirmUsernameBtn" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200 ml-auto">Confirm</div>
-                <button id="startGameButton" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200 ml-auto hidden">Start Game</button>
-            <!-- <button id="cancelUsernameDialog" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button> -->
+                <div id="confirmUsernameBtn" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Continue</div>
+                <button id="startGameButton" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200 hidden">Start Game</button>
+                <!-- <button id="cancelUsernameDialog" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button> -->
+
+                <!--this simply lets user continue-->
+                <button id="modalClose" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200 hidden">Start Game</button>
+
+              </form>
+        </div>
+      </div>
+    </dialog>
+<!--
+    <dialog id="gameInfo" class="modal">SET USERNAME INITIALLY
+      <div class="modal-box bg-white border-4 border-pink-200">
+        <h3 class="text-lg font-bold text-pink-300">Your game information...</h3>
+            <textarea id="roomIdReadOnly" type="text" maxlength="15" class="textarea textarea-bordered w-full h-12 bg-transparent text-green-300 font-bold text-md italic resize-none text-center" aria-expanded="false" readonly>test</textarea>
+            <span class="text-sm italic bold text-green-300">Your game link</span>
+          </div>
+        </div>
+        <div class="modal-action">
+          <div id="copyGameToClipboard" class="btn bg-green-300 text-black border-4 border-pink-200 hover:text-pink-200">Copy Game Link</div>
+          <form method="dialog">
+            if there is a button in form, it will close the modal
+                <button id="continueButton" class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200 ml-auto hidden">Continue</button>
           </form>
         </div>
       </div>
     </dialog>
+  -->
+
+
   </body>
 </html>
