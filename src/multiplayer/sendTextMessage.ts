@@ -97,11 +97,11 @@ onMessage((e) => {
 })();
 
 (function sendTextMessageWenter() {
-    let textMessage = "";
     document.addEventListener('keyup', e => {
         //////////////////let our button click function handle usernameInput field////////////////////
         if (window.usernameInputOnly) {
             let usernameInput = document.getElementById("usernameInput");
+            console.log(`usernameInput?.value\t${usernameInput?.value}`)
             if (usernameInput.value !== "" && e.keyCode === 13) {
                 let confirmUsernameBtn = document.getElementById("confirmUsernameBtn");
                 confirmUsernameBtn?.click();
@@ -130,9 +130,8 @@ onMessage((e) => {
                     username = unameInfo.username;
                     userId = unameInfo.id;
                 }
-                sendMessage(JSON.stringify({ type: 'text', username: username, userId: userId,  message: textMessage, messageId: Math.random().toString().slice(2) }));
+                sendMessage(JSON.stringify({ type: 'text', username: username, userId: userId,  message: input.value, messageId: Math.random().toString().slice(2) }));
                 input.value = "";
-                textMessage = "";
                 input?.focus();
 
             } else {
