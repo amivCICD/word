@@ -1,8 +1,10 @@
 import { usernameExists } from "../checkForUsername";
-import { initializeSocket } from "./initialize_web_socket";
+import { initializeSocket, sendMessage } from "./initialize_web_socket";
 import { unHideRoomId_clipoard_divs } from "./unhide_room_info";
 import { playMultiPlayerAfterUsername } from "./createsocket_changeroom";
 import { roomId } from "./createsocket_changeroom";
+import { setInitialPromptReady } from "./setInitialPromptReady";
+
 
 console.log('usernameExists\t', usernameExists)
 document.addEventListener('DOMContentLoaded', () => {
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const usernameInput = document.getElementById("usernameInput");
             usernameInput.value = usernameExists;
             usernameInput?.classList.add("hidden");
+            setInitialPromptReady();
         }
 
     } else {
@@ -72,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             const usernameInput = document.getElementById("usernameInput");
             usernameInput?.classList.add("hidden");
+            setInitialPromptReady();
             // usernameInput.value = usernameExists;
             // usernameInput.placeholder = "change username";
         }

@@ -150,6 +150,8 @@
       import { CheckCompletionStatus } from "../src/checkCompletionStatus.ts";
       import { windowAPIURL } from "../src/window_api_url.ts"; // set dev or production API_URL here...
       import { sendMessage } from "../src/multiplayer/initialize_web_socket.ts";
+      import { setInitialPromptReady } from "../src/multiplayer/setInitialPromptReady.ts";
+      import { userLeavingMessage } from "../src/multiplayer/newUserJoiningMessage.ts";
 
       const apiURL = windowAPIURL;
       // const apiURL = "";
@@ -244,7 +246,7 @@
       });
 
       document.addEventListener('keydown', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
           return;
         }
         if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {
@@ -283,20 +285,22 @@
       //     }
       //   });
       // });
-      document.addEventListener('keyup', e => {
-        let filteredValue = checkInputValues(e.key.toUpperCase())
-        document.querySelectorAll('.kbd').forEach((keys) => {
-          if (filteredValue === keys.innerHTML) {
-            keys.classList.remove('bg-pink-200')
-          }
-        });
-      });
+
+      // MOVED BELOW TO sendTextMessage.ts in ../src/multiplayer/
+      // document.addEventListener('keyup', e => {
+      //   let filteredValue = checkInputValues(e.key.toUpperCase())
+      //   document.querySelectorAll('.kbd').forEach((keys) => {
+      //     if (filteredValue === keys.innerHTML) {
+      //       keys.classList.remove('bg-pink-200')
+      //     }
+      //   });
+      // });
       const allKeysExceptBSEnter = Array.from(document.querySelectorAll('.kbd')).filter((key) => {
         return key.id.toLowerCase() !== "enter" && key.id.toLowerCase() !== "backspace"; // added to lowercase 02 23 2025
       });
       allKeysExceptBSEnter.forEach((keys) => {
         keys.addEventListener('click', e => {
-          if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
+          if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
             return;
           }
           let letter = e.target.innerHTML;
@@ -317,7 +321,7 @@
       });
 
       document?.getElementById('backspace').addEventListener('click', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
           return;
         }
         typeOutGuess(
@@ -328,7 +332,7 @@
         );
       });
       document?.getElementById('enter').addEventListener('click', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY) {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
           return;
         }
         typeOutGuess(

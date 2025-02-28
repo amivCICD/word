@@ -1,9 +1,9 @@
-import { initializeSocket } from "./multiplayer/initialize_web_socket";
-import { usernameExists } from "./checkForUsername";
+
 import { unHideRoomId_clipoard_divs } from "./multiplayer/unhide_room_info";
 import { playMultiPlayerAfterUsername } from "./multiplayer/createsocket_changeroom";
-
-
+import { setInitialPromptReady } from "./multiplayer/setInitialPromptReady";
+import { sendMessage, onMessage } from "./multiplayer/initialize_web_socket";
+import { newUserJoiningMessage } from "./multiplayer/newUserJoiningMessage";
 
 export const roomId = (function generateroomId(){
     return `room_${Math.random().toString(36).substr(2, 9)}`;
@@ -26,8 +26,11 @@ confirmUsernameBtn.addEventListener('click', () => {
     }
 
     if (usernameInput?.value !== "" || usernameInput?.value !== undefined || usernameInput?.value !== null) {
-        localStorage.setItem("username", JSON.stringify({ username: usernameInput?.value, id: Date.now() }));
-        playMultiPlayerAfterUsername(roomId)
+        localStorage.setItem("username", JSON.stringify({ username: usernameInput?.value, userId: Date.now() }));
+        playMultiPlayerAfterUsername(roomId);
+        // let userInfo = JSON.parse(localStorage.getItem("username"));
+        // sendMessage({ type: 'join', username: userInfo.username, userId: userInfo.userId });
+        // sendMessage(JSON.stringify({ type: "newuserjoining", username: userInfo.username, userId: userInfo.userID }));
 
 
         const uname = usernameInput.value;
@@ -58,9 +61,15 @@ confirmUsernameBtn.addEventListener('click', () => {
         const userHasroomID_username = document.getElementById("modalClose");
         userHasroomID_username?.classList.remove("hidden");
 
+        setInitialPromptReady();
+
         // const usernameInput = document.getElementById("usernameInput");
         // usernameInput.value = usernameExists;
         // usernameInput?.classList.add("hidden");
+
+        // newUserJoiningMessage();
+
+
 
     }
 });

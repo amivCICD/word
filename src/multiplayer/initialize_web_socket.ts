@@ -1,9 +1,12 @@
+import { newUserJoiningMessage, userLeavingMessage } from "./newUserJoiningMessage";
+
 const prodURL = "localhost:1985";
 
 let socket = null;
 let currentRoomId = null;
 const messageCallBacks = [];
 window.WEB_SOCKET_READY = false; // so user cannot spam input while websocket is loading (messing with state)
+
 
 let typeOutGuessGameState = {
     row: 0,
@@ -26,6 +29,8 @@ let textMessageState = {
 
 let allMessagesState = [];
 
+
+
 export function initializeSocket(roomId) {
     if (socket && socket.readyState === WebSocket.OPEN && currentRoomId === roomId) {
         return socket;
@@ -38,9 +43,10 @@ export function initializeSocket(roomId) {
     socket = new WebSocket(`ws://${prodURL}/chat?room=${roomId}`);
 
     socket.onopen = () => {
-        console.log("connected to web sockets!");
-        const unameInfo = JSON.parse(localStorage.getItem("username"));
-        socket.send(JSON.stringify({ type: 'join', ...unameInfo }));
+        console.log("Connected to web socket!");
+        // const unameInfo = JSON.parse(localStorage.getItem("username"));
+        // socket.send(JSON.stringify({ type: 'join', ...unameInfo }));
+        newUserJoiningMessage();
         window.WEB_SOCKET_READY = true;
     };
     socket.onmessage = e => {
@@ -49,12 +55,13 @@ export function initializeSocket(roomId) {
             updateGameState({ ...typeOutGuessGameState, ...eventData});
         } else if (eventData.type === "text") {
             updateTextState(eventData);
-        } else if (eventData.type === "join") {
-
         }
         messageCallBacks.forEach(callback => callback(e.data));
     }
-    socket.onclose = (e) => console.log("Disconnected...\t", e.code, e.reason);
+    socket.onclose = (e) => {
+        console.log("Disconnected...\t", e.code, e.reason);
+        // userLeavingMessage();
+    };
     socket.onerror = (e) => console.log("ERROR: \t", e.message || e);
 
     return socket;
@@ -134,3 +141,36 @@ function updateTextState(data) {
         allMessagesState.push({ ...textMessageState });
     }
 }
+
+
+// leaving
+onMessage((e) => {
+    const data = JSON.parse(e);
+    if (data.type === "userleaving") {
+        const joinedChat = document.getElementById("textMessages");
+        const div = document.createElement('div');
+        div.innerHTML = `<div class="chat-footer">
+        <span class="font-bold italic">${data.username}</span> has left the chat.<br />
+        <time class="text-xs opacity-50">${new Date(Date.now()).toString().slice(0, 24)}</time>
+        </div>`;
+        joinedChat.appendChild(div);
+        const textMessages = document.getElementById("textMessages");
+        textMessages.scrollTo(0, textMessages.scrollHeight);
+    }
+}); // initial join if they exist
+
+// joining
+onMessage((e) => {
+    const data = JSON.parse(e);
+    if (data.type === "newuserjoining") {
+        const joinedChat = document.getElementById("textMessages");
+        const div = document.createElement('div');
+        div.innerHTML = `<div class="chat-footer">
+        <span class="font-bold italic">${data.username}</span> joined the chat.<br />
+        <time class="text-xs opacity-50">${new Date(Date.now()).toString().slice(0, 24)}</time>
+        </div>`;
+        joinedChat.appendChild(div);
+        const textMessages = document.getElementById("textMessages");
+        textMessages.scrollTo(0, textMessages.scrollHeight);
+    }
+});
