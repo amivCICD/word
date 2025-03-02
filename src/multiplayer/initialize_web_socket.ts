@@ -26,8 +26,19 @@ let textMessageState = {
     username: "",
     messageId: "",
 };
-
 let allMessagesState = [];
+
+let player = {
+    username: null,
+    userId: null,
+    isCurrentPlayer: false,
+    score: { letters: [] },
+    // playerCount : [],
+    // playerIsSet: false
+}
+
+let allPlayers = [];
+
 
 
 
@@ -51,10 +62,13 @@ export function initializeSocket(roomId) {
     };
     socket.onmessage = e => {
         let eventData = JSON.parse(e.data);
-        if (eventData.type !== "text") {
-            updateGameState({ ...typeOutGuessGameState, ...eventData});
+
+        if (eventData.type === "updatePlayerState") {
+            updatePlayerState(eventData);
         } else if (eventData.type === "text") {
             updateTextState(eventData);
+        } else if (eventData.type !== "text" && eventData.type !== "updatePlayerState") {
+            updateGameState({ ...typeOutGuessGameState, ...eventData });
         }
         messageCallBacks.forEach(callback => callback(e.data));
     }
@@ -99,6 +113,10 @@ export function getTextMessageState() {
 export function getAllTextMessageState() {
     return allMessagesState;
 }
+export function getPlayerState() {
+    return allPlayers;
+}
+
 function updateGameState(data) {
     if (data.type === "backspace") {
         typeOutGuessGameState.row = data.row;
@@ -142,8 +160,137 @@ function updateTextState(data) {
     }
 }
 
+function updatePlayerState(data) {
+    if (data.updateType === "setCurrentPlayer") {
+        player = {
+            username: data.username,
+            userId: data.userId,
+            // isCurrentUser: allPlayers.length === 0,
+            isCurrentUser: data.isCurrentPlayer,
+            score: { letters: [] },
+            // score: { letters: [ ...playerState.score.letters, data.letter ].filter(i => i) },
+            // playerCount: [
+            //     ...playerState.playerCount,
+            //     { username: data.username, userId: data.userId, isCurrentUser: playerState.isCurrentUser }
+            // ],
+        }
+        allPlayers = [player];
+        // allPlayers = allPlayers.length === 0 ? [player] : [...allPlayers, player];
+        // allPlayers.push({...playerState});
+    } else if (data.updateType === "addPlayer") {
+        // const existingPlayer = allPlayers.find(player => player.userId === data.userId);
+        // if (!existingPlayer) {
+        // }
+        allPlayers = data.playerCount;
+        if (allPlayers) {
+            allPlayers[0].isFirstPlayer = true;
+        }
 
-// leaving
+        const localUserInfo = localStorage.getItem("username");
+        const userInfo = JSON.parse(localUserInfo);
+        if (allPlayers) {
+            const mySessionId = allPlayers.filter(player => player.userId === userInfo.userId.toString());
+            console.log("mySessionId\t", mySessionId);
+
+        }
+
+        // player = allPlayers.find(player => player.userId === data.userId);
+
+        // if (!allPlayers?.some(player => player.userId === data.userId)) {
+        //     allPlayers = [...allPlayers, {
+        //         username: data.username,
+        //         userId: data.userId,
+        //         score: { letters: [] },
+        //         isCurrentPlayer: data.isCurrentPlayer
+        //     }];
+        //     player = allPlayers.find(player => player.userId === data.userId);
+        // }
+        // playerState = {
+        //     ...playerState,
+        //     // isCurrentUser: playerState.playerCount.length === 0,
+        //     playerCount: [ ...playerState.playerCount, { ...data.newPlayerInfo } ]
+        // }
+        // allPlayers.push({ ...data.newPlayerInfo });
+        console.log("allPlayers FROM addPlayer updateType\t", allPlayers);
+
+    } else if (data.updateType === "removePlayer") {
+        // playerState = {
+        //     ...playerState,
+        //     playerCount: playerState.playerCount.filter(user => user.userId !== data.userId)
+        // }
+        allPlayers?.filter(player => player.userId !== data.userId);
+    } else if (data.updateType === "updatePlayerScore") {
+        // playerState = {
+        //     ...playerState,
+        //     score: { letters: [ ...playerState.score.letters, data.letter ] }
+        // }
+        allPlayers = allPlayers?.map(player =>
+            player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
+    } else if (data.updateType === "swapCurrentPlayer") {
+        // playerState = {
+        //     username: data.username,
+        //     userId: data.userId,
+        //     isCurrentUser: true,
+        //     score: { letters: [ ...playerState.score.letters, data.letter ] },
+        //     playerCount: playerState.playerCount
+        // }
+    } else if (data.updateType === "getAllPlayers") {
+
+    } else if (data.updateType === "checkForTwoPlayers") {
+        if (allPlayers.length === 2) {
+            console.log("playerState is 2 or more, do coin flip");
+            allPlayers[data.randomPlayerChoice].isCurrentPlayer = true;
+            // playerState = { ...playerState, playerIsSet: true };
+            // console.log("THIS PLAYER HAS BEEN ASSIGNED TO GO FIRST\t", allPlayers[data.randomPlayerChoice]);
+        } else {
+            console.log("THERE IS ONLY ONE PLAYER READY TO PLAY");
+        }
+    }
+}
+onMessage((e) => {
+    const data = JSON.parse(e);
+    if (data.updateType === "setCurrentPlayer") {
+        // console.log('playerState\t', playerState)
+    } else if (data.updateType === "addPlayer") {
+        // console.log('playerState AFTER INC PLAYER COUNT\t', playerState);
+        console.log("ALL PLAYERS ARRAY AFTER ADD PLAYER\t", allPlayers);
+        const localUserInfo = localStorage.getItem("username");
+        const userInfo = JSON.parse(localUserInfo);
+
+
+
+
+    } else if (data.updateType === "removePlayer") { // whoever sees two players first?
+        console.log('playerState AFTER REMOVE PLAYER \t', player);
+
+    } else if (data.updateType === "checkForTwoPlayers" && allPlayers.length >= 2) {
+        // if (!playerState.playerIsSet) {
+        //     const flipDecision = Math.floor(Math.random() * playerState.playerCount.length);
+        //     let currentPlayer = playerState.playerCount[flipDecision];
+        //     currentPlayer.isCurrentUser = true;
+        //     const userTurn = document.getElementById("userTurn");
+        //     userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+        //     console.log('SET PLAYERS PLAYER STATE', playerState);
+        // }
+        const currentPlayer = allPlayers.filter(player => player.isCurrentPlayer === true);
+        // const currentPlayer = allPlayers.find(player => player.isCurrentPlayer);
+        console.log("currentPlayer\t", currentPlayer);
+        const userTurn = document.getElementById("userTurn");
+        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer[0].username}</div>`;
+        console.log('SET PLAYERS PLAYER STATE', currentPlayer);
+
+    }
+});
+
+// let playerState = {
+//     username: null,
+//     userId: null,
+//     score: { letters: [] },
+//     isCurrentPlayer: false
+// }
+
+
+// leaving chat channel
 onMessage((e) => {
     const data = JSON.parse(e);
     if (data.type === "userleaving") {
@@ -159,7 +306,7 @@ onMessage((e) => {
     }
 }); // initial join if they exist
 
-// joining
+// joining chat channel
 onMessage((e) => {
     const data = JSON.parse(e);
     if (data.type === "newuserjoining") {
@@ -174,3 +321,4 @@ onMessage((e) => {
         textMessages.scrollTo(0, textMessages.scrollHeight);
     }
 });
+

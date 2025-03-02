@@ -6,7 +6,7 @@ import { RowGameState } from "./rowGameState.ts";
 import { showFailureModal } from "./showFailureModal.ts";
 import { GameOver } from "./gameOver.ts";
 import { CheckCompletionStatus } from "./checkCompletionStatus.ts";
-import { sendMessage, onMessage, getGameState } from "./multiplayer/initialize_web_socket.ts";
+import { sendMessage, onMessage, getGameState, getPlayerState } from "./multiplayer/initialize_web_socket.ts";
 
 
 const gameOver = GameOver.getInstance();
@@ -30,6 +30,7 @@ export async function typeOutGuess(
 ): Promise<void> {
     // if (!window.WEB_SOCKET_READY) return;
     const state = getGameState();
+    const playerState = getPlayerState();
     state.rowGameState = rowGameState;
 
     onMessage(async (messageData) => {
@@ -39,7 +40,7 @@ export async function typeOutGuess(
         state.gameComplete = gameComplete;
 
         const data = JSON.parse(messageData);
-        console.log("DATA\t", data)
+        // console.log("DATA\t", data)
         console.log('DATA.TYPE FROM THE TOP\t', data.type)
         if (data.userInput === 'BACKSPACE' && data.type === "backspace") {
             if (state.letterCount >= 0 && state.letterCount < 5) {

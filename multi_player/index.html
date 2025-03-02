@@ -32,6 +32,7 @@
         <h1 class="text-2xl font-bold text-center text-black italic sm:hidden ml-1">WORDLE</h1>
         <h1 class="text-2xl sm:text-4xl font-bold text-center text-black italic mx-auto hidden sm:flex">WORDLE</h1>
 
+
       </div>
 
         <div id="chatBar" class="collapse bg-white absolute right-2 top-2 w-80 text-pink-300">
@@ -57,6 +58,10 @@
           </div>
         </div>
 
+        <div class="flex flex-col items-center justify-center py-4">
+          <span class="text-black italic">Current Players Turn: </span>
+          <div id="userTurn"></div>
+        </div>
 
       <div id="mainTainer" class="grid grid-rows-6 grid-cols-5 place-items-center mx-auto gap-none sm:gap-1 w-fit">
         <div class="word-row bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
@@ -152,6 +157,18 @@
       import { sendMessage } from "../src/multiplayer/initialize_web_socket.ts";
       import { setInitialPromptReady } from "../src/multiplayer/setInitialPromptReady.ts";
       import { userLeavingMessage } from "../src/multiplayer/newUserJoiningMessage.ts";
+      import { getPlayerState } from "../src/multiplayer/initialize_web_socket.ts";
+
+      const localStorageUser = localStorage.getItem("username");
+      let localCurrentPlayer;
+      let localCurrentPlayerId;
+      if (localStorageUser !== null) {
+        localCurrentPlayer = JSON.parse(localStorageUser);
+        localCurrentPlayerId = localCurrentPlayer.userId;
+      }
+
+
+
 
       const apiURL = windowAPIURL;
       // const apiURL = "";
@@ -206,7 +223,6 @@
         } catch (error) {
           console.error(error);
         }
-
       })();
 
       document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
@@ -246,7 +262,14 @@
       });
 
       document.addEventListener('keydown', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
+        const playerState = getPlayerState();
+        console.log('playerState.allPlayers index.html\t', playerState)
+        // let globalCurrentPlayer = playerState.allPlayers.find(player => player.isCurrentPlayer);
+        // let globalCurrentPlayer = playerState.allPlayers.filter(player => player.userId === localCurrentPlayerId);
+        // console.log('globalCurrentPlayer\t', globalCurrentPlayer);
+        // console.log('playerState.allPlayers\t', playerState.allPlayers);
+
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
           return;
         }
         if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {
@@ -300,7 +323,7 @@
       });
       allKeysExceptBSEnter.forEach((keys) => {
         keys.addEventListener('click', e => {
-          if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
+          if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
             return;
           }
           let letter = e.target.innerHTML;
@@ -321,7 +344,7 @@
       });
 
       document?.getElementById('backspace').addEventListener('click', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
           return;
         }
         typeOutGuess(
@@ -332,7 +355,7 @@
         );
       });
       document?.getElementById('enter').addEventListener('click', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.setInitialPromptToReady) {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
           return;
         }
         typeOutGuess(
@@ -367,7 +390,6 @@
     <script src="../src/cancelUsernameDialog.ts" type="module"></script>
 
     <script src="../src/confirmUsernameBtn.ts" type="module"></script>
-    <script src="../src/playersjoining.ts" type="module"></script>
     <script src="../src/checkForUsername.ts" type="module"></script>
     <script src="../src/multiplayer/initialprompt.ts" type="module"></script>
     <script src="../src/multiplayer/createsocket_changeroom.ts" type="module"></script>
