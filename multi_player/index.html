@@ -159,6 +159,10 @@
       import { userLeavingMessage } from "../src/multiplayer/newUserJoiningMessage.ts";
       import { getPlayerState } from "../src/multiplayer/initialize_web_socket.ts";
 
+      // window.addEventListener("playerStateUpdated", () => {
+      //       console.log("Player state UPDATED\t", getPlayerState());
+      //   });
+
       const localStorageUser = localStorage.getItem("username");
       let localCurrentPlayer;
       let localCurrentPlayerId;
@@ -263,13 +267,13 @@
 
       document.addEventListener('keydown', e => {
         const playerState = getPlayerState();
-        console.log('playerState.allPlayers index.html\t', playerState)
-        // let globalCurrentPlayer = playerState.allPlayers.find(player => player.isCurrentPlayer);
+        console.log('playerState index.html\t', playerState);
+        let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
         // let globalCurrentPlayer = playerState.allPlayers.filter(player => player.userId === localCurrentPlayerId);
-        // console.log('globalCurrentPlayer\t', globalCurrentPlayer);
+        console.log('globalCurrentPlayer\t', globalCurrentPlayer, globalCurrentPlayer.userId);
         // console.log('playerState.allPlayers\t', playerState.allPlayers);
 
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
+        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
           return;
         }
         if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {

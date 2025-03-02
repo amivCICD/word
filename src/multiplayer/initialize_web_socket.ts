@@ -181,9 +181,31 @@ function updatePlayerState(data) {
         // const existingPlayer = allPlayers.find(player => player.userId === data.userId);
         // if (!existingPlayer) {
         // }
-        allPlayers = data.playerCount;
-        if (allPlayers) {
-            allPlayers[0].isFirstPlayer = true;
+        // allPlayers = data.playerCount;
+        // window.dispatchEvent(new Event("playerStateUpdated"));
+
+        if (Array.isArray(data.playerCount)) {
+            const incomingPlayers = JSON.stringify(data.playerCount)
+            console.log('incomingPlayers\t', incomingPlayers);
+
+            const currentPlayers = JSON.stringify(allPlayers)
+            console.log('currentPlayers\t', currentPlayers);
+            if (incomingPlayers !== currentPlayers) {
+                allPlayers.length = 0;
+                data.playerCount?.forEach((player) => {
+                    allPlayers.push(player);
+                });
+                console.log("allPlayers FROM addPlayer updateType\t", allPlayers);
+            }
+            if (!allPlayers.find(player => player.isFirstPlayer === true)) {
+                allPlayers[0].isFirstPlayer = true;
+
+                const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+                const userTurn = document.getElementById("userTurn");
+                userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+                console.log('SET PLAYERS PLAYER STATE', currentPlayer);
+            }
+            // allPlayers.length = 0;
         }
 
         const localUserInfo = localStorage.getItem("username");
@@ -211,7 +233,7 @@ function updatePlayerState(data) {
         //     playerCount: [ ...playerState.playerCount, { ...data.newPlayerInfo } ]
         // }
         // allPlayers.push({ ...data.newPlayerInfo });
-        console.log("allPlayers FROM addPlayer updateType\t", allPlayers);
+
 
     } else if (data.updateType === "removePlayer") {
         // playerState = {
@@ -273,11 +295,7 @@ onMessage((e) => {
         //     console.log('SET PLAYERS PLAYER STATE', playerState);
         // }
         const currentPlayer = allPlayers.filter(player => player.isCurrentPlayer === true);
-        // const currentPlayer = allPlayers.find(player => player.isCurrentPlayer);
-        console.log("currentPlayer\t", currentPlayer);
-        const userTurn = document.getElementById("userTurn");
-        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer[0].username}</div>`;
-        console.log('SET PLAYERS PLAYER STATE', currentPlayer);
+
 
     }
 });

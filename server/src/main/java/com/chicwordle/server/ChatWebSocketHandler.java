@@ -58,14 +58,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("sessionId", session.getId())
                 .put("username", username)
                 .put("userId", userId)
-
+                .put("isFirstPlayer", false)
                 .put("playerCount", roomSessions.stream()
                     .map(s -> {
                         JSONObject userInfo = userMap.get(s);
                         return new JSONObject()
                             .put("sessionId", s.getId())
                             .put("username", userInfo != null ? userInfo.getString("username") : "")
-                            .put("userId", userInfo != null ? userInfo.getString("userId") : "");
+                            .put("userId", userInfo != null ? userInfo.getString("userId") : "")
+                            .put("isFirstPlayer", false);
                     }).collect(Collectors.toList()));
 
             for(WebSocketSession s : roomSessions) {
