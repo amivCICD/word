@@ -8,17 +8,45 @@ import { GameOver } from "./gameOver.ts";
 import { CheckCompletionStatus } from "./checkCompletionStatus.ts";
 import { sendMessage, onMessage, getGameState, getPlayerState } from "./multiplayer/initialize_web_socket.ts";
 
-
 const gameOver = GameOver.getInstance();
-const rowGameState = RowGameState.getInstance();
+// const rowGameState = RowGameState.getInstance();
 const checkCompletionStatus = CheckCompletionStatus.getInstance();
-// let letterCount: number = 0;
-// let row: number = 0;
-// let guess: string = "";
 
 let arrayOfRowArrays;
 document.addEventListener("DOMContentLoaded", e => {
     arrayOfRowArrays = arrayOfDivRows();
+});
+
+onMessage(async (messageData) => {
+    const state = getGameState();
+    state.arrayOfRowArrays = arrayOfRowArrays;
+    // state.wordOfTheDay = wordOfTheDay;
+    // state.wordOfTheDayLetters = wordOfTheDayLetters;
+    // state.gameComplete = gameComplete;
+
+    const data = JSON.parse(messageData);
+    console.log('DATA.TYPE FROM THE TOP\t', data.type);
+
+    if (data.updateType === "backspace" && data.userInput === 'BACKSPACE') {
+        if (state.letterCount >= 0 && state.letterCount < 5) {
+            state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
+        } else if (state.letterCount === 5 || state.letterCount === 0) {
+            return;
+        }
+    } else if (data.updateType === 'append') {
+        // state.userInput = data.userInput; // 03 03 2025, is this necessary?
+        if (state.letterCount <= 5 && state.rowLetterCount < 6) {
+            state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
+        }
+    } else if (data.updateType === "guessAttempt" && data.userInput === "ENTER") {
+        if (state.letterCount === 5) {
+            if (!checkIfWordInWordList(state.guess)) {
+                handleWiggleAnimation(state.arrayOfRowArrays[state.row]);
+                return;
+            }
+            await handleGuess(state, data, gameOver, checkCompletionStatus);
+        }
+    }
 });
 
 let gameComplete = false;
@@ -28,116 +56,35 @@ export async function typeOutGuess(
     wordOfTheDay: string,
     wordOfTheDayLetters: string[],
 ): Promise<void> {
-    // if (!window.WEB_SOCKET_READY) return;
+
     const state = getGameState();
     const playerState = getPlayerState();
-    state.rowGameState = rowGameState;
-
-    console.log("state.letterCount\t", state.letterCount);
-    console.log("state.userInput\t", state.userInput);
+    // state.rowGameState = rowGameState;
+    state.wordOfTheDayLetters = wordOfTheDayLetters
 
     if (state.letterCount !== 5 && userInput === "ENTER") return; // enter key was ENTERING the guess...
+    if (state.gameComplete || userInput === null) return;
 
-    onMessage(async (messageData) => {
-        state.arrayOfRowArrays = arrayOfRowArrays;
-        state.wordOfTheDay = wordOfTheDay;
-        state.wordOfTheDayLetters = wordOfTheDayLetters;
-        state.gameComplete = gameComplete;
-
-        const data = JSON.parse(messageData);
-        // console.log("DATA\t", data)
-        console.log('DATA.TYPE FROM THE TOP\t', data.type);
-
-
-        if (data.userInput === 'BACKSPACE' && data.updateType === "backspace") {
-            if (state.letterCount >= 0 && state.letterCount < 5) {
-                state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
-            } else if (state.letterCount === 5 || state.letterCount === 0) {
-                return;
-            }
-        } else if (data.updateType === 'append') {
-
-            if (state.letterCount <= 5 && state.rowLetterCount < 6) {
-                state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
-            }
-        } else if (state.letterCount === 5 && data.userInput === "ENTER") {
-            // } else if (data.updateType === 'wiggle' && data.userInput === "ENTER") {
-
-            // if (state.letterCount === 5) {
-            // if (data.updateType === 'wiggle') {
-            if (!checkIfWordInWordList(state.guess)) {
-                state.arrayOfRowArrays[state.row].forEach((row) => {
-                    row.classList.add('animate-wiggle');
-                });
-                // state.userInput = data.userInput;
-                setTimeout(() => {
-                    state.arrayOfRowArrays[state.row].forEach((row) => {
-                        row.classList.remove('animate-wiggle');
-                    });
-                }, 750);
-                return;
-            } else
-            // }
-            if (data.updateType === "guessAttempt" && checkIfWordInWordList(state.guess)) {
-                console.log("state.arrayOfRowArrays[state.row]\t", state.arrayOfRowArrays[state.row])
-                console.log("state.arrayOfRowArrays\t", state.arrayOfRowArrays)
-                console.log("state.row\t", state.row)
-                const newRow = await appendGuess(
-                    state.arrayOfRowArrays[state.row],
-                    state.guess,
-                    state.wordOfTheDay,
-                    state.wordOfTheDayLetters,
-                    gameStateParam
-                );
-                if (state.row !== 5) {
-                    state.arrayOfRowArrays[state.row+1][0].innerHTML = "";
-                    state.row = newRow.incRow;
-                    state.letterCount = 0;
-                    state.rowGameState.startFromZero();
-                    state.guess = "";
-                }
-                if (newRow.restart) {
-                    state.gameComplete = true;
-                    checkCompletionStatus.setCompletedGame();
-                    console.log('You can now restart the game...');
-                    fireOffConfetti();
-                }
-                if (gameOver.getGameOverStatus()) {
-                    state.gameComplete = true;
-                    checkCompletionStatus.setCompletedGame();
-                    console.log("You did not get the word...fire off modal...");
-                    showFailureModal(newRow.wordOfTheDay);
-                }
-                return;
-            }
-        }
-    });
 
     if (gameStateParam.reset) {
-        state.letterCount = 0;
-        state.row = 0;
-        state.guess = "";
+        resetGameState(state);
         await appendGuess(null, null, null, null, gameStateParam);
-        state.gameComplete = false;
     }
 
-    if (state.gameComplete) return;
-    if (userInput === null) return;
-
     if (state.letterCount === 5 && userInput === "ENTER" && state.guess !== "ENTER") {
+        console.log("state.wordOfTheDayLetters\t", state.wordOfTheDayLetters)
         sendMessage(JSON.stringify({
             type: "updateGameState",
             updateType: "guessAttempt",
             row: state.row,
             userInput: userInput,
             wordOfTheDay: wordOfTheDay,
-            wordOfTheDayLetters: wordOfTheDayLetters,
+            wordOfTheDayLetters: state.wordOfTheDayLetters,
             gameStateParam: gameStateParam,
-            rowGameState: rowGameState
+            arrayOfRowArrays: state.arrayOfRowArrays,
         }));
     } else if (userInput === "BACKSPACE" && state.letterCount !== 0) {
         state.rowGameState.decRowLetterCount();
-        // console.log("USER INPUT\t", userInput);
         sendMessage(JSON.stringify({
             type: 'updateGameState',
             updateType: 'backspace',
@@ -150,7 +97,6 @@ export async function typeOutGuess(
         }));
         return;
     } else if (state.letterCount < 5 && userInput !== "BACKSPACE" && state.rowLetterCount < 5 && !state.userInput.includes("ENTER")) {
-        // console.log("USER INPUT\t", userInput);
         state.rowGameState.incRowLetterCount();
         sendMessage(JSON.stringify({
             type: 'updateGameState',
@@ -163,30 +109,55 @@ export async function typeOutGuess(
             arrayOfRowArrays: state.arrayOfRowArrays
         }));
     }
+}
 
-    // else if (letterCount < 5 && userInput === "ENTER") {
-    //     return;
-    // }
-    // else if (userInput.length > 1) {
-    //     return;
-    // }
+function handleWiggleAnimation(row) {
+    row.forEach((r) => {
+        r.classList.add('animate-wiggle');
+    });
+    setTimeout(() => {
+        row.forEach((r) => {
+            r.classList.remove('animate-wiggle');
+        });
+    }, 750);
+}
 
-
-    // if (letterCount === 5 || letterCount === 0 && userInput === "BACKSPACE") { // boundaries
-    //     return;
-    // }
-    // guess += userInput;
-    // // arrayOfRowArrays[row][letterCount].innerHTML = userInput;
-
-    // // ++letterCount;
-    // letterCount++;
-    // rowGameState.incRowLetterCount();
-
-
-
-
-
-
-
-
+async function handleGuess(state, data, gameOver, checkCompletionStatus) {
+    const newRow = await appendGuess(
+        state.arrayOfRowArrays[state.row],
+        state.guess,
+        state.wordOfTheDay,
+        state.wordOfTheDayLetters,
+        data.gameStateParam
+    );
+    if (state.row !== 5) {
+        console.log("newRow.incRow\t", newRow.incRow)
+        console.log("newRow.restart\t", newRow.restart)
+        // rowGameState.startFromZero();
+        state.arrayOfRowArrays[state.row+1][0].innerHTML = "";
+        state.row = newRow.incRow;
+        state.letterCount = 0;
+        state.rowGameState.startFromZero();
+        state.userInput = ""; // this fixed it for now 03 03 2025
+        // state.rowGameState = 0;
+        state.guess = "";
+    }
+    if (newRow.restart) {
+        state.gameComplete = true;
+        checkCompletionStatus.setCompletedGame();
+        console.log('You can now restart the game...');
+        fireOffConfetti();
+    }
+    if (gameOver.getGameOverStatus()) {
+        state.gameComplete = true;
+        checkCompletionStatus.setCompletedGame();
+        console.log("You did not get the word...fire off modal...");
+        showFailureModal(newRow.wordOfTheDay);
+    }
+}
+function resetGameState(state) {
+        state.letterCount = 0;
+        state.row = 0;
+        state.guess = "";
+        state.gameComplete = false;
 }

@@ -1,3 +1,4 @@
+import { RowGameState } from "../rowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "./newUserJoiningMessage";
 
 const prodURL = "localhost:1985";
@@ -19,6 +20,8 @@ let typeOutGuessGameState = {
     gameStateParam: undefined,
     arrayOfRowArrays: [],
     wordOfTheDayLetters: [],
+    // gameState: null,
+    rowGameState: RowGameState.getInstance()
 };
 let textMessageState = {
     userId: "",
@@ -146,8 +149,15 @@ function updateGameState(data) {
         typeOutGuessGameState.gameState = data.gameState;
         // typeOutGuessGameState.arrayOfRowArrays = data.typeOutGuessGameState;
     }
-    if (data.updateType === "wiggle") {
+    if (data.updateType === "guessAttempt") {
         // typeOutGuessGameState.userInput = "";
+        typeOutGuessGameState.row = data.row;
+        typeOutGuessGameState.userInput = data.userInput;
+        typeOutGuessGameState.wordOfTheDay =  data.wordOfTheDay;
+        typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
+        typeOutGuessGameState.gameStateParam = data.gameStateParam;
+        typeOutGuessGameState.rowGameState = data.rowGameState;
+        typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
     }
 }
 

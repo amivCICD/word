@@ -83,33 +83,16 @@ export async function appendGuess(
     let yellowWorthy = [...new Set(filt)];
     let correctPositionArr = checkForCorrectPosition(wordOfTheDayLetters, guessAsArray).aux;
 
-
-    // const match = checkForCorrectPosition(wordOfTheDayLetters, guessAsArray).aux;
-    // console.log('match\t', match);
-    // console.log('correctLetters\t', correctLetters);
-    // checkForCorrectLetter(correctLetters, guessAsArray, wordOfTheDayLetters);
-    // let correctLetters = checkForCorrectPosition(wordOfTheDayLetters, guessAsArray).correctLetters;
-
     for (const letter of divEl) {
-        // letter.classList.toggle('animate-spin');
         letter.classList.toggle('box');
         await new Promise(res => setTimeout(res, 500));
         console.log(letter.innerHTML);
-        // letter.classList.toggle('animate-spin');
 
         guess += letter.innerHTML;
 
-        // if (wordOfTheDayLetters[c] === letter.innerHTML) {
-        //     letter.classList.remove('bg-black');
-        //     letter.classList.add('bg-green-200');
-        // } else if (wordOfTheDayLetters.includes(letter.innerHTML) && wordOfTheDayLetters[c] !== letter.innerHTML) {
-        //     letter.classList.remove('bg-black');
-        //     letter.classList.add('bg-yellow-200');
-        // }
         checkForCorrectLetter(letter, yellowWorthy, correctPositionArr, c);
         letter.classList.toggle('box');
         illuminateKeys(letter.innerHTML, "miss");
-
 
         c++;
     }
