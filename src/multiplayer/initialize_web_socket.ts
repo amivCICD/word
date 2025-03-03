@@ -67,7 +67,7 @@ export function initializeSocket(roomId) {
             updatePlayerState(eventData);
         } else if (eventData.type === "text") {
             updateTextState(eventData);
-        } else if (eventData.type !== "text" && eventData.type !== "updatePlayerState") {
+        } else if (eventData.type === "updateGameState") {
             updateGameState({ ...typeOutGuessGameState, ...eventData });
         }
         messageCallBacks.forEach(callback => callback(e.data));
@@ -118,7 +118,7 @@ export function getPlayerState() {
 }
 
 function updateGameState(data) {
-    if (data.type === "backspace") {
+    if (data.updateType === "backspace") {
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.guess = data.guess || typeOutGuessGameState.guess.slice(0, -1);
         typeOutGuessGameState.guess = data.guess;
@@ -129,7 +129,7 @@ function updateGameState(data) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
     }
-    if (data.type === "append") {
+    if (data.updateType === "append") {
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.type = data.type;
         typeOutGuessGameState.guess = data.guess;
@@ -140,11 +140,14 @@ function updateGameState(data) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
     }
-    if (data.type === "setWOTD_and_params") {
+    if (data.updateType === "setWOTD_and_params") {
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
         typeOutGuessGameState.gameState = data.gameState;
         // typeOutGuessGameState.arrayOfRowArrays = data.typeOutGuessGameState;
+    }
+    if (data.updateType === "wiggle") {
+        // typeOutGuessGameState.userInput = "";
     }
 }
 
@@ -186,10 +189,10 @@ function updatePlayerState(data) {
 
         if (Array.isArray(data.playerCount)) {
             const incomingPlayers = JSON.stringify(data.playerCount)
-            console.log('incomingPlayers\t', incomingPlayers);
+            // console.log('incomingPlayers\t', incomingPlayers);
 
             const currentPlayers = JSON.stringify(allPlayers)
-            console.log('currentPlayers\t', currentPlayers);
+            // console.log('currentPlayers\t', currentPlayers);
             if (incomingPlayers !== currentPlayers) {
                 allPlayers.length = 0;
                 data.playerCount?.forEach((player) => {
@@ -212,7 +215,7 @@ function updatePlayerState(data) {
         const userInfo = JSON.parse(localUserInfo);
         if (allPlayers) {
             const mySessionId = allPlayers.filter(player => player.userId === userInfo.userId.toString());
-            console.log("mySessionId\t", mySessionId);
+            // console.log("mySessionId\t", mySessionId);
 
         }
 

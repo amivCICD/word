@@ -267,12 +267,7 @@
 
       document.addEventListener('keydown', e => {
         const playerState = getPlayerState();
-        console.log('playerState index.html\t', playerState);
         let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
-        // let globalCurrentPlayer = playerState.allPlayers.filter(player => player.userId === localCurrentPlayerId);
-        console.log('globalCurrentPlayer\t', globalCurrentPlayer, globalCurrentPlayer.userId);
-        // console.log('playerState.allPlayers\t', playerState.allPlayers);
-
         if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
           return;
         }
