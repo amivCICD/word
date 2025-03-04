@@ -44,7 +44,7 @@ onMessage(async (messageData) => {
                 handleWiggleAnimation(state.arrayOfRowArrays[state.row]);
                 return;
             }
-            await handleGuess(state, data, gameOver, checkCompletionStatus);
+            await handleGuess(state, data, state.gameOver, state.checkCompletionStatus);
         }
     }
 });
@@ -144,15 +144,17 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
     }
     if (newRow.restart) {
         state.gameComplete = true;
-        checkCompletionStatus.setCompletedGame();
+        state.checkCompletionStatus.setCompletedGame();
         console.log('You can now restart the game...');
+        resetGameState(state);
         fireOffConfetti();
     }
     if (gameOver.getGameOverStatus()) {
         state.gameComplete = true;
         checkCompletionStatus.setCompletedGame();
         console.log("You did not get the word...fire off modal...");
-        showFailureModal(newRow.wordOfTheDay);
+        showFailureModal(state.wordOfTheDay);
+        // showFailureModal(newRow.wordOfTheDay);
     }
 }
 function resetGameState(state) {
@@ -160,4 +162,5 @@ function resetGameState(state) {
         state.row = 0;
         state.guess = "";
         state.gameComplete = false;
+        // state.userInput = "";
 }

@@ -1,5 +1,11 @@
+import { CheckCompletionStatus } from "../checkCompletionStatus";
+import { GameOver } from "../gameOver";
+import { GuessStarted } from "../guessStarted";
+import { ResetGameState } from "../resetGameState";
 import { RowGameState } from "../rowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "./newUserJoiningMessage";
+
+
 
 const prodURL = "localhost:1985";
 
@@ -20,8 +26,11 @@ let typeOutGuessGameState = {
     gameStateParam: undefined,
     arrayOfRowArrays: [],
     wordOfTheDayLetters: [],
-    // gameState: null,
-    rowGameState: RowGameState.getInstance()
+    resetGameState: ResetGameState,
+    gameOver: GameOver.getInstance(),
+    rowGameState: RowGameState.getInstance(),
+    guessStarted: GuessStarted.getInstance(),
+    checkCompletionStatus: CheckCompletionStatus.getInstance()
 };
 let textMessageState = {
     userId: "",
@@ -158,6 +167,10 @@ function updateGameState(data) {
         typeOutGuessGameState.gameStateParam = data.gameStateParam;
         typeOutGuessGameState.rowGameState = data.rowGameState;
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
+    } if (data.updateType === "resetGameState") {
+        typeOutGuessGameState.resetGameState = data.resetGameState;
+        typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
+        typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
     }
 }
 

@@ -4,8 +4,12 @@ import { illuminateKeys } from "./illuminateKeys";
 import { GuessStarted } from "./guessStarted.ts";
 import { GameOver } from "./gameOver.ts";
 import { sendMessage, onMessage } from "./multiplayer/initialize_web_socket.ts";
+import { getGameState } from "./multiplayer/initialize_web_socket.ts";
 
-const guessStarted = GuessStarted.getInstance();
+
+const gameState = getGameState();
+// const guessStarted = GuessStarted.getInstance();
+const guessStarted = gameState.guessStarted;
 let incRow: number = 0;
 let guess: string = "";
 
@@ -56,24 +60,25 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
 
 
 let c: number = 0;
-const gameOver = GameOver.getInstance();
+const gameOver = gameState.gameOver;
 export async function appendGuess(
     divEl: HTMLDivElement[],
     guessFromPrev: string,
     wordOfTheDay: string,
     wordOfTheDayLetters: string[],
-    gameState
+    gameStateParam
 ): Promise<number> {
     let restart = false;
     guessStarted.setGuessStartedTrue();
-    if (gameState.reset) {
+    if (gameStateParam.reset) {
         incRow = 0;
         guess = "";
         c = 0;
-        illuminateKeys("", "", gameState.reset);
+        illuminateKeys("", "", gameStateParam.reset);
         restart = false;
         guessStarted.setGuessStartedFalse();
         gameOver.setGameOverFalse();
+        sendMessage(JSON.stringify({ type: "updateGameState", updateType: "reset_guess_gameOver" }))
         return;
     }
 
