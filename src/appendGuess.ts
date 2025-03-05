@@ -59,7 +59,7 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
 }
 
 
-let c: number = gameState.c;
+// let c: number = gameState.c;
 const gameOver = gameState.gameOver;
 export async function appendGuess(
     divEl: HTMLDivElement[],
@@ -68,7 +68,7 @@ export async function appendGuess(
     wordOfTheDayLetters: string[],
     gameStateParam
 ): Promise<number> {
-    let restart = false;
+    // let restart = false;
     guessStarted.setGuessStartedTrue();
     console.log("gameStateParam.reset in appendGuess.ts\t", gameStateParam.reset)
     if (gameStateParam.reset) {
@@ -76,11 +76,12 @@ export async function appendGuess(
         gameState.appendGuess = "";
         gameState.c = 0;
         illuminateKeys("", "", gameStateParam.reset);
-        restart = false;
+        gameState.restart = false;
         guessStarted.setGuessStartedFalse();
-        gameOver.setGameOverFalse();
+        // gameOver.setGameOverFalse();
         // sendMessage(JSON.stringify({ type: "updateGameState", updateType: "resetGuessState" }));
-        return { incRow: gameState.incRow, restart };
+        // sendMessage(JSON.stringify({ type: "updateGameState", updateType: "resetGameState" }));
+        return { incRow: gameState.incRow, restart: gameState.restart };
         // return;
     }
 
@@ -105,7 +106,7 @@ export async function appendGuess(
     }
     if (gameState.appendGuess === wordOfTheDay) {
         console.log('You got it!');
-        restart = true;
+        gameState.restart = true;
     } else if (gameState.incRow === 5 && gameState.appendGuess !== wordOfTheDay) {
         gameOver.setGameOverTrue();
     } else {
@@ -114,5 +115,5 @@ export async function appendGuess(
     gameState.c = 0;
     gameState.incRow++;
     guessStarted.setGuessStartedFalse();
-    return { incRow: gameState.incRow, restart, wordOfTheDay };
+    return { incRow: gameState.incRow, restart: gameState.restart, wordOfTheDay };
 }

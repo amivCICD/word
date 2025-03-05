@@ -34,7 +34,8 @@ let typeOutGuessGameState = {
     // for appendGuess.ts
     incRow: 0,
     c: 0,
-    appendGuess: ""
+    appendGuess: "",
+    restart: false
 };
 let textMessageState = {
     userId: "",
@@ -264,23 +265,27 @@ onMessage((e) => {
     } else if (data.updateType === "checkCompletionStatus") {
 
     } else if (data.updateType === "resetGameState") {
-        state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
+        state.resetGameState = data.resetGameState;
+        // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
         state.wordOfTheDay = data.wordOfTheDay;
         state.wordOfTheDayLetters = data.wordOfTheDayLetters;
+        // state.gameOver =  data.gameOver;
         state.letterCount = 0;
         state.row = 0;
         state.guess = "";
-        state.gameComplete = false;
+        state.gameComplete = data.gameComplete;
         state.rowGameState.startFromZero();
         state.incRow = 0;
         state.appendGuess = "";
         state.c = 0;
+        state.restart = false // added later
         UIReset.resetUI();
         return;
     } else if (data.updateType === "resetGuessState") {
         state.incRow = data.incRow;
         state.appendGuess = data.appendGuess;
         state.c = data.c;
+        state.restart = data.restart;
         return;
     }
 });

@@ -16,6 +16,8 @@
 
     change front-end endpoints to query server
 
+
+    03 04 2025 - Upon user rejoining or joining mid game, must post game state
     03 04 2025 - ResetGameState is where everything gets set after start new game buttton, so we need to add it to a message?
     02 27 2025 - add an initial setup window event listener to cancel input on appendGuess.ts when use is going through the modal process, e.g. for enter button on startGameButton, closeModalButton, possibly usernameBtn
     03 04 2025 - NOTE: START NEW GAME button is only revealed for 1080+ monitors...consider revising...

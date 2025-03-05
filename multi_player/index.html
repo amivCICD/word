@@ -220,7 +220,8 @@
             const wotd = await fetchWord.json();
             resetGameState = new ResetGameState(true, wotd.word);
             resetGameState.setResetFalse();
-            if (state.checkCompletionStatus.isCompleted()) {
+            if (checkCompletionStatus.isCompleted()) {
+              console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
               sendMessage(JSON.stringify({ type: "updateGameState", updateType: "checkCompletionStatus", checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false) }));
                // reveal after game end....
               // checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
@@ -253,27 +254,32 @@
                   const w = await fetchWord.json();
                   console.log('fetchWord\t', w);
                   resetGameState = new ResetGameState(true, w.word);
+                  state.gameOver.setGameOverFalse();
                   sendMessage(JSON.stringify({
                     type: "updateGameState",
                     updateType: "resetGameState",
                     resetGameState: resetGameState, // || reset: true
                     wordOfTheDay: w.word,
                     wordOfTheDayLetters: resetGameState.wordOfTheDayLetters,
+                    // gameOver: gameOver.getGameOverStatus(),
                     UIReset: UIReset
                   }));
-                  if (state.checkCompletionStatus.isCompleted()) {
+                  if (checkCompletionStatus.isCompleted()) { // this is only to unhide the stat new game button
                     checkCompletionStatus.setCompletedGame();
+                    console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
                   }
-                  gameOver.setGameOverFalse();
+
                   // sendMessage(JSON.stringify({ type: "updateGameState", updateType: "resetGameState", resetGameState: resetGameState, gameOver: gameOver, UIReset: UIReset }))
-                  console.log('resetGameState.reset is true?\t', resetGameState.reset)
+                  console.log('resetGameState.reset is true?\t', resetGameState.reset);
+                  resetGameState.setResetFalse();
                   typeOutGuess(
                     null,
                     resetGameState,
                     resetGameState.wordOfTheDay,
                     resetGameState.wordOfTheDayLetters
                   );
-                  resetGameState.setResetFalse();
+
+                  // resetGameState.setResetFalse();
                 }
               } catch (error) {
                 console.error(error);
@@ -390,6 +396,7 @@
         <div class="modal-action">
           <form method="dialog">
             <!-- if there is a button in form, it will close the modal -->
+            <!-- <button class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button> -->
             <button class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button>
             <button class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button>
           </form>

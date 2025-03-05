@@ -8,9 +8,9 @@ import { GameOver } from "./gameOver.ts";
 import { CheckCompletionStatus } from "./checkCompletionStatus.ts";
 import { sendMessage, onMessage, getGameState, getPlayerState } from "./multiplayer/initialize_web_socket.ts";
 
-const gameOver = GameOver.getInstance();
+// const gameOver = GameOver.getInstance();
 // const rowGameState = RowGameState.getInstance();
-const checkCompletionStatus = CheckCompletionStatus.getInstance();
+// const checkCompletionStatus = CheckCompletionStatus.getInstance();
 
 let arrayOfRowArrays;
 document.addEventListener("DOMContentLoaded", e => {
@@ -65,14 +65,29 @@ export async function typeOutGuess(
     // state.rowGameState = rowGameState;
     state.wordOfTheDayLetters = wordOfTheDayLetters
 
-    console.log("gameStateParam.reset in typeOutGuess IF statement\t", gameStateParam.reset)
+    console.log("gameStateParam.reset in typeOutGuess IF statement\t", gameStateParam.reset);
     if (gameStateParam.reset) {
-        resetGameState(state);
+        // resetGameState(state);
+        sendMessage(JSON.stringify({
+            type: "updateGameState",
+            updateType: "resetGameState",
+            resetGameState: gameStateParam,
+            wordOfTheDay: wordOfTheDay,
+            wordOfTheDayLetters:
+            wordOfTheDayLetters,
+            reset: gameStateParam.reset,
+            gameComplete: false
+        }));
         await appendGuess(null, null, null, null, gameStateParam);
     }
 
+    // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
+    //         state.wordOfTheDay = data.wordOfTheDay;
+    //         state.wordOfTheDayLetters = data.wordOfTheDayLetters;
+
     if (state.letterCount !== 5 && userInput === "ENTER") return; // enter key was ENTERING the guess...
-    if (state.gameComplete || userInput === null) return;
+    if (state.gameOver.getGameOverStatus() || userInput === null) return; // test...
+    // if (state.gameComplete || userInput === null) return; // test...
 
 
     if (state.letterCount === 5 && userInput === "ENTER" && state.guess !== "ENTER") {
@@ -153,12 +168,16 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         // resetGameState(state);
         fireOffConfetti();
     }
+    // if (gameOver.getGameOverStatus()) {
     if (gameOver.getGameOverStatus()) {
         state.gameComplete = true;
         checkCompletionStatus.setCompletedGame();
         console.log("You did not get the word...fire off modal...");
+        // resetGameState(state);
         showFailureModal(state.wordOfTheDay);
-        // showFailureModal(newRow.wordOfTheDay);
+        state.userInput = "";
+        // state.gameOver.setGameOverFalse(); // perhaps?
+
     }
 }
 function resetGameState(state) {
