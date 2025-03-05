@@ -16,9 +16,13 @@
 
     change front-end endpoints to query server
 
-    02 23 2025 - provide dictionary definition of the word after game end
-    02 25 2025 - cannot use enter to confirm name change // quick fixed with setting input val to current name...
-    02 25 2025 - need to confirm that "Start new game" resets match
-    02 25 2025 - see why the first chat message doesnt reach the other end... - check
-    02 25 2025 - UI updates on both screens, but it is not synced, need to sync the users to the word count on message....
+    03 04 2025 - ResetGameState is where everything gets set after start new game buttton, so we need to add it to a message?
     02 27 2025 - add an initial setup window event listener to cancel input on appendGuess.ts when use is going through the modal process, e.g. for enter button on startGameButton, closeModalButton, possibly usernameBtn
+    03 04 2025 - NOTE: START NEW GAME button is only revealed for 1080+ monitors...consider revising...
+    02 23 2025 - provide dictionary definition of the word after game end
+    03 04 2025 - MAIN ISSUE: we are not resetting the state for all players when we start a new game... e.g.clearing everyhthing
+    02 25 2025 - cannot use enter to confirm name change // quick fixed with setting input val to current name...  - CHHECK
+    02 25 2025 - need to confirm that "Start new game" resets match - CHECK
+    02 25 2025 - see why the first chat message doesnt reach the other end... - CHECK
+    02 25 2025 - UI updates on both screens, but it is not synced, need to sync the users to the word count on message.... - CHECK
+    03 04 2025 - current is, firefox_dev doesnt show start new game button after game is won || firefox regs... // line 223 index.html //multiplayer - CHECK

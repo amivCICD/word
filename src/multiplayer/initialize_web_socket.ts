@@ -1,7 +1,7 @@
 import { CheckCompletionStatus } from "../checkCompletionStatus";
 import { GameOver } from "../gameOver";
 import { GuessStarted } from "../guessStarted";
-import { ResetGameState } from "../resetGameState";
+import { ResetGameState, UIReset } from "../resetGameState";
 import { RowGameState } from "../rowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "./newUserJoiningMessage";
 
@@ -30,7 +30,11 @@ let typeOutGuessGameState = {
     gameOver: GameOver.getInstance(),
     rowGameState: RowGameState.getInstance(),
     guessStarted: GuessStarted.getInstance(),
-    checkCompletionStatus: CheckCompletionStatus.getInstance()
+    checkCompletionStatus: CheckCompletionStatus.getInstance(),
+    // for appendGuess.ts
+    incRow: 0,
+    c: 0,
+    appendGuess: ""
 };
 let textMessageState = {
     userId: "",
@@ -140,8 +144,7 @@ function updateGameState(data) {
         if (data.arrayOfRowArrays) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
-    }
-    if (data.updateType === "append") {
+    } else if (data.updateType === "append") {
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.type = data.type;
         typeOutGuessGameState.guess = data.guess;
@@ -151,14 +154,12 @@ function updateGameState(data) {
         if (data.arrayOfRowArrays) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
-    }
-    if (data.updateType === "setWOTD_and_params") {
+    } else if (data.updateType === "setWOTD_and_params") {
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
         typeOutGuessGameState.gameState = data.gameState;
         // typeOutGuessGameState.arrayOfRowArrays = data.typeOutGuessGameState;
-    }
-    if (data.updateType === "guessAttempt") {
+    } else if (data.updateType === "guessAttempt") {
         // typeOutGuessGameState.userInput = "";
         typeOutGuessGameState.row = data.row;
         typeOutGuessGameState.userInput = data.userInput;
@@ -167,10 +168,12 @@ function updateGameState(data) {
         typeOutGuessGameState.gameStateParam = data.gameStateParam;
         typeOutGuessGameState.rowGameState = data.rowGameState;
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
-    } if (data.updateType === "resetGameState") {
+    } else if (data.updateType === "resetGameState") {
         typeOutGuessGameState.resetGameState = data.resetGameState;
         typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
+    } else if (data.updateType === "checkCompletionStatus") {
+        typeOutGuessGameState.checkCompletionStatus = data.checkCompletionStatus
     }
 }
 
@@ -191,31 +194,14 @@ function updatePlayerState(data) {
         player = {
             username: data.username,
             userId: data.userId,
-            // isCurrentUser: allPlayers.length === 0,
             isCurrentUser: data.isCurrentPlayer,
             score: { letters: [] },
-            // score: { letters: [ ...playerState.score.letters, data.letter ].filter(i => i) },
-            // playerCount: [
-            //     ...playerState.playerCount,
-            //     { username: data.username, userId: data.userId, isCurrentUser: playerState.isCurrentUser }
-            // ],
         }
         allPlayers = [player];
-        // allPlayers = allPlayers.length === 0 ? [player] : [...allPlayers, player];
-        // allPlayers.push({...playerState});
     } else if (data.updateType === "addPlayer") {
-        // const existingPlayer = allPlayers.find(player => player.userId === data.userId);
-        // if (!existingPlayer) {
-        // }
-        // allPlayers = data.playerCount;
-        // window.dispatchEvent(new Event("playerStateUpdated"));
-
         if (Array.isArray(data.playerCount)) {
             const incomingPlayers = JSON.stringify(data.playerCount)
-            // console.log('incomingPlayers\t', incomingPlayers);
-
             const currentPlayers = JSON.stringify(allPlayers)
-            // console.log('currentPlayers\t', currentPlayers);
             if (incomingPlayers !== currentPlayers) {
                 allPlayers.length = 0;
                 data.playerCount?.forEach((player) => {
@@ -231,71 +217,36 @@ function updatePlayerState(data) {
                 userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
                 console.log('SET PLAYERS PLAYER STATE', currentPlayer);
             }
-            // allPlayers.length = 0;
         }
 
         const localUserInfo = localStorage.getItem("username");
         const userInfo = JSON.parse(localUserInfo);
         if (allPlayers) {
             const mySessionId = allPlayers.filter(player => player.userId === userInfo.userId.toString());
-            // console.log("mySessionId\t", mySessionId);
-
         }
-
-        // player = allPlayers.find(player => player.userId === data.userId);
-
-        // if (!allPlayers?.some(player => player.userId === data.userId)) {
-        //     allPlayers = [...allPlayers, {
-        //         username: data.username,
-        //         userId: data.userId,
-        //         score: { letters: [] },
-        //         isCurrentPlayer: data.isCurrentPlayer
-        //     }];
-        //     player = allPlayers.find(player => player.userId === data.userId);
-        // }
-        // playerState = {
-        //     ...playerState,
-        //     // isCurrentUser: playerState.playerCount.length === 0,
-        //     playerCount: [ ...playerState.playerCount, { ...data.newPlayerInfo } ]
-        // }
-        // allPlayers.push({ ...data.newPlayerInfo });
-
-
     } else if (data.updateType === "removePlayer") {
-        // playerState = {
-        //     ...playerState,
-        //     playerCount: playerState.playerCount.filter(user => user.userId !== data.userId)
-        // }
         allPlayers?.filter(player => player.userId !== data.userId);
+
     } else if (data.updateType === "updatePlayerScore") {
-        // playerState = {
-        //     ...playerState,
-        //     score: { letters: [ ...playerState.score.letters, data.letter ] }
-        // }
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
+
     } else if (data.updateType === "swapCurrentPlayer") {
-        // playerState = {
-        //     username: data.username,
-        //     userId: data.userId,
-        //     isCurrentUser: true,
-        //     score: { letters: [ ...playerState.score.letters, data.letter ] },
-        //     playerCount: playerState.playerCount
-        // }
+
     } else if (data.updateType === "getAllPlayers") {
 
     } else if (data.updateType === "checkForTwoPlayers") {
         if (allPlayers.length === 2) {
             console.log("playerState is 2 or more, do coin flip");
             allPlayers[data.randomPlayerChoice].isCurrentPlayer = true;
-            // playerState = { ...playerState, playerIsSet: true };
-            // console.log("THIS PLAYER HAS BEEN ASSIGNED TO GO FIRST\t", allPlayers[data.randomPlayerChoice]);
+
         } else {
             console.log("THERE IS ONLY ONE PLAYER READY TO PLAY");
         }
     }
 }
 onMessage((e) => {
+    const state = getGameState();
     const data = JSON.parse(e);
     if (data.updateType === "setCurrentPlayer") {
         // console.log('playerState\t', playerState)
@@ -305,33 +256,34 @@ onMessage((e) => {
         const localUserInfo = localStorage.getItem("username");
         const userInfo = JSON.parse(localUserInfo);
 
-
-
-
     } else if (data.updateType === "removePlayer") { // whoever sees two players first?
         console.log('playerState AFTER REMOVE PLAYER \t', player);
 
     } else if (data.updateType === "checkForTwoPlayers" && allPlayers.length >= 2) {
-        // if (!playerState.playerIsSet) {
-        //     const flipDecision = Math.floor(Math.random() * playerState.playerCount.length);
-        //     let currentPlayer = playerState.playerCount[flipDecision];
-        //     currentPlayer.isCurrentUser = true;
-        //     const userTurn = document.getElementById("userTurn");
-        //     userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
-        //     console.log('SET PLAYERS PLAYER STATE', playerState);
-        // }
-        const currentPlayer = allPlayers.filter(player => player.isCurrentPlayer === true);
 
+    } else if (data.updateType === "checkCompletionStatus") {
 
+    } else if (data.updateType === "resetGameState") {
+        state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
+        state.wordOfTheDay = data.wordOfTheDay;
+        state.wordOfTheDayLetters = data.wordOfTheDayLetters;
+        state.letterCount = 0;
+        state.row = 0;
+        state.guess = "";
+        state.gameComplete = false;
+        state.rowGameState.startFromZero();
+        state.incRow = 0;
+        state.appendGuess = "";
+        state.c = 0;
+        UIReset.resetUI();
+        return;
+    } else if (data.updateType === "resetGuessState") {
+        state.incRow = data.incRow;
+        state.appendGuess = data.appendGuess;
+        state.c = data.c;
+        return;
     }
 });
-
-// let playerState = {
-//     username: null,
-//     userId: null,
-//     score: { letters: [] },
-//     isCurrentPlayer: false
-// }
 
 
 // leaving chat channel

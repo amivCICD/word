@@ -148,6 +148,7 @@
       import { typeOutGuess } from "../src/typeOutGuess.ts";
       import { checkInputValues } from "../src/checkInputValues.ts";
       import { ResetGameState } from "../src/resetGameState.ts";
+      import { UIReset } from "../src/resetGameState.ts";
       import { sWords } from "../src/sWords";
       import { RowGameState } from "../src/rowGameState.ts";
       import { GuessStarted } from "../src/guessStarted.ts";
@@ -219,8 +220,10 @@
             const wotd = await fetchWord.json();
             resetGameState = new ResetGameState(true, wotd.word);
             resetGameState.setResetFalse();
-            if (checkCompletionStatus.isCompleted()) {
-              checkCompletionStatus.hideRevealStartBtn(false);
+            if (state.checkCompletionStatus.isCompleted()) {
+              sendMessage(JSON.stringify({ type: "updateGameState", updateType: "checkCompletionStatus", checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false) }));
+               // reveal after game end....
+              // checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
             }
             typeOutGuess(
                 null,
@@ -250,16 +253,25 @@
                   const w = await fetchWord.json();
                   console.log('fetchWord\t', w);
                   resetGameState = new ResetGameState(true, w.word);
-                  sendMessage(JSON.stringify({ type: "updateGameState", updateType: "resetGameState", resetGameState: resetGameState, wordOfTheDay: resetGameState.wordOfTheDay, wordOfTheDayLetters: resetGameState.wordOfTheDayLetters }));
-                  if (checkCompletionStatus.isCompleted()) {
+                  sendMessage(JSON.stringify({
+                    type: "updateGameState",
+                    updateType: "resetGameState",
+                    resetGameState: resetGameState, // || reset: true
+                    wordOfTheDay: w.word,
+                    wordOfTheDayLetters: resetGameState.wordOfTheDayLetters,
+                    UIReset: UIReset
+                  }));
+                  if (state.checkCompletionStatus.isCompleted()) {
                     checkCompletionStatus.setCompletedGame();
                   }
                   gameOver.setGameOverFalse();
+                  // sendMessage(JSON.stringify({ type: "updateGameState", updateType: "resetGameState", resetGameState: resetGameState, gameOver: gameOver, UIReset: UIReset }))
+                  console.log('resetGameState.reset is true?\t', resetGameState.reset)
                   typeOutGuess(
                     null,
-                    state.resetGameState,
-                    state.resetGameState.wordOfTheDay,
-                    state.resetGameState.wordOfTheDayLetters
+                    resetGameState,
+                    resetGameState.wordOfTheDay,
+                    resetGameState.wordOfTheDayLetters
                   );
                   resetGameState.setResetFalse();
                 }

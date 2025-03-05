@@ -46,6 +46,9 @@ onMessage(async (messageData) => {
             }
             await handleGuess(state, data, state.gameOver, state.checkCompletionStatus);
         }
+    } else if (data.updateType === "resetGameState") {
+        // resetGameState(state);
+        console.log("we hit the data.updateType in our onmessage in typeoutGuess.ts")
     }
 });
 
@@ -62,17 +65,18 @@ export async function typeOutGuess(
     // state.rowGameState = rowGameState;
     state.wordOfTheDayLetters = wordOfTheDayLetters
 
-    if (state.letterCount !== 5 && userInput === "ENTER") return; // enter key was ENTERING the guess...
-    if (state.gameComplete || userInput === null) return;
-
-
+    console.log("gameStateParam.reset in typeOutGuess IF statement\t", gameStateParam.reset)
     if (gameStateParam.reset) {
         resetGameState(state);
         await appendGuess(null, null, null, null, gameStateParam);
     }
 
+    if (state.letterCount !== 5 && userInput === "ENTER") return; // enter key was ENTERING the guess...
+    if (state.gameComplete || userInput === null) return;
+
+
     if (state.letterCount === 5 && userInput === "ENTER" && state.guess !== "ENTER") {
-        console.log("state.wordOfTheDayLetters\t", state.wordOfTheDayLetters)
+        console.log("state.wordOfTheDayLetters\t", state.wordOfTheDayLetters);
         sendMessage(JSON.stringify({
             type: "updateGameState",
             updateType: "guessAttempt",
@@ -131,8 +135,8 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         data.gameStateParam
     );
     if (state.row !== 5) {
-        console.log("newRow.incRow\t", newRow.incRow)
-        console.log("newRow.restart\t", newRow.restart)
+        console.log("newRow.incRow\t", newRow.incRow);
+        console.log("newRow.restart\t", newRow.restart);
         // rowGameState.startFromZero();
         state.arrayOfRowArrays[state.row+1][0].innerHTML = "";
         state.row = newRow.incRow;
@@ -146,7 +150,7 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         state.gameComplete = true;
         state.checkCompletionStatus.setCompletedGame();
         console.log('You can now restart the game...');
-        resetGameState(state);
+        // resetGameState(state);
         fireOffConfetti();
     }
     if (gameOver.getGameOverStatus()) {
@@ -163,4 +167,9 @@ function resetGameState(state) {
         state.guess = "";
         state.gameComplete = false;
         // state.userInput = "";
+}
+
+function startNewMultiPlayerGame() {
+    // let newMultiPlayerGameModal = document.getElementById("newMultiPlayerGameModal");
+    // newMultiPlayerGame.showModal();
 }

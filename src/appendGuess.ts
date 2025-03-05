@@ -8,10 +8,10 @@ import { getGameState } from "./multiplayer/initialize_web_socket.ts";
 
 
 const gameState = getGameState();
-// const guessStarted = GuessStarted.getInstance();
 const guessStarted = gameState.guessStarted;
-let incRow: number = 0;
-let guess: string = "";
+// const guessStarted = GuessStarted.getInstance();
+// let incRow: number = gameState.incRow;
+// let append_guess: string = gameState.appendGuess;
 
 function checkForCorrectPosition(wordOfTheDayLetters: string[], guessArr: string[]) {
     console.log("wordOfTheDayLetters from checkForCorrectPosition\t", wordOfTheDayLetters);
@@ -59,7 +59,7 @@ function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPo
 }
 
 
-let c: number = 0;
+let c: number = gameState.c;
 const gameOver = gameState.gameOver;
 export async function appendGuess(
     divEl: HTMLDivElement[],
@@ -70,16 +70,18 @@ export async function appendGuess(
 ): Promise<number> {
     let restart = false;
     guessStarted.setGuessStartedTrue();
+    console.log("gameStateParam.reset in appendGuess.ts\t", gameStateParam.reset)
     if (gameStateParam.reset) {
-        incRow = 0;
-        guess = "";
-        c = 0;
+        gameState.incRow = 0;
+        gameState.appendGuess = "";
+        gameState.c = 0;
         illuminateKeys("", "", gameStateParam.reset);
         restart = false;
         guessStarted.setGuessStartedFalse();
         gameOver.setGameOverFalse();
-        sendMessage(JSON.stringify({ type: "updateGameState", updateType: "reset_guess_gameOver" }))
-        return;
+        // sendMessage(JSON.stringify({ type: "updateGameState", updateType: "resetGuessState" }));
+        return { incRow: gameState.incRow, restart };
+        // return;
     }
 
 
@@ -93,24 +95,24 @@ export async function appendGuess(
         await new Promise(res => setTimeout(res, 500));
         console.log(letter.innerHTML);
 
-        guess += letter.innerHTML;
+        gameState.appendGuess += letter.innerHTML;
 
-        checkForCorrectLetter(letter, yellowWorthy, correctPositionArr, c);
+        checkForCorrectLetter(letter, yellowWorthy, correctPositionArr, gameState.c);
         letter.classList.toggle('box');
         illuminateKeys(letter.innerHTML, "miss");
 
-        c++;
+        gameState.c++;
     }
-    if (guess === wordOfTheDay) {
+    if (gameState.appendGuess === wordOfTheDay) {
         console.log('You got it!');
         restart = true;
-    } else if (incRow === 5 && guess !== wordOfTheDay) {
+    } else if (gameState.incRow === 5 && gameState.appendGuess !== wordOfTheDay) {
         gameOver.setGameOverTrue();
     } else {
-        guess = "";
+        gameState.appendGuess = "";
     }
-    c = 0;
-    incRow++;
+    gameState.c = 0;
+    gameState.incRow++;
     guessStarted.setGuessStartedFalse();
-    return { incRow, restart, wordOfTheDay };
+    return { incRow: gameState.incRow, restart, wordOfTheDay };
 }
