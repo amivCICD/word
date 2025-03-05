@@ -30,7 +30,8 @@ onMessage(async (messageData) => {
     if (data.updateType === "backspace" && data.userInput === 'BACKSPACE') {
         if (state.letterCount >= 0 && state.letterCount < 5) {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
-            syncMatrixArrayToServer(state);
+            // syncMatrixArrayToServer(state);
+            syncWordRowArrayState(state)
 
         } else if (state.letterCount === 5 || state.letterCount === 0) {
             return;
@@ -38,7 +39,8 @@ onMessage(async (messageData) => {
     } else if (data.updateType === 'append') {
         if (state.letterCount <= 5 && state.rowLetterCount < 6) {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
-            syncMatrixArrayToServer(state);
+            // syncMatrixArrayToServer(state);
+            syncWordRowArrayState(state)
         }
     } else if (data.updateType === "guessAttempt" && data.userInput === "ENTER") {
         if (state.letterCount === 5) {
@@ -201,4 +203,12 @@ function syncMatrixArrayToServer(state) {
         matrixArray: JSON.stringify(state.matrixArray)
     }));
     console.log("JSON.stringify(state.matrixArray) inside syncMatrixArray()\t", JSON.stringify(state.matrixArray))
+}
+
+function syncWordRowArrayState(state) {
+    sendMessage(JSON.stringify({ // send to server
+        type: "syncWordRowArrayState",
+        wordRowArrayState: JSON.stringify(state.wordRowArrayState)
+    }));
+    console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(state.wordRowArrayState))
 }

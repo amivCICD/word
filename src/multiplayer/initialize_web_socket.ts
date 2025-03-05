@@ -36,7 +36,8 @@ let typeOutGuessGameState = {
     c: 0,
     appendGuess: "",
     restart: false,
-    matrixArray: [['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','','']]
+    matrixArray: [['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','','']],
+    wordRowArrayState: [[ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ]]
 };
 let textMessageState = {
     userId: "",
@@ -129,10 +130,21 @@ export function getAllTextMessageState() {
 export function getPlayerState() {
     return allPlayers;
 }
+function getCurrentArrowOfRowArrays(): [][] {
+    const rows = document.querySelectorAll('.word-row');
+    const arrayOfRows = Array.from(rows);
+    let arrayOfRowArrays: Array<T> = [];
+    for (let i = 0; i < arrayOfRows.length; i+=5) {
+        const element = arrayOfRows.slice(i, i+5);
+        arrayOfRowArrays.push(element);
+    }
+    return arrayOfRowArrays;
+}
 
 
 function updateGameState(data) {
     if (data.updateType === "backspace") {
+        const currentRowArrayState = getCurrentArrowOfRowArrays();
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.guess = data.guess || typeOutGuessGameState.guess.slice(0, -1);
         typeOutGuessGameState.guess = data.guess;
@@ -142,6 +154,8 @@ function updateGameState(data) {
         typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount] = "";
         if (data.arrayOfRowArrays) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].class = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].classList.value;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = "";
         }
         // sendMessage(JSON.stringify({ // send to server
         //     type: "syncMatrixArray",
@@ -150,6 +164,9 @@ function updateGameState(data) {
 
         // console.log("typeOutGuessGameState.matrixArray\t", typeOutGuessGameState.matrixArray);
     } else if (data.updateType === "append") {
+        const currentRowArrayState = getCurrentArrowOfRowArrays();
+        console.log('currentRowArrayState*********', currentRowArrayState);
+
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.type = data.type;
         typeOutGuessGameState.guess = data.guess;
@@ -158,7 +175,14 @@ function updateGameState(data) {
         typeOutGuessGameState.rowLetterCount = data.rowLetterCount;
         typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount - 1] = data.userInput;
         if (data.arrayOfRowArrays) {
+            console.log("currentRowArrayState[typeOutGuessGameState.row][data.letterCount]\t", currentRowArrayState[typeOutGuessGameState.row][data.letterCount])
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
+        }
+        if (currentRowArrayState) {
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].class = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].classList.value;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].value = data.userInput;
+            // typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].innerHTML;
+
         }
         // sendMessage(JSON.stringify({ // send to server
         //     type: "syncMatrixArray",
@@ -188,8 +212,8 @@ function updateGameState(data) {
     } else if (data.updateType === "syncStateToServer") {
         console.log('typeOutGuessGameState.matrixArray from updateState\t', typeOutGuessGameState.matrixArray)
     } else if (data.updateType === "syncMatrix") {
-        console.log("JSON PARSE data.matrixArray\t", JSON.parse(data.matrixArray));
-        typeOutGuessGameState.matrixArray = JSON.parse(data.matrixArray);
+        // console.log("JSON PARSE data.matrixArray\t", JSON.parse(data.wordRowArrayState));
+        // typeOutGuessGameState.wordRowArrayState = JSON.parse(data.wordRowArrayState);
     }
 
 }
@@ -232,7 +256,8 @@ function updatePlayerState(data) {
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
                 userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
-                console.log("currentPlayer MATRIX ARRAY\t", JSON.parse(currentPlayer.matrixArray));
+                // console.log("currentPlayer MATRIX ARRAY\t", JSON.parse(currentPlayer.wordRowArrayState));
+                console.log("currentPlayer wordArrayState\t", currentPlayer);
             }
         }
 

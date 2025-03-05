@@ -21,16 +21,14 @@ export function newUserJoiningMessage() {
 
         }));
 
-
-
-
         sendMessage(JSON.stringify({
             type: "updatePlayerState",
             updateType: "addPlayer",
             username: username,
             userId: userId.toString(),
             score: { letters: [] },
-            matrixArray: JSON.stringify(state.matrixArray)
+            wordRowArrayState: JSON.stringify(state.wordRowArrayState)
+            // matrixArray: JSON.stringify(state.matrixArray) // was working, moving to above 03 05 2025
             // isCurrentPlayer: !playerState.allPlayers.length
         }));
 

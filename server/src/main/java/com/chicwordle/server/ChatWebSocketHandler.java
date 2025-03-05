@@ -68,7 +68,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                             .put("sessionId", s.getId())
                             .put("username", userInfo != null ? userInfo.getString("username") : "")
                             .put("userId", userInfo != null ? userInfo.getString("userId") : "")
-                            .put("matrixArray", matrixInfo != null ? matrixInfo.getString("matrixArray") : "[]")
+                            .put("wordRowArrayState", matrixInfo != null ? matrixInfo.getString("wordRowArrayState") : "[]")
                             .put("isFirstPlayer", false);
                     }).collect(Collectors.toList()));
 
@@ -78,11 +78,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-        if (msg.getString("type").equals("syncMatrixArray")) {
+        if (msg.getString("type").equals("syncWordRowArrayState")) {
             String payload = session.getId();
-            String matrixArrayStr = msg.optString("matrixArray", "[['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','','']]");
+            String matrixArrayStr = msg.optString("wordRowArrayState", "[[{class: '', value: ''}]]");
 
-            JSONObject matrix = new JSONObject().put("matrixArray", matrixArrayStr);
+            JSONObject matrix = new JSONObject().put("wordRowArrayState", matrixArrayStr);
             matrixArrayMap.put(session, matrix);
             matrixArrayMap.forEach((key, val) -> {
                 System.out.println("matrixArrayMap updates: " + val.toString());
@@ -93,7 +93,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("type", "updateGameState")
                 .put("updateType", "syncMatrix")
                 .put("sessionId", session.getId())
-                .put("matrixArray", matrixArrayStr);
+                .put("wordRowArrayState", matrixArrayStr);
             String syncMessage = syncMatrix.toString();
             // System.out.println("syncMatrix\t" + syncMessage + " SessionId Payload:\t" + payload);
 
