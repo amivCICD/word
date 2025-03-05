@@ -1,6 +1,8 @@
 import { sendMessage, getPlayerState } from "./initialize_web_socket";
+import { getGameState } from "./initialize_web_socket";
 
 export function newUserJoiningMessage() {
+    const state = getGameState();
     const playerState = getPlayerState();
     if (localStorage.getItem("username") !== null) {
         const userinfo = JSON.parse(localStorage.getItem("username"));
@@ -11,21 +13,27 @@ export function newUserJoiningMessage() {
         // const currentPlayer = playerState.allPlayers[randomPlayerChoice];
         // userinfo.isCurrentUser = false;
 
+
         sendMessage(JSON.stringify({ // for text messages
             type: "newuserjoining",
             username: username,
             userId: userId.toString(),
+
         }));
-        // sendMessage(JSON.stringify({ type: "updatePlayerState", updateType: "setCurrentPlayer", username: username, userId: userID, score: { letters: [] }, isCurrentPlayer: false }));
+
+
+
+
         sendMessage(JSON.stringify({
             type: "updatePlayerState",
             updateType: "addPlayer",
             username: username,
             userId: userId.toString(),
             score: { letters: [] },
+            matrixArray: JSON.stringify(state.matrixArray)
             // isCurrentPlayer: !playerState.allPlayers.length
         }));
-        // sendMessage(JSON.stringify({ type: "updatePlayerState", updateType: "checkForTwoPlayers", randomPlayerChoice: randomPlayerChoice, currentPlayer: currentPlayer }));
+
 
     }
 }

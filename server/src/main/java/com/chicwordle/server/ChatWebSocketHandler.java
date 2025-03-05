@@ -17,6 +17,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     // private final List<WebSocketSession> sessions = new ArrayList<>();
     private final Map<String, List<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> userMap = new ConcurrentHashMap<>();
+    private final Map<WebSocketSession, JSONObject> matrixArrayMap = new ConcurrentHashMap<>();
 
 
     @Override
@@ -62,10 +63,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("playerCount", roomSessions.stream()
                     .map(s -> {
                         JSONObject userInfo = userMap.get(s);
+                        JSONObject matrixInfo = matrixArrayMap.get(s);
                         return new JSONObject()
                             .put("sessionId", s.getId())
                             .put("username", userInfo != null ? userInfo.getString("username") : "")
                             .put("userId", userInfo != null ? userInfo.getString("userId") : "")
+                            .put("matrixArray", matrixInfo != null ? matrixInfo.getString("matrixArray") : "[]")
                             .put("isFirstPlayer", false);
                     }).collect(Collectors.toList()));
 
@@ -74,46 +77,57 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     s.sendMessage(new TextMessage(sessionId.toString()));
                 }
             }
-
-
-
         }
-        // if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("addPlayer")) {
-        //     String username = msg.getString("username");
-        //     String userId = msg.getString("userId");
-        //     List<Player> allPlayers = playerRooms.getOrDefault(roomId, new ArrayList<>());
-        //     boolean isFirstPlayer = allPlayers.isEmpty();
-        //     Player newPlayer = new Player(username, userId, new Score(), isFirstPlayer);
-        //     allPlayers.add(newPlayer);
-        //     playerRooms.put(roomId, allPlayers);
-        //     JSONObject jsonMessage = new JSONObject()
-        //         .put("type", "updatePlayerState")
-        //         .put("updateType", "addPlayer")
-        //         .put("userId", userId)
-        //         .put("sessionId", session.getId())
-        //         .put("username", username) // Replace with username from client
-        //         .put("score", new JSONObject().put("letters", new JSONArray()))
-        //         .put("isCurrentPlayer", isFirstPlayer)
-        //         .put("playerCount", roomSessions.stream()
-        //             .map(s -> new JSONObject()
-        //                 .put("userId", userId)
-        //                 .put("sessionId", s.getId())
-        //                 .put("username", username)
-        //                 .put("score", new JSONObject().put("letters", new JSONArray()))
-        //                 .put("isCurrentPlayer", s == roomSessions.get(0)))
-        //             .collect(Collectors.toList()));
+        if (msg.getString("type").equals("syncMatrixArray")) {
+            String payload = session.getId();
+            String matrixArrayStr = msg.optString("matrixArray", "[['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','','']]");
 
-        //     List<WebSocketSession> roomSessions2 = rooms.get(roomId);
-        //     for (WebSocketSession s : roomSessions2) {
-        //         if (s.isOpen()) {
-        //             s.sendMessage(new TextMessage(jsonMessage.toString()));
-        //         }
-        //     }
-        // }
+            JSONObject matrix = new JSONObject().put("matrixArray", matrixArrayStr);
+            matrixArrayMap.put(session, matrix);
+            matrixArrayMap.forEach((key, val) -> {
+                System.out.println("matrixArrayMap updates: " + val.toString());
+            });
+            // System.out.println("matrixArray\t" + matrixArrayStr + " SessionId Payload:\t" + payload);
 
+            JSONObject syncMatrix = new JSONObject()
+                .put("type", "updateGameState")
+                .put("updateType", "syncMatrix")
+                .put("sessionId", session.getId())
+                .put("matrixArray", matrixArrayStr);
+            String syncMessage = syncMatrix.toString();
+            // System.out.println("syncMatrix\t" + syncMessage + " SessionId Payload:\t" + payload);
 
-        // List<WebSocketSession> roomSessions = rooms.get(roomId);
-        if (roomSessions != null) {
+            synchronized (session) {
+                // for(WebSocketSession s : roomSessions) {
+                //     if (s.isOpen() && s != session) {
+                //         try {
+                //             s.sendMessage(new TextMessage(syncMessage));
+
+                //             // synchronized (s) {
+                //             // }
+                //         } catch(Exception e) {
+                //             System.err.println("Failed to send syncMatrix to session: " + s.getId() + e.getMessage());
+                //         }
+                //     }
+                // }
+                if (session.isOpen()) { // this works without all the other bull shit....
+                    session.sendMessage(new TextMessage(syncMatrix.toString()));
+                }
+            }
+            // for (WebSocketSession s : roomSessions) { // working as of 03 05 2025
+            //     if (s.isOpen()) {
+            //         synchronized (s) { // Thread safety for concurrent sends
+            //             try {
+            //                 s.sendMessage(new TextMessage(syncMessage));
+            //                 System.out.println("Sent syncMatrix to session: " + s.getId());
+            //             } catch (IOException e) {
+            //                 System.err.println("Failed to send syncMatrix to session: " + s.getId());
+
+            //             }
+            //         }
+            //     }
+            // }
+        } else if (roomSessions != null) {
             String payload = message.getPayload();
             System.out.println("Received payload:\t" + payload);
             for(WebSocketSession s : roomSessions) {
@@ -122,6 +136,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
+
+
+        // List<WebSocketSession> roomSessions = rooms.get(roomId);
+
     }
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {

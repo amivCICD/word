@@ -35,7 +35,8 @@ let typeOutGuessGameState = {
     incRow: 0,
     c: 0,
     appendGuess: "",
-    restart: false
+    restart: false,
+    matrixArray: [['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','','']]
 };
 let textMessageState = {
     userId: "",
@@ -56,9 +57,6 @@ let player = {
 
 let allPlayers = [];
 
-
-
-
 export function initializeSocket(roomId) {
     if (socket && socket.readyState === WebSocket.OPEN && currentRoomId === roomId) {
         return socket;
@@ -72,8 +70,6 @@ export function initializeSocket(roomId) {
 
     socket.onopen = () => {
         console.log("Connected to web socket!");
-        // const unameInfo = JSON.parse(localStorage.getItem("username"));
-        // socket.send(JSON.stringify({ type: 'join', ...unameInfo }));
         newUserJoiningMessage();
         window.WEB_SOCKET_READY = true;
     };
@@ -134,6 +130,7 @@ export function getPlayerState() {
     return allPlayers;
 }
 
+
 function updateGameState(data) {
     if (data.updateType === "backspace") {
         typeOutGuessGameState.row = data.row;
@@ -142,9 +139,16 @@ function updateGameState(data) {
         typeOutGuessGameState.userInput = data.userInput;
         typeOutGuessGameState.letterCount = data.letterCount;
         typeOutGuessGameState.rowLetterCount = data.rowLetterCount;
+        typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount] = "";
         if (data.arrayOfRowArrays) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
+        // sendMessage(JSON.stringify({ // send to server
+        //     type: "syncMatrixArray",
+        //     matrixArray: JSON.stringify(typeOutGuessGameState.matrixArray)
+        // }));
+
+        // console.log("typeOutGuessGameState.matrixArray\t", typeOutGuessGameState.matrixArray);
     } else if (data.updateType === "append") {
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.type = data.type;
@@ -152,9 +156,15 @@ function updateGameState(data) {
         typeOutGuessGameState.userInput = data.userInput;
         typeOutGuessGameState.letterCount = data.letterCount;
         typeOutGuessGameState.rowLetterCount = data.rowLetterCount;
+        typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount - 1] = data.userInput;
         if (data.arrayOfRowArrays) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
+        // sendMessage(JSON.stringify({ // send to server
+        //     type: "syncMatrixArray",
+        //     matrixArray: JSON.stringify(typeOutGuessGameState.matrixArray)
+        // }));
+        // console.log("typeOutGuessGameState.matrixArray\t", typeOutGuessGameState.matrixArray);
     } else if (data.updateType === "setWOTD_and_params") {
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
@@ -175,7 +185,13 @@ function updateGameState(data) {
         typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
     } else if (data.updateType === "checkCompletionStatus") {
         typeOutGuessGameState.checkCompletionStatus = data.checkCompletionStatus
+    } else if (data.updateType === "syncStateToServer") {
+        console.log('typeOutGuessGameState.matrixArray from updateState\t', typeOutGuessGameState.matrixArray)
+    } else if (data.updateType === "syncMatrix") {
+        console.log("JSON PARSE data.matrixArray\t", JSON.parse(data.matrixArray));
+        typeOutGuessGameState.matrixArray = JSON.parse(data.matrixArray);
     }
+
 }
 
 function updateTextState(data) {
@@ -216,7 +232,7 @@ function updatePlayerState(data) {
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
                 userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
-                console.log('SET PLAYERS PLAYER STATE', currentPlayer);
+                console.log("currentPlayer MATRIX ARRAY\t", JSON.parse(currentPlayer.matrixArray));
             }
         }
 
@@ -232,34 +248,19 @@ function updatePlayerState(data) {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
 
-    } else if (data.updateType === "swapCurrentPlayer") {
-
-    } else if (data.updateType === "getAllPlayers") {
-
-    } else if (data.updateType === "checkForTwoPlayers") {
-        if (allPlayers.length === 2) {
-            console.log("playerState is 2 or more, do coin flip");
-            allPlayers[data.randomPlayerChoice].isCurrentPlayer = true;
-
-        } else {
-            console.log("THERE IS ONLY ONE PLAYER READY TO PLAY");
-        }
     }
 }
 onMessage((e) => {
     const state = getGameState();
     const data = JSON.parse(e);
-    if (data.updateType === "setCurrentPlayer") {
-        // console.log('playerState\t', playerState)
-    } else if (data.updateType === "addPlayer") {
+    if (data.updateType === "addPlayer") {
         // console.log('playerState AFTER INC PLAYER COUNT\t', playerState);
-        console.log("ALL PLAYERS ARRAY AFTER ADD PLAYER\t", allPlayers);
+        // console.log("ALL PLAYERS ARRAY AFTER ADD PLAYER\t", allPlayers);
         const localUserInfo = localStorage.getItem("username");
         const userInfo = JSON.parse(localUserInfo);
 
     } else if (data.updateType === "removePlayer") { // whoever sees two players first?
         console.log('playerState AFTER REMOVE PLAYER \t', player);
-
     } else if (data.updateType === "checkForTwoPlayers" && allPlayers.length >= 2) {
 
     } else if (data.updateType === "checkCompletionStatus") {
@@ -309,6 +310,7 @@ onMessage((e) => {
 
 // joining chat channel
 onMessage((e) => {
+    const state = getGameState();
     const data = JSON.parse(e);
     if (data.type === "newuserjoining") {
         const joinedChat = document.getElementById("textMessages");
@@ -320,6 +322,10 @@ onMessage((e) => {
         joinedChat.appendChild(div);
         const textMessages = document.getElementById("textMessages");
         textMessages.scrollTo(0, textMessages.scrollHeight);
+
+
+
     }
 });
+
 

@@ -30,13 +30,15 @@ onMessage(async (messageData) => {
     if (data.updateType === "backspace" && data.userInput === 'BACKSPACE') {
         if (state.letterCount >= 0 && state.letterCount < 5) {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
+            syncMatrixArrayToServer(state);
+
         } else if (state.letterCount === 5 || state.letterCount === 0) {
             return;
         }
     } else if (data.updateType === 'append') {
-        // state.userInput = data.userInput; // 03 03 2025, is this necessary?
         if (state.letterCount <= 5 && state.rowLetterCount < 6) {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
+            syncMatrixArrayToServer(state);
         }
     } else if (data.updateType === "guessAttempt" && data.userInput === "ENTER") {
         if (state.letterCount === 5) {
@@ -113,7 +115,9 @@ export async function typeOutGuess(
             rowLetterCount: state.letterCount - 1,
             letterCount: state.letterCount - 1,
             arrayOfRowArrays: state.arrayOfRowArrays,
+            matrixArray: state.matrixArray
         }));
+
         return;
     } else if (state.letterCount < 5 && userInput !== "BACKSPACE" && state.rowLetterCount < 5 && !state.userInput.includes("ENTER")) {
         state.rowGameState.incRowLetterCount();
@@ -125,8 +129,10 @@ export async function typeOutGuess(
             rowLetterCount: state.letterCount,
             letterCount: state.letterCount + 1,
             row: state.row,
-            arrayOfRowArrays: state.arrayOfRowArrays
+            arrayOfRowArrays: state.arrayOfRowArrays,
+            matrixArray: state.matrixArray
         }));
+
     }
 }
 
@@ -149,6 +155,7 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         state.wordOfTheDayLetters,
         data.gameStateParam
     );
+
     if (state.row !== 5) {
         console.log("newRow.incRow\t", newRow.incRow);
         console.log("newRow.restart\t", newRow.restart);
@@ -188,7 +195,10 @@ function resetGameState(state) {
         // state.userInput = "";
 }
 
-function startNewMultiPlayerGame() {
-    // let newMultiPlayerGameModal = document.getElementById("newMultiPlayerGameModal");
-    // newMultiPlayerGame.showModal();
+function syncMatrixArrayToServer(state) {
+    sendMessage(JSON.stringify({ // send to server
+        type: "syncMatrixArray",
+        matrixArray: JSON.stringify(state.matrixArray)
+    }));
+    console.log("JSON.stringify(state.matrixArray) inside syncMatrixArray()\t", JSON.stringify(state.matrixArray))
 }
