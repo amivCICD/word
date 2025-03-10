@@ -179,7 +179,7 @@ function updateGameState(data) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
         if (currentRowArrayState) {
-            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].class = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].classList.value;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].class = currentRowArrayState[typeOutGuessGameState.row][data.letterCount]?.classList?.value;
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].value = data.userInput;
             // typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].innerHTML;
 
@@ -231,6 +231,7 @@ function updateTextState(data) {
 }
 
 function updatePlayerState(data) {
+    let state = getGameState();
     if (data.updateType === "setCurrentPlayer") {
         player = {
             username: data.username,
@@ -258,6 +259,36 @@ function updatePlayerState(data) {
                 userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
                 // console.log("currentPlayer MATRIX ARRAY\t", JSON.parse(currentPlayer.wordRowArrayState));
                 console.log("currentPlayer wordArrayState\t", currentPlayer);
+            }
+            // allPlayers
+            if (allPlayers.length > 1 && allPlayers[0].wordRowArrayState.length) {
+                const localUser = localStorage.getItem("username");
+                const localUserData = JSON.parse(localUser);
+                const localUserId = localUserData.userId.toString();
+                const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+                const currentRowArrayState = getCurrentArrowOfRowArrays();
+                const wordRowData = JSON.parse(currentPlayer.wordRowArrayState);
+                console.log("***************currentRowArrayState***************\t", currentRowArrayState)
+
+                if (localUserId !== currentPlayer.userId && currentPlayer.wordRowArrayState.length > 0) {
+                    // document.querySelectorAll(".word-row").forEach((row, rowIndex) => {
+                    //     row[rowIndex].innerHTML = wordRowData[rowIndex][0]?.value;
+                    //     row[rowIndex].classList = wordRowData[rowIndex][0]?.class;
+                    // });
+                    if (wordRowData) {
+
+                        wordRowData.forEach((row, rowIndex) => {
+                            row.forEach((col, colIndex) => {
+                                if (col.value === "") {
+                                    return;
+                                } else {
+                                    currentRowArrayState[rowIndex][colIndex].innerHTML = col.value;
+                                    currentRowArrayState[rowIndex][colIndex].classList = col.class;
+                                }
+                            });
+                        });
+                    }
+                }
             }
         }
 

@@ -18,7 +18,6 @@ export function newUserJoiningMessage() {
             type: "newuserjoining",
             username: username,
             userId: userId.toString(),
-
         }));
 
         sendMessage(JSON.stringify({
