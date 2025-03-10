@@ -37,7 +37,14 @@ let typeOutGuessGameState = {
     appendGuess: "",
     restart: false,
     matrixArray: [['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','','']],
-    wordRowArrayState: [[ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ]]
+    wordRowArrayState: [
+        [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
+        [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
+        [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
+        [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
+        [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
+        [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
+    ]
 };
 let textMessageState = {
     userId: "",
@@ -130,7 +137,7 @@ export function getAllTextMessageState() {
 export function getPlayerState() {
     return allPlayers;
 }
-function getCurrentArrowOfRowArrays(): [][] {
+export function getCurrentArrowOfRowArrays(): [][] {
     const rows = document.querySelectorAll('.word-row');
     const arrayOfRows = Array.from(rows);
     let arrayOfRowArrays: Array<T> = [];
@@ -140,6 +147,7 @@ function getCurrentArrowOfRowArrays(): [][] {
     }
     return arrayOfRowArrays;
 }
+
 
 
 function updateGameState(data) {
@@ -154,8 +162,8 @@ function updateGameState(data) {
         typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount] = "";
         if (data.arrayOfRowArrays) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
-            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].class = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].classList.value;
-            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = "";
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount].class = currentRowArrayState[data.row][data.letterCount]?.classList?.value;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount].value = "";
         }
         // sendMessage(JSON.stringify({ // send to server
         //     type: "syncMatrixArray",
@@ -179,7 +187,7 @@ function updateGameState(data) {
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         }
         if (currentRowArrayState) {
-            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].class = currentRowArrayState[typeOutGuessGameState.row][data.letterCount]?.classList?.value;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].class = currentRowArrayState[data.row][data.letterCount - 1]?.classList?.value;
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].value = data.userInput;
             // typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].innerHTML;
 
@@ -203,6 +211,8 @@ function updateGameState(data) {
         typeOutGuessGameState.gameStateParam = data.gameStateParam;
         typeOutGuessGameState.rowGameState = data.rowGameState;
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
+        ////////////////
+        typeOutGuessGameState.wordRowArrayState = [...data.wordRowArrayState];
     } else if (data.updateType === "resetGameState") {
         typeOutGuessGameState.resetGameState = data.resetGameState;
         typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
@@ -280,10 +290,11 @@ function updatePlayerState(data) {
                         wordRowData.forEach((row, rowIndex) => {
                             row.forEach((col, colIndex) => {
                                 if (col.value === "") {
-                                    return;
+                                    console.log("col.value\t", col.value);
+                                    console.log("col.class\t", col.class);
                                 } else {
                                     currentRowArrayState[rowIndex][colIndex].innerHTML = col.value;
-                                    currentRowArrayState[rowIndex][colIndex].classList = col.class;
+                                    currentRowArrayState[rowIndex][colIndex].className = col.class;
                                 }
                             });
                         });

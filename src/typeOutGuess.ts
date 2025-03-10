@@ -6,7 +6,7 @@ import { RowGameState } from "./rowGameState.ts";
 import { showFailureModal } from "./showFailureModal.ts";
 import { GameOver } from "./gameOver.ts";
 import { CheckCompletionStatus } from "./checkCompletionStatus.ts";
-import { sendMessage, onMessage, getGameState, getPlayerState } from "./multiplayer/initialize_web_socket.ts";
+import { sendMessage, onMessage, getGameState, getPlayerState, getCurrentArrowOfRowArrays } from "./multiplayer/initialize_web_socket.ts";
 
 // const gameOver = GameOver.getInstance();
 // const rowGameState = RowGameState.getInstance();
@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", e => {
 
 onMessage(async (messageData) => {
     const state = getGameState();
+
     state.arrayOfRowArrays = arrayOfRowArrays;
     // state.wordOfTheDay = wordOfTheDay;
     // state.wordOfTheDayLetters = wordOfTheDayLetters;
@@ -31,7 +32,7 @@ onMessage(async (messageData) => {
         if (state.letterCount >= 0 && state.letterCount < 5) {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
             // syncMatrixArrayToServer(state);
-            syncWordRowArrayState(state)
+            syncWordRowArrayState(state);
 
         } else if (state.letterCount === 5 || state.letterCount === 0) {
             return;
@@ -40,7 +41,7 @@ onMessage(async (messageData) => {
         if (state.letterCount <= 5 && state.rowLetterCount < 6) {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
             // syncMatrixArrayToServer(state);
-            syncWordRowArrayState(state)
+            syncWordRowArrayState(state);
         }
     } else if (data.updateType === "guessAttempt" && data.userInput === "ENTER") {
         if (state.letterCount === 5) {
@@ -48,6 +49,8 @@ onMessage(async (messageData) => {
                 handleWiggleAnimation(state.arrayOfRowArrays[state.row]);
                 return;
             }
+
+            syncWordRowArrayState(state);
             await handleGuess(state, data, state.gameOver, state.checkCompletionStatus);
         }
     } else if (data.updateType === "resetGameState") {
