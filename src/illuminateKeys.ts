@@ -6,7 +6,7 @@ export function illuminateKeys(letter: string, colorCode: string, reset): void {
 
     arrayOfKeys.forEach((key) => {
         if (key.innerHTML === letter) {
-            console.log('key.innerHTML, letter', key.innerHTML, letter);
+            // console.log('key.innerHTML, letter', key.innerHTML, letter);
 
             switch (colorCode) {
                 case "hit":

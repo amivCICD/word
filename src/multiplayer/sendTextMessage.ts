@@ -120,7 +120,7 @@ onMessage((e) => {
 
 (function sendTextMessageWenter() {
     document.addEventListener('keyup', e => {
-        console.log("e\t", e)
+        // console.log("e\t", e);
         //////////////////let our button click function handle usernameInput field////////////////////
         if (window.usernameInputOnly) {
             let usernameInput = document.getElementById("usernameInput");

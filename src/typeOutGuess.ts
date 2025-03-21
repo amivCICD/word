@@ -26,7 +26,7 @@ onMessage(async (messageData) => {
     // state.gameComplete = gameComplete;
 
     const data = JSON.parse(messageData);
-    console.log('DATA.TYPE FROM THE TOP\t', data.type);
+    // console.log('DATA.TYPE FROM THE TOP\t', data.type);
 
     if (data.updateType === "backspace" && data.userInput === 'BACKSPACE') {
         if (state.letterCount >= 0 && state.letterCount < 5) {
@@ -49,9 +49,24 @@ onMessage(async (messageData) => {
                 handleWiggleAnimation(state.arrayOfRowArrays[state.row]);
                 return;
             }
+            await handleGuess(state, data, state.gameOver, state.checkCompletionStatus)
+                .then(() => {
+                    console.log("FOCUSED FOCUSED state.wordRowArrayState\t", state.wordRowArrayState);
+                    console.log("@@@@@@@@@@ state.arrayOfRowArrays in THEN() @@@@@@@@@@@@\t", state.arrayOfRowArrays);
 
-            syncWordRowArrayState(state);
-            await handleGuess(state, data, state.gameOver, state.checkCompletionStatus);
+                    state.wordRowArrayState.forEach((row, rowIdx) => {
+                        row.forEach((col, colIdx) => {
+                            if (state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML === "") {
+                                return;
+                            }
+                            col.class = state.arrayOfRowArrays[rowIdx][colIdx]?.className || "";
+                            col.value = state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML || "";
+                        })
+                    })
+                    syncNewCss(state.wordRowArrayState);
+
+                })
+                .catch((e) => console.log(`Error for setting sync word array state in guess attempt\t${e}`));
         }
     } else if (data.updateType === "resetGameState") {
         // resetGameState(state);
@@ -72,7 +87,7 @@ export async function typeOutGuess(
     // state.rowGameState = rowGameState;
     state.wordOfTheDayLetters = wordOfTheDayLetters
 
-    console.log("gameStateParam.reset in typeOutGuess IF statement\t", gameStateParam.reset);
+    // console.log("gameStateParam.reset in typeOutGuess IF statement\t", gameStateParam.reset);
     if (gameStateParam.reset) {
         // resetGameState(state);
         sendMessage(JSON.stringify({
@@ -98,7 +113,7 @@ export async function typeOutGuess(
 
 
     if (state.letterCount === 5 && userInput === "ENTER" && state.guess !== "ENTER") {
-        console.log("state.wordOfTheDayLetters\t", state.wordOfTheDayLetters);
+        // console.log("state.wordOfTheDayLetters\t", state.wordOfTheDayLetters);
         sendMessage(JSON.stringify({
             type: "updateGameState",
             updateType: "guessAttempt",
@@ -108,6 +123,8 @@ export async function typeOutGuess(
             wordOfTheDayLetters: state.wordOfTheDayLetters,
             gameStateParam: gameStateParam,
             arrayOfRowArrays: state.arrayOfRowArrays,
+            letterCount: state.letterCount,
+            wordRowArrayState: state.wordRowArrayState
         }));
     } else if (userInput === "BACKSPACE" && state.letterCount !== 0) {
         state.rowGameState.decRowLetterCount();
@@ -141,17 +158,6 @@ export async function typeOutGuess(
     }
 }
 
-function handleWiggleAnimation(row) {
-    row.forEach((r) => {
-        r.classList.add('animate-wiggle');
-    });
-    setTimeout(() => {
-        row.forEach((r) => {
-            r.classList.remove('animate-wiggle');
-        });
-    }, 750);
-}
-
 async function handleGuess(state, data, gameOver, checkCompletionStatus) {
     const newRow = await appendGuess(
         state.arrayOfRowArrays[state.row],
@@ -162,8 +168,8 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
     );
 
     if (state.row !== 5) {
-        console.log("newRow.incRow\t", newRow.incRow);
-        console.log("newRow.restart\t", newRow.restart);
+        // console.log("newRow.incRow\t", newRow.incRow);
+        // console.log("newRow.restart\t", newRow.restart);
         // rowGameState.startFromZero();
         state.arrayOfRowArrays[state.row+1][0].innerHTML = "";
         state.row = newRow.incRow;
@@ -191,7 +197,26 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         // state.gameOver.setGameOverFalse(); // perhaps?
 
     }
+    // const currentRowArrayState = getCurrentArrowOfRowArrays();
+    // console.log("currentRowArrayState\t", currentRowArrayState);
+
+    // state.arrayOfRowArrays = currentRowArrayState;
+    // console.log("state.arrayOfRowArrays\t", state.arrayOfRowArrays);
+    // syncWordRowArrayState(state); // this was BACKTRACKING, we have the letters without this, just not the CSS, this makes no letters...
 }
+
+function handleWiggleAnimation(row) {
+    row.forEach((r) => {
+        r.classList.add('animate-wiggle');
+    });
+    setTimeout(() => {
+        row.forEach((r) => {
+            r.classList.remove('animate-wiggle');
+        });
+    }, 750);
+}
+
+
 function resetGameState(state) {
         state.letterCount = 0;
         state.row = 0;
@@ -208,10 +233,18 @@ function syncMatrixArrayToServer(state) {
     console.log("JSON.stringify(state.matrixArray) inside syncMatrixArray()\t", JSON.stringify(state.matrixArray))
 }
 
-function syncWordRowArrayState(state) {
+export function syncWordRowArrayState(state) { // to append and backspace
     sendMessage(JSON.stringify({ // send to server
         type: "syncWordRowArrayState",
         wordRowArrayState: JSON.stringify(state.wordRowArrayState)
     }));
     console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(state.wordRowArrayState))
+}
+
+export function syncNewCss(updatedWordRowArrayState: [][]) { // to append and backspace
+    sendMessage(JSON.stringify({ // send to server
+        type: "syncWordRowArrayState",
+        wordRowArrayState: JSON.stringify(updatedWordRowArrayState)
+    }));
+    console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(updatedWordRowArrayState))
 }

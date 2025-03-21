@@ -183,13 +183,19 @@ function updateGameState(data) {
         typeOutGuessGameState.rowLetterCount = data.rowLetterCount;
         typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount - 1] = data.userInput;
         if (data.arrayOfRowArrays) {
-            console.log("currentRowArrayState[typeOutGuessGameState.row][data.letterCount]\t", currentRowArrayState[typeOutGuessGameState.row][data.letterCount])
+            console.log("currentRowArrayState[typeOutGuessGameState.row][data.letterCount]\t", currentRowArrayState[typeOutGuessGameState.row][data.letterCount]) // shows the current array state
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
+            // console.log("typeOutGuessGameState.arrayOfRowArrays@@@@@@@@@@@\t", typeOutGuessGameState.arrayOfRowArrays); // is empty objects
+
         }
         if (currentRowArrayState) {
-            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].class = currentRowArrayState[data.row][data.letterCount - 1]?.classList?.value;
-            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount - 1].value = data.userInput;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount - 1].class = currentRowArrayState[data.row][data.letterCount - 1].classList.value;
+            typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount - 1].value = data.userInput;
             // typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].innerHTML;
+
+
+
+
 
         }
         // sendMessage(JSON.stringify({ // send to server
@@ -212,7 +218,38 @@ function updateGameState(data) {
         typeOutGuessGameState.rowGameState = data.rowGameState;
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         ////////////////
-        typeOutGuessGameState.wordRowArrayState = [...data.wordRowArrayState];
+        // console.log(`@@@@@@@@@@@@@@@@@@@@data.arrayOfRowArrays@@@@@\t ${data.arrayOfRowArrays}`);
+        // typeOutGuessGameState.wordRowArrayState = data.arrayOfRowArrays; // 03 10 2025 -- why
+
+
+
+        // const currentRowArrayState = getCurrentArrowOfRowArrays();
+        // // data.arrayOfRowArrays.forEach((row, rowIdx) => {
+        // currentRowArrayState.forEach((row, rowIdx) => {
+        //     row.forEach((col, colIdx) => {
+        //         console.log("FOCUSED FOCUSED currentRowArrayState[rowIdx][colIdx]?.classList?.value;\t", col[rowIdx][colIdx]?.classList?.value);
+        //         typeOutGuessGameState.wordRowArrayState[rowIdx][colIdx].class = col[rowIdx][colIdx].classList.value;
+        //         typeOutGuessGameState.wordRowArrayState[rowIdx][colIdx].value = col[rowIdx][colIdx].innerHTML;
+        //         const domCell = document.querySelector(`.word-row:nth-child(${rowIdx + 1}) .cell:nth-child(${colIdx + 1})`);
+        //         if (domCell) {
+        //             // domCell.innerHTML = col.innerHTML || "";
+        //             // domCell.className = col.className || ""; // Apply CSS
+        //         }
+        //     });
+        // });
+        console.log("IN GUESS ATTEMPT typeOutGuessGameState.wordRowArrayState\t", typeOutGuessGameState.wordRowArrayState);
+
+        // typeOutGuessGameState.wordRowArrayState.forEach((row, rowIdx) => {
+        //     row.forEach((col, colIdx) => {
+        //         col[rowIdx][colIdx].class = typeOutGuessGameState.arrayOfRowArrays[rowIdx][colIdx].classList.value;
+        //         col[rowIdx][colIdx].value = typeOutGuessGameState.arrayOfRowArrays[rowIdx][colIdx].innerHTML;
+        //     });
+        // });
+
+
+        // typeOutGuessGameState.wordRowArrayState.forEach((r, i) => {
+        //     r = data.arrayOfRowArrays[i];
+        // });
     } else if (data.updateType === "resetGameState") {
         typeOutGuessGameState.resetGameState = data.resetGameState;
         typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
@@ -285,19 +322,39 @@ function updatePlayerState(data) {
                     //     row[rowIndex].innerHTML = wordRowData[rowIndex][0]?.value;
                     //     row[rowIndex].classList = wordRowData[rowIndex][0]?.class;
                     // });
+                    // state.wordRowArrayState = wordRowData; // Sync state
+                    // state.arrayOfRowArrays = wordRowData.map(row =>
+                    //     row.map(col => ({
+                    //         innerHTML: col.innerHTML,
+                    //         className: col.className
+                    //     }))
+                    // );
+                    // paintGameState(state);
                     if (wordRowData) {
 
-                        wordRowData.forEach((row, rowIndex) => {
+                        // currentRowArrayState.forEach((row, rowIndex) => {
+                        //     row.forEach((col, colIndex) => {
+                        //         if (col.value === "") {
+                        //             console.log("col.value\t", col.value);
+                        //             console.log("col.class\t", col.class);
+                        //         } else {
+                        //             state.wordRowArrayState[rowIndex][colIndex].innerHTML = col.value;
+                        //             state.wordRowArrayState[rowIndex][colIndex].className = col.class;
+                        //         }
+                        //     });
+                        // });
+                        wordRowData.forEach((row, rowIndex) => { // this successfully updates the new player joining (letters not css yet)
                             row.forEach((col, colIndex) => {
                                 if (col.value === "") {
-                                    console.log("col.value\t", col.value);
-                                    console.log("col.class\t", col.class);
+                                    // console.log("col.value\t", col.value);
+                                    // console.log("col.class\t", col.class);
                                 } else {
                                     currentRowArrayState[rowIndex][colIndex].innerHTML = col.value;
-                                    currentRowArrayState[rowIndex][colIndex].className = col.class;
+                                    currentRowArrayState[rowIndex][colIndex].classList.value = col.class;
                                 }
                             });
                         });
+
                     }
                 }
             }
@@ -394,5 +451,17 @@ onMessage((e) => {
 
     }
 });
+
+function paintGameState (state) {
+    state.arrayOfRowArrays.forEach((row, rowIdx) => {
+        row.forEach((col, colIdx) => {
+            const domCell = document.querySelector(`.word-row:nth-child(${rowIdx + 1}) .cell:nth-child(${colIdx + 1})`);
+            if (domCell) {
+                domCell.innerHTML = col.innerHTML || "";
+                domCell.className = col.className || ""; // Apply CSS
+            }
+        });
+    });
+}
 
 

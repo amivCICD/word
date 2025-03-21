@@ -4,7 +4,8 @@ import { illuminateKeys } from "./illuminateKeys";
 import { GuessStarted } from "./guessStarted.ts";
 import { GameOver } from "./gameOver.ts";
 import { sendMessage, onMessage } from "./multiplayer/initialize_web_socket.ts";
-import { getGameState } from "./multiplayer/initialize_web_socket.ts";
+import { getGameState, getCurrentArrowOfRowArrays } from "./multiplayer/initialize_web_socket.ts";
+import { syncWordRowArrayState } from "./typeOutGuess.ts";
 
 
 const gameState = getGameState();
@@ -13,8 +14,10 @@ const guessStarted = gameState.guessStarted;
 // let incRow: number = gameState.incRow;
 // let append_guess: string = gameState.appendGuess;
 
+
+
 function checkForCorrectPosition(wordOfTheDayLetters: string[], guessArr: string[]) {
-    console.log("wordOfTheDayLetters from checkForCorrectPosition\t", wordOfTheDayLetters);
+    // console.log("wordOfTheDayLetters from checkForCorrectPosition\t", wordOfTheDayLetters);
 
     let aux = Array.from({ length: 5 });
     let correctLetters = [];
@@ -29,7 +32,7 @@ function checkForCorrectPosition(wordOfTheDayLetters: string[], guessArr: string
 }
 let keysArray = Array.from(document.querySelectorAll('.kbd'));
 function checkForCorrectLetter(letter: string, yellowWorthy: string[], correctPositionArr: string[], count: number) {
-    console.log('correctPositionArr\t', correctPositionArr);
+    // console.log('correctPositionArr\t', correctPositionArr);
 
     // if (yellowWorthy.length) {
         if (correctPositionArr[count] === letter.innerHTML) {
@@ -70,7 +73,7 @@ export async function appendGuess(
 ): Promise<number> {
     // let restart = false;
     guessStarted.setGuessStartedTrue();
-    console.log("gameStateParam.reset in appendGuess.ts\t", gameStateParam.reset)
+    // console.log("gameStateParam.reset in appendGuess.ts\t", gameStateParam.reset);
     if (gameStateParam.reset) {
         gameState.incRow = 0;
         gameState.appendGuess = "";
@@ -94,7 +97,7 @@ export async function appendGuess(
     for (const letter of divEl) {
         letter.classList.toggle('box');
         await new Promise(res => setTimeout(res, 500));
-        console.log(letter.innerHTML);
+        // console.log(letter.innerHTML);
 
         gameState.appendGuess += letter.innerHTML;
 
@@ -103,7 +106,14 @@ export async function appendGuess(
         illuminateKeys(letter.innerHTML, "miss");
 
         gameState.c++;
+        // syncWordRowArrayState(gameState);
     }
+    // const currentRowArrayState = getCurrentArrowOfRowArrays(); // commented out, as it is undefined in the end...
+    // gameState.wordRowArrayState = currentRowArrayState;
+    // console.log(`ZZZZZZZZZZZZZZZZcurrentRowArrayStateZZZZZZZZZZZZZZZZZZZZZ\t${currentRowArrayState}`);
+    // syncWordRowArrayState(gameState);
+
+
     if (gameState.appendGuess === wordOfTheDay) {
         console.log('You got it!');
         gameState.restart = true;
