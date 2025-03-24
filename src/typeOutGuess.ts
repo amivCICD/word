@@ -51,8 +51,8 @@ onMessage(async (messageData) => {
             }
             await handleGuess(state, data, state.gameOver, state.checkCompletionStatus)
                 .then(() => {
-                    console.log("FOCUSED FOCUSED state.wordRowArrayState\t", state.wordRowArrayState);
-                    console.log("@@@@@@@@@@ state.arrayOfRowArrays in THEN() @@@@@@@@@@@@\t", state.arrayOfRowArrays);
+                    // console.log("FOCUSED FOCUSED state.wordRowArrayState\t", state.wordRowArrayState);
+                    // console.log("@@@@@@@@@@ state.arrayOfRowArrays in THEN() @@@@@@@@@@@@\t", state.arrayOfRowArrays);
 
                     state.wordRowArrayState.forEach((row, rowIdx) => {
                         row.forEach((col, colIdx) => {
@@ -64,9 +64,10 @@ onMessage(async (messageData) => {
                         })
                     })
                     syncNewCss(state.wordRowArrayState);
-
+                    // swap to next player
                 })
                 .catch((e) => console.log(`Error for setting sync word array state in guess attempt\t${e}`));
+
         }
     } else if (data.updateType === "resetGameState") {
         // resetGameState(state);
@@ -178,6 +179,16 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         state.userInput = ""; // this fixed it for now 03 03 2025
         // state.rowGameState = 0;
         state.guess = "";
+
+        const players = getPlayerState();
+        const currentPlayer = players.find(player => player.isFirstPlayer === true);
+        const localCurrentPlayer = localStorage.getItem("username");
+        const localUserData = JSON.parse(localCurrentPlayer);
+        if (localUserData.userId.toString() === currentPlayer.userId) {
+            console.log("localUserData.userId.toString() === currentPlayer.userId\t", localUserData.userId.toString() === currentPlayer.userId);
+
+            swapToNextPlayer();
+        }
     }
     if (newRow.restart) {
         state.gameComplete = true;
@@ -238,7 +249,7 @@ export function syncWordRowArrayState(state) { // to append and backspace
         type: "syncWordRowArrayState",
         wordRowArrayState: JSON.stringify(state.wordRowArrayState)
     }));
-    console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(state.wordRowArrayState))
+    // console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(state.wordRowArrayState));
 }
 
 export function syncNewCss(updatedWordRowArrayState: [][]) { // to append and backspace
@@ -246,5 +257,23 @@ export function syncNewCss(updatedWordRowArrayState: [][]) { // to append and ba
         type: "syncWordRowArrayState",
         wordRowArrayState: JSON.stringify(updatedWordRowArrayState)
     }));
-    console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(updatedWordRowArrayState))
+    // console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(updatedWordRowArrayState));
+}
+
+export function swapToNextPlayer() {
+    // console.log("Swap to next player() was called");
+    // console.trace();
+    sendMessage(JSON.stringify({ // send to server
+        // type: "updatePlayerState",
+        type: "updatePlayerState",
+        updateType: "swapToNextPlayer",
+        // wordRowArrayState: JSON.stringify(updatedWordRowArrayState)
+    }));
+}
+
+function gameCompleteClearServerCache() {
+    sendMessage(JSON.stringify({
+        type: "gameComplete",
+        updateType: "resetPlayerServerState"
+    }));
 }

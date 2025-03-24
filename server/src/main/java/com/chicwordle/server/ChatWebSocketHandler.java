@@ -45,10 +45,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             String payload = session.getId();
             String username = msg.getString("username");
             String userId = msg.getString("userId");
+            boolean isFirstPlayer = roomSessions.isEmpty();
 
             JSONObject user = new JSONObject()
                 .put("username", username)
-                .put("userId", userId);
+                .put("userId", userId)
+                .put("isFirstPlayer", isFirstPlayer);
 
             userMap.put(session, user);
             System.out.println("username: " + username + " SessionId Payload:\t" + payload);
@@ -59,7 +61,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("sessionId", session.getId())
                 .put("username", username)
                 .put("userId", userId)
-                .put("isFirstPlayer", false)
+                .put("isFirstPlayer", isFirstPlayer)
                 .put("playerCount", roomSessions.stream()
                     .map(s -> {
                         JSONObject userInfo = userMap.get(s);
@@ -69,7 +71,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                             .put("username", userInfo != null ? userInfo.getString("username") : "")
                             .put("userId", userInfo != null ? userInfo.getString("userId") : "")
                             .put("wordRowArrayState", matrixInfo != null ? matrixInfo.getString("wordRowArrayState") : "[]")
-                            .put("isFirstPlayer", false);
+                            .put("isFirstPlayer", userInfo != null && userInfo.getBoolean("isFirstPlayer"));
                     }).collect(Collectors.toList()));
 
             for(WebSocketSession s : roomSessions) {
@@ -78,6 +80,60 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
+        if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("swapToNextPlayer")) {
+            int currentIndex = -1;
+            System.out.println("@@@@SERVER CURRENT INDEX@@@@\t" + currentIndex);
+            System.out.println("@@@@@@USER MAP BEFORE FOR LOOP@@@@\t" + userMap);
+            for (int i = 0; i < roomSessions.size(); i++) {
+                // if (userMap.get(roomSessions.get(i)).getBoolean("isFirstPlayer")) {
+                //     currentIndex = i;
+                //     break;
+                // }
+                JSONObject userInfo = userMap.get(roomSessions.get(i));
+                if (userInfo != null && userInfo.getBoolean("isFirstPlayer")) {
+                    currentIndex = i;
+                    break;
+                }
+            }
+            if (currentIndex >= 0 && currentIndex < roomSessions.size() - 1) { // we dont even hit this
+                System.out.println("@@@@IF STATEMENT FOR CURRENT INDEX @@@@");
+                userMap.get(roomSessions.get(currentIndex)).put("isFirstPlayer", false);
+                userMap.get(roomSessions.get(currentIndex + 1)).put("isFirstPlayer", true);
+            } else if (currentIndex == roomSessions.size() - 1) {
+                System.out.println("@@@@@@@ ELSE IF STATEMENT FOR CURRENT INDEX @@@@@@@");
+                userMap.get(roomSessions.get(currentIndex)).put("isFirstPlayer", false);
+                userMap.get(roomSessions.get(0)).put("isFirstPlayer", true);
+            } else if (currentIndex == -1) {
+                if (!roomSessions.isEmpty()) {
+                    userMap.get(roomSessions.get(0)).put("isFirstPlayer", true);
+                }
+            }
+
+            JSONObject currentPlayers = new JSONObject()
+                .put("type", "updatePlayerState")
+                .put("updateType", "swapToNextPlayer")
+                .put("sessionId", session.getId())
+                // .put("username", username)
+                // .put("userId", userId)
+                // .put("isFirstPlayer", false)
+                .put("currentPlayers", roomSessions.stream()
+                    .map(s -> {
+                        JSONObject userInfo = userMap.get(s);
+                        JSONObject matrixInfo = matrixArrayMap.get(s);
+                        return new JSONObject()
+                            .put("sessionId", s.getId())
+                            .put("username", userInfo != null ? userInfo.getString("username") : "")
+                            .put("userId", userInfo != null ? userInfo.getString("userId") : "")
+                            .put("wordRowArrayState", matrixInfo != null ? matrixInfo.getString("wordRowArrayState") : "[]")
+                            .put("isFirstPlayer", userInfo != null && userInfo.getBoolean("isFirstPlayer"));
+                    }).collect(Collectors.toList()));
+            for(WebSocketSession s : roomSessions) {
+                if (s.isOpen()) {
+                    s.sendMessage(new TextMessage(currentPlayers.toString()));
+                }
+            }
+        }
+
         if (msg.getString("type").equals("syncWordRowArrayState")) {
             String payload = session.getId();
             String matrixArrayStr = msg.optString("wordRowArrayState", "[[{class: '', value: ''}]]");
@@ -96,37 +152,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("wordRowArrayState", matrixArrayStr);
             String syncMessage = syncMatrix.toString();
             // System.out.println("syncMatrix\t" + syncMessage + " SessionId Payload:\t" + payload);
-
             synchronized (session) {
-                // for(WebSocketSession s : roomSessions) {
-                //     if (s.isOpen() && s != session) {
-                //         try {
-                //             s.sendMessage(new TextMessage(syncMessage));
-
-                //             // synchronized (s) {
-                //             // }
-                //         } catch(Exception e) {
-                //             System.err.println("Failed to send syncMatrix to session: " + s.getId() + e.getMessage());
-                //         }
-                //     }
-                // }
                 if (session.isOpen()) { // this works without all the other bull shit....
                     session.sendMessage(new TextMessage(syncMatrix.toString()));
                 }
             }
-            // for (WebSocketSession s : roomSessions) { // working as of 03 05 2025
-            //     if (s.isOpen()) {
-            //         synchronized (s) { // Thread safety for concurrent sends
-            //             try {
-            //                 s.sendMessage(new TextMessage(syncMessage));
-            //                 System.out.println("Sent syncMatrix to session: " + s.getId());
-            //             } catch (IOException e) {
-            //                 System.err.println("Failed to send syncMatrix to session: " + s.getId());
-
-            //             }
-            //         }
-            //     }
-            // }
         } else if (roomSessions != null) {
             String payload = message.getPayload();
             System.out.println("Received payload:\t" + payload);
@@ -136,10 +166,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-
-
-        // List<WebSocketSession> roomSessions = rooms.get(roomId);
-
     }
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {

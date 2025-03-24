@@ -183,7 +183,7 @@ function updateGameState(data) {
         typeOutGuessGameState.rowLetterCount = data.rowLetterCount;
         typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount - 1] = data.userInput;
         if (data.arrayOfRowArrays) {
-            console.log("currentRowArrayState[typeOutGuessGameState.row][data.letterCount]\t", currentRowArrayState[typeOutGuessGameState.row][data.letterCount]) // shows the current array state
+            // console.log("currentRowArrayState[typeOutGuessGameState.row][data.letterCount]\t", currentRowArrayState[typeOutGuessGameState.row][data.letterCount]) // shows the current array state
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
             // console.log("typeOutGuessGameState.arrayOfRowArrays@@@@@@@@@@@\t", typeOutGuessGameState.arrayOfRowArrays); // is empty objects
 
@@ -285,6 +285,7 @@ function updatePlayerState(data) {
             userId: data.userId,
             isCurrentUser: data.isCurrentPlayer,
             score: { letters: [] },
+            currentPlayerIndex: null
         }
         allPlayers = [player];
     } else if (data.updateType === "addPlayer") {
@@ -300,7 +301,16 @@ function updatePlayerState(data) {
             }
             if (!allPlayers.find(player => player.isFirstPlayer === true)) {
                 allPlayers[0].isFirstPlayer = true;
+                allPlayers[0].currentPlayerIndex = 0;
 
+                const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+                const userTurn = document.getElementById("userTurn");
+                userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+                // console.log("currentPlayer MATRIX ARRAY\t", JSON.parse(currentPlayer.wordRowArrayState));
+                console.log("currentPlayer wordArrayState\t", currentPlayer);
+            }
+            else if (allPlayers.find(player => player.isFirstPlayer === true)) {
+                // new 03 23 2025
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
                 userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
@@ -372,6 +382,51 @@ function updatePlayerState(data) {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
 
+    } else if (data.updateType === "swapToNextPlayer") {
+        // console.log("FOCUSED FOCUSED data.currentPlayers\t", data.currentPlayers);
+        // const currentServerPlayer = data.currentPlayers?.find(player => player.isFirstPlayer === true);
+        // console.log("currentPlayer from server data\t", currentServerPlayer);
+
+        // const currentLocalPlayer = allPlayers?.find(player => player.isFirstPlayer === true);
+
+        // allPlayers.forEach((player) => {
+        //     data.currentPlayers.find()
+        // });
+        if (data.currentPlayers) {
+            allPlayers = data.currentPlayers.map(player => ({
+                username: player.username,
+                userId: player.userId,
+                isFirstPlayer: player.isFirstPlayer,
+                sessionId: player.sessionId,
+                wordRowArrayState: player.wordRowArrayState,
+            }));
+            console.log("allPlayers after server update VIA MAP\t", allPlayers);
+
+            const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+            const userTurn = document.getElementById("userTurn");
+            userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+        }
+
+
+
+        // const currentPlayerIndex = allPlayers?.indexOf(allPlayers?.find(ifp => ifp.isFirstPlayer === true));
+
+        // currentPlayer.isFirstPlayer = false;
+        // allPlayers[currentPlayerIndex + 1].isFirstPlayer = true;
+        // console.log("FOCUSED FOCUSED allPlayers AFTER INDEX CHANGE\t", allPlayers);
+
+        // const allPlayers = getPlayerState();
+        // let currentPlayerIndex = currentPlayer.currentPlayerIndex;
+        // console.log("currentPlayerIndex\t", currentPlayerIndex);
+
+        // currentPlayer.isFirstPlayer = false;
+        // currentPlayerIndex = (currentPlayerIndex + 1) % allPlayers.length;
+        // console.log("currentPlayerIndex AFTER CHANGE\t", currentPlayerIndex);
+        // console.log("FOCUSED FOCUSED allPlayers[currentPlayerIndex]@@@@\t", allPlayers[currentPlayerIndex]);
+
+        // allPlayers[currentPlayerIndex].isFirstPlayer = true;
+        // console.log("Changing Players!");
+        // console.log("currentPlayer players!\t", currentPlayer);
     }
 }
 onMessage((e) => {

@@ -60,7 +60,7 @@
 
         <div class="flex flex-col items-center justify-center py-4">
           <span class="text-black italic">Current Players Turn: </span>
-          <div id="userTurn"></div>
+          <div id="userTurn" class="min-h-8"></div>
         </div>
 
       <div id="mainTainer" class="grid grid-rows-6 grid-cols-5 place-items-center mx-auto gap-none sm:gap-1 w-fit">
@@ -292,6 +292,8 @@
       document.addEventListener('keydown', e => {
         const playerState = getPlayerState();
         let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
+        console.log("globalCurrentPlayer\t", globalCurrentPlayer);
+
         if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
           return;
         }
