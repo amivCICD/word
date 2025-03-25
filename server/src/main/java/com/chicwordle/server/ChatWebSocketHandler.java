@@ -95,19 +95,30 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     break;
                 }
             }
-            if (currentIndex >= 0 && currentIndex < roomSessions.size() - 1) { // we dont even hit this
-                System.out.println("@@@@IF STATEMENT FOR CURRENT INDEX @@@@");
+            // NEW
+            if (currentIndex != -1) {
                 userMap.get(roomSessions.get(currentIndex)).put("isFirstPlayer", false);
-                userMap.get(roomSessions.get(currentIndex + 1)).put("isFirstPlayer", true);
-            } else if (currentIndex == roomSessions.size() - 1) {
-                System.out.println("@@@@@@@ ELSE IF STATEMENT FOR CURRENT INDEX @@@@@@@");
-                userMap.get(roomSessions.get(currentIndex)).put("isFirstPlayer", false);
-                userMap.get(roomSessions.get(0)).put("isFirstPlayer", true);
-            } else if (currentIndex == -1) {
+                int nextIndex = (currentIndex + 1) % roomSessions.size(); // Circular turn logic
+                userMap.get(roomSessions.get(nextIndex)).put("isFirstPlayer", true);
+            } else {
                 if (!roomSessions.isEmpty()) {
                     userMap.get(roomSessions.get(0)).put("isFirstPlayer", true);
                 }
             }
+            // OLD
+            // if (currentIndex >= 0 && currentIndex < roomSessions.size() - 1) { // we dont even hit this
+            //     System.out.println("@@@@IF STATEMENT FOR CURRENT INDEX @@@@");
+            //     userMap.get(roomSessions.get(currentIndex)).put("isFirstPlayer", false);
+            //     userMap.get(roomSessions.get(currentIndex + 1)).put("isFirstPlayer", true);
+            // } else if (currentIndex == roomSessions.size() - 1) {
+            //     System.out.println("@@@@@@@ ELSE IF STATEMENT FOR CURRENT INDEX @@@@@@@");
+            //     userMap.get(roomSessions.get(currentIndex)).put("isFirstPlayer", false);
+            //     userMap.get(roomSessions.get(0)).put("isFirstPlayer", true);
+            // } else if (currentIndex == -1) {
+            //     if (!roomSessions.isEmpty()) {
+            //         userMap.get(roomSessions.get(0)).put("isFirstPlayer", true);
+            //     }
+            // }
 
             JSONObject currentPlayers = new JSONObject()
                 .put("type", "updatePlayerState")

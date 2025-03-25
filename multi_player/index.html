@@ -292,7 +292,7 @@
       document.addEventListener('keydown', e => {
         const playerState = getPlayerState();
         let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
-        console.log("globalCurrentPlayer\t", globalCurrentPlayer);
+        // console.log("globalCurrentPlayer\t", globalCurrentPlayer);
 
         if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
           return;

@@ -17,6 +17,16 @@ document.addEventListener("DOMContentLoaded", e => {
     arrayOfRowArrays = arrayOfDivRows();
 });
 
+function cycle(arr) {
+    let index = 0;
+    return () => {
+        let currentVal = arr[index];
+        index = (index + 1) % arr.length;
+        console.log("--------currentPlayer in cycle-------\t", currentVal)
+        return currentVal;
+    }
+}
+
 onMessage(async (messageData) => {
     const state = getGameState();
 
@@ -66,6 +76,19 @@ onMessage(async (messageData) => {
                     syncNewCss(state.wordRowArrayState);
                     // swap to next player
                 })
+                .then(() => {
+                    swapPlayersFrontEnd();
+                })
+                // .then(() => {
+                //     const players = getPlayerState();
+                //     const currentPlayer = players.find(player => player.isFirstPlayer === true);
+                //     const localCurrentPlayer = localStorage.getItem("username");
+                //     const localUserData = JSON.parse(localCurrentPlayer);
+                //     if (localUserData.userId.toString() === currentPlayer.userId) {
+                //         console.log("localUserData.userId.toString() === currentPlayer.userId\t", localUserData.userId.toString() === currentPlayer.userId);
+                //         swapToNextPlayer();
+                //     }
+                // })
                 .catch((e) => console.log(`Error for setting sync word array state in guess attempt\t${e}`));
 
         }
@@ -168,6 +191,7 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         data.gameStateParam
     );
 
+
     if (state.row !== 5) {
         // console.log("newRow.incRow\t", newRow.incRow);
         // console.log("newRow.restart\t", newRow.restart);
@@ -180,15 +204,7 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         // state.rowGameState = 0;
         state.guess = "";
 
-        const players = getPlayerState();
-        const currentPlayer = players.find(player => player.isFirstPlayer === true);
-        const localCurrentPlayer = localStorage.getItem("username");
-        const localUserData = JSON.parse(localCurrentPlayer);
-        if (localUserData.userId.toString() === currentPlayer.userId) {
-            console.log("localUserData.userId.toString() === currentPlayer.userId\t", localUserData.userId.toString() === currentPlayer.userId);
 
-            swapToNextPlayer();
-        }
     }
     if (newRow.restart) {
         state.gameComplete = true;
@@ -268,6 +284,27 @@ export function swapToNextPlayer() {
         type: "updatePlayerState",
         updateType: "swapToNextPlayer",
         // wordRowArrayState: JSON.stringify(updatedWordRowArrayState)
+    }));
+}
+
+function swapPlayersFrontEnd() {
+
+    const players = getPlayerState();
+    console.log("players.length\t", players.length);
+
+    // const currentPlayer = players.find(player => player.isFirstPlayer === true);
+    let currentPlayerIndex = players.indexOf(players.find(player => player.isFirstPlayer === true));
+    players[currentPlayerIndex].isFirstPlayer = false;
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    players[currentPlayerIndex].isFirstPlayer = true;
+    // currentPlayer.isFirstPlayer = false;
+    // players[currentPlayerIndex + 1 % players.length].isFirstPlayer = true;
+    // console.log("players\t", players);
+
+    sendMessage(JSON.stringify({
+        type: "updatePlayerState",
+        updateType: "nextPlayer",
+        players: players
     }));
 }
 
