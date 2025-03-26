@@ -303,6 +303,7 @@ function updatePlayerState(data) {
             if (!allPlayers.find(player => player.isFirstPlayer === true)) {
                 allPlayers[0].isFirstPlayer = true;
                 allPlayers[0].currentPlayerIndex = 0;
+                state.currentPlayer = JSON.stringify(allPlayers[0]);
 
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
@@ -385,25 +386,7 @@ function updatePlayerState(data) {
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
 
     } else if (data.updateType === "swapToNextPlayer") {
-        // console.log("FOCUSED FOCUSED data.currentPlayers\t", data.currentPlayers);
-        // const currentServerPlayer = data.currentPlayers?.find(player => player.isFirstPlayer === true);
-        // console.log("currentPlayer from server data\t", currentServerPlayer);
-
-        // const currentLocalPlayer = allPlayers?.find(player => player.isFirstPlayer === true);
-
-        // allPlayers.forEach((player) => {
-        //     data.currentPlayers.find()
-        // });
         if (Array.isArray(data.currentPlayers)) {
-            // allPlayers = data.currentPlayers.map(player => ({ // previous with bugs 03 24 2025
-            //     username: player.username,
-            //     userId: player.userId,
-            //     isFirstPlayer: player.isFirstPlayer,
-            //     sessionId: player.sessionId,
-            //     wordRowArrayState: player.wordRowArrayState,
-            // }));
-            // console.log("allPlayers after server update VIA MAP\t", allPlayers);
-
             const incomingPlayers = JSON.stringify(data.currentPlayers);
             const currentPlayers = JSON.stringify(allPlayers);
             if (incomingPlayers !== currentPlayers) {
@@ -419,46 +402,13 @@ function updatePlayerState(data) {
             userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
         }
 
-
-
-        // const currentPlayerIndex = allPlayers?.indexOf(allPlayers?.find(ifp => ifp.isFirstPlayer === true));
-
-        // currentPlayer.isFirstPlayer = false;
-        // allPlayers[currentPlayerIndex + 1].isFirstPlayer = true;
-        // console.log("FOCUSED FOCUSED allPlayers AFTER INDEX CHANGE\t", allPlayers);
-
-        // const allPlayers = getPlayerState();
-        // let currentPlayerIndex = currentPlayer.currentPlayerIndex;
-        // console.log("currentPlayerIndex\t", currentPlayerIndex);
-
-        // currentPlayer.isFirstPlayer = false;
-        // currentPlayerIndex = (currentPlayerIndex + 1) % allPlayers.length;
-        // console.log("currentPlayerIndex AFTER CHANGE\t", currentPlayerIndex);
-        // console.log("FOCUSED FOCUSED allPlayers[currentPlayerIndex]@@@@\t", allPlayers[currentPlayerIndex]);
-
-        // allPlayers[currentPlayerIndex].isFirstPlayer = true;
-        // console.log("Changing Players!");
-        // console.log("currentPlayer players!\t", currentPlayer);
     } else if (data.updateType === "nextPlayer") {
-        console.log("FOCUSED FOCUSED data.players\t", data);
-        console.log("data.currentPlayer\t", data.currentPlayer);
-        console.log("data.nextPlayer\t", data.nextPlayer);
-
-
-
-        state.currentPlayer = data.nextPlayer;
-        console.log("FOCUSSSSSSSSSSED state.currentPlayer\t", JSON.parse(state.currentPlayer));
-
+        state.currentPlayer = data.currentPlayer;
         // 03 26 2025 - 12:16 AM
         // HERES AN IDEA, DITCH THE isFirstPlayer, and just run it off state, state.currentPlayer, and set it each time...then we are not updating anything, we are simply checking if localUserId === state.currentPlayer.userId
-
-
-
-        // const currentPlayer = data.players.find(player => player.isFirstPlayer);
-        // well we passed in the game state, but game state only need be passed in on new users joining in late, otherwise everything is fine...simply change the player name here...
-
-        // const userTurn = document.getElementById("userTurn");
-        // userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+        const username = JSON.parse(state.currentPlayer);
+        const userTurn = document.getElementById("userTurn");
+        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${username.username}</div>`;
     }
 }
 onMessage((e) => {

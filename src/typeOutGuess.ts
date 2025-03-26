@@ -284,11 +284,13 @@ export function swapToNextPlayer() {
 function swapPlayersFrontEnd() {
     const players = getPlayerState();
     let currentPlayerIndex = players.indexOf(players.find(player => player.isFirstPlayer === true));
-    const currentPlayer = players[currentPlayerIndex];
-    // players[currentPlayerIndex].isFirstPlayer = false;
     let nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
 
-    const nextPlayer = players[nextPlayerIndex];
+    players[currentPlayerIndex].isFirstPlayer = false;
+    players[nextPlayerIndex].isFirstPlayer = true;
+
+    const currentPlayer = players[nextPlayerIndex]; // new next player
+    const nextPlayer = players[currentPlayerIndex]; // player after..
 
     sendMessage(JSON.stringify({
         // type: "updatePlayerState",
