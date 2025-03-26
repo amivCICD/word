@@ -4,6 +4,7 @@ import { GuessStarted } from "../guessStarted";
 import { ResetGameState, UIReset } from "../resetGameState";
 import { RowGameState } from "../rowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "./newUserJoiningMessage";
+import { updateServerGameState } from "../typeOutGuess";
 
 
 
@@ -31,6 +32,7 @@ let typeOutGuessGameState = {
     rowGameState: RowGameState.getInstance(),
     guessStarted: GuessStarted.getInstance(),
     checkCompletionStatus: CheckCompletionStatus.getInstance(),
+    currentPlayer: null,
     // for appendGuess.ts
     incRow: 0,
     c: 0,
@@ -170,6 +172,7 @@ function updateGameState(data) {
         //     matrixArray: JSON.stringify(typeOutGuessGameState.matrixArray)
         // }));
 
+
         // console.log("typeOutGuessGameState.matrixArray\t", typeOutGuessGameState.matrixArray);
     } else if (data.updateType === "append") {
         const currentRowArrayState = getCurrentArrowOfRowArrays();
@@ -193,11 +196,8 @@ function updateGameState(data) {
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount - 1].value = data.userInput;
             // typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].innerHTML;
 
-
-
-
-
         }
+
         // sendMessage(JSON.stringify({ // send to server
         //     type: "syncMatrixArray",
         //     matrixArray: JSON.stringify(typeOutGuessGameState.matrixArray)
@@ -289,6 +289,7 @@ function updatePlayerState(data) {
         }
         allPlayers = [player];
     } else if (data.updateType === "addPlayer") {
+
         if (Array.isArray(data.playerCount)) {
             const incomingPlayers = JSON.stringify(data.playerCount)
             const currentPlayers = JSON.stringify(allPlayers)
@@ -297,7 +298,7 @@ function updatePlayerState(data) {
                 data.playerCount?.forEach((player) => {
                     allPlayers.push(player);
                 });
-                console.log("allPlayers FROM addPlayer updateType\t", allPlayers);
+
             }
             if (!allPlayers.find(player => player.isFirstPlayer === true)) {
                 allPlayers[0].isFirstPlayer = true;
@@ -325,6 +326,7 @@ function updatePlayerState(data) {
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const currentRowArrayState = getCurrentArrowOfRowArrays();
                 const wordRowData = JSON.parse(currentPlayer.wordRowArrayState);
+
                 // console.log("***************currentRowArrayState***************\t", currentRowArrayState);
 
                 if (localUserId !== currentPlayer.userId && currentPlayer.wordRowArrayState.length > 0) {
@@ -438,11 +440,25 @@ function updatePlayerState(data) {
         // console.log("Changing Players!");
         // console.log("currentPlayer players!\t", currentPlayer);
     } else if (data.updateType === "nextPlayer") {
-        console.log("FOCUSED FOCUSED data.players\t", data.players);
-        const currentPlayer = data.players.find(player => player.isFirstPlayer);
+        console.log("FOCUSED FOCUSED data.players\t", data);
+        console.log("data.currentPlayer\t", data.currentPlayer);
+        console.log("data.nextPlayer\t", data.nextPlayer);
 
-        const userTurn = document.getElementById("userTurn");
-        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+
+
+        state.currentPlayer = data.nextPlayer;
+        console.log("FOCUSSSSSSSSSSED state.currentPlayer\t", JSON.parse(state.currentPlayer));
+
+        // 03 26 2025 - 12:16 AM
+        // HERES AN IDEA, DITCH THE isFirstPlayer, and just run it off state, state.currentPlayer, and set it each time...then we are not updating anything, we are simply checking if localUserId === state.currentPlayer.userId
+
+
+
+        // const currentPlayer = data.players.find(player => player.isFirstPlayer);
+        // well we passed in the game state, but game state only need be passed in on new users joining in late, otherwise everything is fine...simply change the player name here...
+
+        // const userTurn = document.getElementById("userTurn");
+        // userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
     }
 }
 onMessage((e) => {
@@ -522,17 +538,5 @@ onMessage((e) => {
 
     }
 });
-
-function paintGameState (state) {
-    state.arrayOfRowArrays.forEach((row, rowIdx) => {
-        row.forEach((col, colIdx) => {
-            const domCell = document.querySelector(`.word-row:nth-child(${rowIdx + 1}) .cell:nth-child(${colIdx + 1})`);
-            if (domCell) {
-                domCell.innerHTML = col.innerHTML || "";
-                domCell.className = col.className || ""; // Apply CSS
-            }
-        });
-    });
-}
 
 

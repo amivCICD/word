@@ -8,10 +8,6 @@ export function newUserJoiningMessage() {
         const userinfo = JSON.parse(localStorage.getItem("username"));
         const username = userinfo.username;
         const userId = userinfo.userId;
-        // console.log(`username ${username} userID: ${userID} JOINED`);
-        // let randomPlayerChoice = Math.floor(Math.random() * playerState.allPlayers.length);
-        // const currentPlayer = playerState.allPlayers[randomPlayerChoice];
-        // userinfo.isCurrentUser = false;
 
 
         sendMessage(JSON.stringify({ // for text messages
@@ -26,7 +22,8 @@ export function newUserJoiningMessage() {
             username: username,
             userId: userId.toString(),
             score: { letters: [] },
-            wordRowArrayState: JSON.stringify(state.wordRowArrayState)
+            wordRowArrayState: JSON.stringify(state.wordRowArrayState),
+            // gameState: JSON.stringify(state)
             // matrixArray: JSON.stringify(state.matrixArray) // was working, moving to above 03 05 2025
             // isCurrentPlayer: !playerState.allPlayers.length
         }));

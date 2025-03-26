@@ -17,16 +17,6 @@ document.addEventListener("DOMContentLoaded", e => {
     arrayOfRowArrays = arrayOfDivRows();
 });
 
-function cycle(arr) {
-    let index = 0;
-    return () => {
-        let currentVal = arr[index];
-        index = (index + 1) % arr.length;
-        console.log("--------currentPlayer in cycle-------\t", currentVal)
-        return currentVal;
-    }
-}
-
 onMessage(async (messageData) => {
     const state = getGameState();
 
@@ -44,6 +34,7 @@ onMessage(async (messageData) => {
             // syncMatrixArrayToServer(state);
             syncWordRowArrayState(state);
 
+
         } else if (state.letterCount === 5 || state.letterCount === 0) {
             return;
         }
@@ -52,6 +43,7 @@ onMessage(async (messageData) => {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
             // syncMatrixArrayToServer(state);
             syncWordRowArrayState(state);
+
         }
     } else if (data.updateType === "guessAttempt" && data.userInput === "ENTER") {
         if (state.letterCount === 5) {
@@ -77,7 +69,7 @@ onMessage(async (messageData) => {
                     // swap to next player
                 })
                 .then(() => {
-                    swapPlayersFrontEnd();
+                    swapPlayersFrontEnd(); // commented in 03 25 2025 - changed type "updatePlayerState" on this function to swapPlayer, as I believe it was overloading the websockets TEXT_PARTIAL_WRITING
                 })
                 // .then(() => {
                 //     const players = getPlayerState();
@@ -164,20 +156,22 @@ export async function typeOutGuess(
             matrixArray: state.matrixArray
         }));
 
+
         return;
     } else if (state.letterCount < 5 && userInput !== "BACKSPACE" && state.rowLetterCount < 5 && !state.userInput.includes("ENTER")) {
         state.rowGameState.incRowLetterCount();
         sendMessage(JSON.stringify({
             type: 'updateGameState',
             updateType: 'append',
-            guess: state.guess + userInput,
             userInput: userInput,
+            row: state.row,
+            guess: state.guess + userInput,
             rowLetterCount: state.letterCount,
             letterCount: state.letterCount + 1,
-            row: state.row,
             arrayOfRowArrays: state.arrayOfRowArrays,
             matrixArray: state.matrixArray
         }));
+
 
     }
 }
@@ -288,23 +282,28 @@ export function swapToNextPlayer() {
 }
 
 function swapPlayersFrontEnd() {
-
     const players = getPlayerState();
-    console.log("players.length\t", players.length);
-
-    // const currentPlayer = players.find(player => player.isFirstPlayer === true);
     let currentPlayerIndex = players.indexOf(players.find(player => player.isFirstPlayer === true));
-    players[currentPlayerIndex].isFirstPlayer = false;
-    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-    players[currentPlayerIndex].isFirstPlayer = true;
-    // currentPlayer.isFirstPlayer = false;
-    // players[currentPlayerIndex + 1 % players.length].isFirstPlayer = true;
-    // console.log("players\t", players);
+    const currentPlayer = players[currentPlayerIndex];
+    // players[currentPlayerIndex].isFirstPlayer = false;
+    let nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+
+    const nextPlayer = players[nextPlayerIndex];
 
     sendMessage(JSON.stringify({
+        // type: "updatePlayerState",
         type: "updatePlayerState",
         updateType: "nextPlayer",
-        players: players
+        currentPlayer: JSON.stringify(currentPlayer),
+        nextPlayer: JSON.stringify(nextPlayer)
+    }));
+}
+
+export function updateServerGameState(state, updateType) {
+    sendMessage(JSON.stringify({
+        type: "updateServerGameState",
+        updateType: updateType,
+        gameState: state
     }));
 }
 
