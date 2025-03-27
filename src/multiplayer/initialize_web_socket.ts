@@ -4,7 +4,7 @@ import { GuessStarted } from "../guessStarted";
 import { ResetGameState, UIReset } from "../resetGameState";
 import { RowGameState } from "../rowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "./newUserJoiningMessage";
-import { updateServerGameState } from "../typeOutGuess";
+
 
 
 
@@ -33,7 +33,6 @@ let typeOutGuessGameState = {
     guessStarted: GuessStarted.getInstance(),
     checkCompletionStatus: CheckCompletionStatus.getInstance(),
     currentPlayer: null,
-    // for appendGuess.ts
     incRow: 0,
     c: 0,
     appendGuess: "",
@@ -61,8 +60,6 @@ let player = {
     userId: null,
     isCurrentPlayer: false,
     score: { letters: [] },
-    // playerCount : [],
-    // playerIsSet: false
 }
 
 let allPlayers = [];
@@ -77,7 +74,6 @@ export function initializeSocket(roomId) {
 
     currentRoomId = roomId;
     socket = new WebSocket(`ws://${prodURL}/chat?room=${roomId}`);
-
     socket.onopen = () => {
         console.log("Connected to web socket!");
         newUserJoiningMessage();
@@ -97,10 +93,8 @@ export function initializeSocket(roomId) {
     }
     socket.onclose = (e) => {
         console.log("Disconnected...\t", e.code, e.reason);
-        // userLeavingMessage();
     };
     socket.onerror = (e) => console.log("ERROR: \t", e.message || e);
-
     return socket;
 }
 
@@ -150,13 +144,10 @@ export function getCurrentArrowOfRowArrays(): [][] {
     return arrayOfRowArrays;
 }
 
-
-
 function updateGameState(data) {
     if (data.updateType === "backspace") {
         const currentRowArrayState = getCurrentArrowOfRowArrays();
         typeOutGuessGameState.row = data.row;
-        // typeOutGuessGameState.guess = data.guess || typeOutGuessGameState.guess.slice(0, -1);
         typeOutGuessGameState.guess = data.guess;
         typeOutGuessGameState.userInput = data.userInput;
         typeOutGuessGameState.letterCount = data.letterCount;
@@ -167,17 +158,9 @@ function updateGameState(data) {
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount].class = currentRowArrayState[data.row][data.letterCount]?.classList?.value;
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount].value = "";
         }
-        // sendMessage(JSON.stringify({ // send to server
-        //     type: "syncMatrixArray",
-        //     matrixArray: JSON.stringify(typeOutGuessGameState.matrixArray)
-        // }));
-
-
-        // console.log("typeOutGuessGameState.matrixArray\t", typeOutGuessGameState.matrixArray);
     } else if (data.updateType === "append") {
         const currentRowArrayState = getCurrentArrowOfRowArrays();
         // console.log('currentRowArrayState*********', currentRowArrayState);
-
         typeOutGuessGameState.row = data.row;
         // typeOutGuessGameState.type = data.type;
         typeOutGuessGameState.guess = data.guess;
@@ -186,23 +169,12 @@ function updateGameState(data) {
         typeOutGuessGameState.rowLetterCount = data.rowLetterCount;
         typeOutGuessGameState.matrixArray[typeOutGuessGameState.row][data.letterCount - 1] = data.userInput;
         if (data.arrayOfRowArrays) {
-            // console.log("currentRowArrayState[typeOutGuessGameState.row][data.letterCount]\t", currentRowArrayState[typeOutGuessGameState.row][data.letterCount]) // shows the current array state
             typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
-            // console.log("typeOutGuessGameState.arrayOfRowArrays@@@@@@@@@@@\t", typeOutGuessGameState.arrayOfRowArrays); // is empty objects
-
         }
         if (currentRowArrayState) {
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount - 1].class = currentRowArrayState[data.row][data.letterCount - 1].classList.value;
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount - 1].value = data.userInput;
-            // typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][data.letterCount].value = currentRowArrayState[typeOutGuessGameState.row][data.letterCount].innerHTML;
-
         }
-
-        // sendMessage(JSON.stringify({ // send to server
-        //     type: "syncMatrixArray",
-        //     matrixArray: JSON.stringify(typeOutGuessGameState.matrixArray)
-        // }));
-        // console.log("typeOutGuessGameState.matrixArray\t", typeOutGuessGameState.matrixArray);
     } else if (data.updateType === "setWOTD_and_params") {
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
@@ -217,39 +189,8 @@ function updateGameState(data) {
         typeOutGuessGameState.gameStateParam = data.gameStateParam;
         typeOutGuessGameState.rowGameState = data.rowGameState;
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
-        ////////////////
-        // console.log(`@@@@@@@@@@@@@@@@@@@@data.arrayOfRowArrays@@@@@\t ${data.arrayOfRowArrays}`);
-        // typeOutGuessGameState.wordRowArrayState = data.arrayOfRowArrays; // 03 10 2025 -- why
-
-
-
-        // const currentRowArrayState = getCurrentArrowOfRowArrays();
-        // // data.arrayOfRowArrays.forEach((row, rowIdx) => {
-        // currentRowArrayState.forEach((row, rowIdx) => {
-        //     row.forEach((col, colIdx) => {
-        //         console.log("FOCUSED FOCUSED currentRowArrayState[rowIdx][colIdx]?.classList?.value;\t", col[rowIdx][colIdx]?.classList?.value);
-        //         typeOutGuessGameState.wordRowArrayState[rowIdx][colIdx].class = col[rowIdx][colIdx].classList.value;
-        //         typeOutGuessGameState.wordRowArrayState[rowIdx][colIdx].value = col[rowIdx][colIdx].innerHTML;
-        //         const domCell = document.querySelector(`.word-row:nth-child(${rowIdx + 1}) .cell:nth-child(${colIdx + 1})`);
-        //         if (domCell) {
-        //             // domCell.innerHTML = col.innerHTML || "";
-        //             // domCell.className = col.className || ""; // Apply CSS
-        //         }
-        //     });
-        // });
         console.log("IN GUESS ATTEMPT typeOutGuessGameState.wordRowArrayState\t", typeOutGuessGameState.wordRowArrayState);
 
-        // typeOutGuessGameState.wordRowArrayState.forEach((row, rowIdx) => {
-        //     row.forEach((col, colIdx) => {
-        //         col[rowIdx][colIdx].class = typeOutGuessGameState.arrayOfRowArrays[rowIdx][colIdx].classList.value;
-        //         col[rowIdx][colIdx].value = typeOutGuessGameState.arrayOfRowArrays[rowIdx][colIdx].innerHTML;
-        //     });
-        // });
-
-
-        // typeOutGuessGameState.wordRowArrayState.forEach((r, i) => {
-        //     r = data.arrayOfRowArrays[i];
-        // });
     } else if (data.updateType === "resetGameState") {
         typeOutGuessGameState.resetGameState = data.resetGameState;
         typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
@@ -259,21 +200,10 @@ function updateGameState(data) {
     } else if (data.updateType === "syncStateToServer") {
         console.log('typeOutGuessGameState.matrixArray from updateState\t', typeOutGuessGameState.matrixArray)
     } else if (data.updateType === "syncMatrix") {
-        // console.log("JSON PARSE data.matrixArray\t", JSON.parse(data.wordRowArrayState));
-        // typeOutGuessGameState.wordRowArrayState = JSON.parse(data.wordRowArrayState);
-    }
-
-}
-
-function updateTextState(data) {
-    if (data.type === "text") {
-        textMessageState = {
-            userId: data.userId || "",
-            message: data.message || "",
-            username: data.username || "",
-            messageId: data.messageId || "",
-        };
-        allMessagesState.push({ ...textMessageState });
+        const state = getGameState();
+        console.log("@updateType syncMatrix: data.incRow\t", data.incRow);
+        console.log("state.currentPlayer\t", state.currentPlayer)
+        // typeOutGuessGameState.incRow = data.incRow; // didnt work, but did reset incRow for both players...
     }
 }
 
@@ -298,12 +228,15 @@ function updatePlayerState(data) {
                 data.playerCount?.forEach((player) => {
                     allPlayers.push(player);
                 });
-
             }
             if (!allPlayers.find(player => player.isFirstPlayer === true)) {
+                // state.incRow = parseInt(data.playerCount[0].incRow);
+                console.log("(when addPlayer called) state.incRow\t", state.incRow)
+                console.log("@@@@@@@@DATA.PLAYERCOUNT\t", data.playerCount);
+                console.log("It does NOT see a players.isFirstPlayer");
                 allPlayers[0].isFirstPlayer = true;
                 allPlayers[0].currentPlayerIndex = 0;
-                state.currentPlayer = JSON.stringify(allPlayers[0]);
+                state.currentPlayer = JSON.stringify(allPlayers[0]); // initial first player
 
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
@@ -312,6 +245,7 @@ function updatePlayerState(data) {
                 console.log("currentPlayer wordArrayState\t", currentPlayer);
             }
             else if (allPlayers.find(player => player.isFirstPlayer === true)) {
+                console.log("It sees a players.isFirstPlayer")
                 // new 03 23 2025
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
@@ -327,47 +261,18 @@ function updatePlayerState(data) {
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const currentRowArrayState = getCurrentArrowOfRowArrays();
                 const wordRowData = JSON.parse(currentPlayer.wordRowArrayState);
-
-                // console.log("***************currentRowArrayState***************\t", currentRowArrayState);
-
                 if (localUserId !== currentPlayer.userId && currentPlayer.wordRowArrayState.length > 0) {
-                    // document.querySelectorAll(".word-row").forEach((row, rowIndex) => {
-                    //     row[rowIndex].innerHTML = wordRowData[rowIndex][0]?.value;
-                    //     row[rowIndex].classList = wordRowData[rowIndex][0]?.class;
-                    // });
-                    // state.wordRowArrayState = wordRowData; // Sync state
-                    // state.arrayOfRowArrays = wordRowData.map(row =>
-                    //     row.map(col => ({
-                    //         innerHTML: col.innerHTML,
-                    //         className: col.className
-                    //     }))
-                    // );
-                    // paintGameState(state);
                     if (wordRowData) { // currentPlayer.wordRowArrayState
-
-                        // currentRowArrayState.forEach((row, rowIndex) => {
-                        //     row.forEach((col, colIndex) => {
-                        //         if (col.value === "") {
-                        //             console.log("col.value\t", col.value);
-                        //             console.log("col.class\t", col.class);
-                        //         } else {
-                        //             state.wordRowArrayState[rowIndex][colIndex].innerHTML = col.value;
-                        //             state.wordRowArrayState[rowIndex][colIndex].className = col.class;
-                        //         }
-                        //     });
-                        // });
+                        console.log("wordRowData in if statement is called")
                         wordRowData.forEach((row, rowIndex) => { // this successfully updates the new player joining (letters not css yet)
                             row.forEach((col, colIndex) => {
                                 if (col.value === "") {
-                                    // console.log("col.value\t", col.value);
-                                    // console.log("col.class\t", col.class);
                                 } else {
                                     currentRowArrayState[rowIndex][colIndex].innerHTML = col.value;
                                     currentRowArrayState[rowIndex][colIndex].classList.value = col.class;
                                 }
                             });
                         });
-
                     }
                 }
             }
@@ -384,42 +289,22 @@ function updatePlayerState(data) {
     } else if (data.updateType === "updatePlayerScore") {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
-
-    } else if (data.updateType === "swapToNextPlayer") {
-        if (Array.isArray(data.currentPlayers)) {
-            const incomingPlayers = JSON.stringify(data.currentPlayers);
-            const currentPlayers = JSON.stringify(allPlayers);
-            if (incomingPlayers !== currentPlayers) {
-                allPlayers.length = 0;
-                data.currentPlayers?.forEach((player) => {
-                    allPlayers.push(player);
-                });
-                console.log("allPlayers FROM addPlayer updateType\t", allPlayers);
-            }
-
-            const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
-            const userTurn = document.getElementById("userTurn");
-            userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
-        }
-
     } else if (data.updateType === "nextPlayer") {
         state.currentPlayer = data.currentPlayer;
         // 03 26 2025 - 12:16 AM
         // HERES AN IDEA, DITCH THE isFirstPlayer, and just run it off state, state.currentPlayer, and set it each time...then we are not updating anything, we are simply checking if localUserId === state.currentPlayer.userId
-        const username = JSON.parse(state.currentPlayer);
+        const player = JSON.parse(state.currentPlayer);
+        console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
         const userTurn = document.getElementById("userTurn");
-        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${username.username}</div>`;
+        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${player.username}</div>`;
     }
 }
 onMessage((e) => {
     const state = getGameState();
     const data = JSON.parse(e);
     if (data.updateType === "addPlayer") {
-        // console.log('playerState AFTER INC PLAYER COUNT\t', playerState);
-        // console.log("ALL PLAYERS ARRAY AFTER ADD PLAYER\t", allPlayers);
         const localUserInfo = localStorage.getItem("username");
         const userInfo = JSON.parse(localUserInfo);
-
     } else if (data.updateType === "removePlayer") { // whoever sees two players first?
         console.log('playerState AFTER REMOVE PLAYER \t', player);
     } else if (data.updateType === "checkForTwoPlayers" && allPlayers.length >= 2) {
@@ -452,7 +337,6 @@ onMessage((e) => {
     }
 });
 
-
 // leaving chat channel
 onMessage((e) => {
     const data = JSON.parse(e);
@@ -483,10 +367,19 @@ onMessage((e) => {
         joinedChat.appendChild(div);
         const textMessages = document.getElementById("textMessages");
         textMessages.scrollTo(0, textMessages.scrollHeight);
-
-
-
     }
 });
+
+function updateTextState(data) {
+    if (data.type === "text") {
+        textMessageState = {
+            userId: data.userId || "",
+            message: data.message || "",
+            username: data.username || "",
+            messageId: data.messageId || "",
+        };
+        allMessagesState.push({ ...textMessageState });
+    }
+}
 
 

@@ -8,9 +8,6 @@ import { GameOver } from "./gameOver.ts";
 import { CheckCompletionStatus } from "./checkCompletionStatus.ts";
 import { sendMessage, onMessage, getGameState, getPlayerState, getCurrentArrowOfRowArrays } from "./multiplayer/initialize_web_socket.ts";
 
-// const gameOver = GameOver.getInstance();
-// const rowGameState = RowGameState.getInstance();
-// const checkCompletionStatus = CheckCompletionStatus.getInstance();
 
 let arrayOfRowArrays;
 document.addEventListener("DOMContentLoaded", e => {
@@ -19,22 +16,13 @@ document.addEventListener("DOMContentLoaded", e => {
 
 onMessage(async (messageData) => {
     const state = getGameState();
-
     state.arrayOfRowArrays = arrayOfRowArrays;
-    // state.wordOfTheDay = wordOfTheDay;
-    // state.wordOfTheDayLetters = wordOfTheDayLetters;
-    // state.gameComplete = gameComplete;
-
     const data = JSON.parse(messageData);
-    // console.log('DATA.TYPE FROM THE TOP\t', data.type);
-
     if (data.updateType === "backspace" && data.userInput === 'BACKSPACE') {
         if (state.letterCount >= 0 && state.letterCount < 5) {
             state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
             // syncMatrixArrayToServer(state);
             syncWordRowArrayState(state);
-
-
         } else if (state.letterCount === 5 || state.letterCount === 0) {
             return;
         }
@@ -53,9 +41,6 @@ onMessage(async (messageData) => {
             }
             await handleGuess(state, data, state.gameOver, state.checkCompletionStatus)
                 .then(() => {
-                    // console.log("FOCUSED FOCUSED state.wordRowArrayState\t", state.wordRowArrayState);
-                    // console.log("@@@@@@@@@@ state.arrayOfRowArrays in THEN() @@@@@@@@@@@@\t", state.arrayOfRowArrays);
-
                     state.wordRowArrayState.forEach((row, rowIdx) => {
                         row.forEach((col, colIdx) => {
                             if (state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML === "") {
@@ -66,25 +51,14 @@ onMessage(async (messageData) => {
                         })
                     })
                     syncNewCss(state.wordRowArrayState);
-                    // swap to next player
                 })
                 .then(() => {
-                    swapPlayersFrontEnd(); // commented in 03 25 2025 - changed type "updatePlayerState" on this function to swapPlayer, as I believe it was overloading the websockets TEXT_PARTIAL_WRITING
+                    swapPlayersFrontEnd(state);
                 })
-                // .then(() => {
-                //     const players = getPlayerState();
-                //     const currentPlayer = players.find(player => player.isFirstPlayer === true);
-                //     const localCurrentPlayer = localStorage.getItem("username");
-                //     const localUserData = JSON.parse(localCurrentPlayer);
-                //     if (localUserData.userId.toString() === currentPlayer.userId) {
-                //         console.log("localUserData.userId.toString() === currentPlayer.userId\t", localUserData.userId.toString() === currentPlayer.userId);
-                //         swapToNextPlayer();
-                //     }
-                // })
                 .catch((e) => console.log(`Error for setting sync word array state in guess attempt\t${e}`));
 
         }
-    } else if (data.updateType === "resetGameState") {
+    } else if (data.updateType === "resetGameState") { // we have resetGameState in initialize_web_sockets.ts
         // resetGameState(state);
         console.log("we hit the data.updateType in our onmessage in typeoutGuess.ts")
     }
@@ -103,16 +77,13 @@ export async function typeOutGuess(
     // state.rowGameState = rowGameState;
     state.wordOfTheDayLetters = wordOfTheDayLetters
 
-    // console.log("gameStateParam.reset in typeOutGuess IF statement\t", gameStateParam.reset);
     if (gameStateParam.reset) {
-        // resetGameState(state);
         sendMessage(JSON.stringify({
             type: "updateGameState",
             updateType: "resetGameState",
             resetGameState: gameStateParam,
             wordOfTheDay: wordOfTheDay,
-            wordOfTheDayLetters:
-            wordOfTheDayLetters,
+            wordOfTheDayLetters: wordOfTheDayLetters,
             reset: gameStateParam.reset,
             gameComplete: false
         }));
@@ -129,7 +100,6 @@ export async function typeOutGuess(
 
 
     if (state.letterCount === 5 && userInput === "ENTER" && state.guess !== "ENTER") {
-        // console.log("state.wordOfTheDayLetters\t", state.wordOfTheDayLetters);
         sendMessage(JSON.stringify({
             type: "updateGameState",
             updateType: "guessAttempt",
@@ -155,8 +125,6 @@ export async function typeOutGuess(
             arrayOfRowArrays: state.arrayOfRowArrays,
             matrixArray: state.matrixArray
         }));
-
-
         return;
     } else if (state.letterCount < 5 && userInput !== "BACKSPACE" && state.rowLetterCount < 5 && !state.userInput.includes("ENTER")) {
         state.rowGameState.incRowLetterCount();
@@ -171,8 +139,6 @@ export async function typeOutGuess(
             arrayOfRowArrays: state.arrayOfRowArrays,
             matrixArray: state.matrixArray
         }));
-
-
     }
 }
 
@@ -184,46 +150,27 @@ async function handleGuess(state, data, gameOver, checkCompletionStatus) {
         state.wordOfTheDayLetters,
         data.gameStateParam
     );
-
-
     if (state.row !== 5) {
-        // console.log("newRow.incRow\t", newRow.incRow);
-        // console.log("newRow.restart\t", newRow.restart);
-        // rowGameState.startFromZero();
         state.arrayOfRowArrays[state.row+1][0].innerHTML = "";
         state.row = newRow.incRow;
         state.letterCount = 0;
         state.rowGameState.startFromZero();
         state.userInput = ""; // this fixed it for now 03 03 2025
-        // state.rowGameState = 0;
         state.guess = "";
-
-
     }
     if (newRow.restart) {
         state.gameComplete = true;
         state.checkCompletionStatus.setCompletedGame();
         console.log('You can now restart the game...');
-        // resetGameState(state);
         fireOffConfetti();
     }
-    // if (gameOver.getGameOverStatus()) {
     if (gameOver.getGameOverStatus()) {
         state.gameComplete = true;
         checkCompletionStatus.setCompletedGame();
         console.log("You did not get the word...fire off modal...");
-        // resetGameState(state);
         showFailureModal(state.wordOfTheDay);
         state.userInput = "";
-        // state.gameOver.setGameOverFalse(); // perhaps?
-
     }
-    // const currentRowArrayState = getCurrentArrowOfRowArrays();
-    // console.log("currentRowArrayState\t", currentRowArrayState);
-
-    // state.arrayOfRowArrays = currentRowArrayState;
-    // console.log("state.arrayOfRowArrays\t", state.arrayOfRowArrays);
-    // syncWordRowArrayState(state); // this was BACKTRACKING, we have the letters without this, just not the CSS, this makes no letters...
 }
 
 function handleWiggleAnimation(row) {
@@ -257,32 +204,24 @@ function syncMatrixArrayToServer(state) {
 export function syncWordRowArrayState(state) { // to append and backspace
     sendMessage(JSON.stringify({ // send to server
         type: "syncWordRowArrayState",
-        wordRowArrayState: JSON.stringify(state.wordRowArrayState)
+        // updateType: "syncMatrix",
+        wordRowArrayState: JSON.stringify(state.wordRowArrayState),
+        // gameState: JSON.stringify(state), // new // overloads server, w/out TEXT PARTIAL WRITING
+        // incRow: JSON.stringify(state.incRow) // disable for now....03 27 2025
     }));
-    // console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(state.wordRowArrayState));
 }
 
-export function syncNewCss(updatedWordRowArrayState: [][]) { // to append and backspace
-    sendMessage(JSON.stringify({ // send to server
+export function syncNewCss(updatedWordRowArrayState: [][]) { // in then()
+    sendMessage(JSON.stringify({
         type: "syncWordRowArrayState",
         wordRowArrayState: JSON.stringify(updatedWordRowArrayState)
     }));
-    // console.log("JSON.stringify(state.wordRowArrayState)\t", JSON.stringify(updatedWordRowArrayState));
 }
 
-export function swapToNextPlayer() {
-    // console.log("Swap to next player() was called");
-    // console.trace();
-    sendMessage(JSON.stringify({ // send to server
-        // type: "updatePlayerState",
-        type: "updatePlayerState",
-        updateType: "swapToNextPlayer",
-        // wordRowArrayState: JSON.stringify(updatedWordRowArrayState)
-    }));
-}
-
-function swapPlayersFrontEnd() {
+function swapPlayersFrontEnd(state) {
+    console.log("state.incRow in swapPlayersFrontEnd()\t", state.incRow);
     const players = getPlayerState();
+    // const state = getGameState();
     let currentPlayerIndex = players.indexOf(players.find(player => player.isFirstPlayer === true));
     let nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
 
@@ -291,17 +230,18 @@ function swapPlayersFrontEnd() {
 
     const currentPlayer = players[nextPlayerIndex]; // new next player
     const nextPlayer = players[currentPlayerIndex]; // player after..
+    state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
 
     sendMessage(JSON.stringify({
-        // type: "updatePlayerState",
         type: "updatePlayerState",
         updateType: "nextPlayer",
         currentPlayer: JSON.stringify(currentPlayer),
-        nextPlayer: JSON.stringify(nextPlayer)
+        nextPlayer: JSON.stringify(nextPlayer),
+        incRow: JSON.stringify(state.incRow)
     }));
 }
 
-export function updateServerGameState(state, updateType) {
+function updateServerGameState(state, updateType) { // unused as of 03 27 2025
     sendMessage(JSON.stringify({
         type: "updateServerGameState",
         updateType: updateType,
