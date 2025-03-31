@@ -221,6 +221,7 @@ export function syncNewCss(updatedWordRowArrayState: [][]) { // in then()
 function swapPlayersFrontEnd(state) {
     console.log("state.incRow in swapPlayersFrontEnd()\t", state.incRow);
     const players = getPlayerState();
+    const cp = players.find(player => player.isFirstPlayer);
     // const state = getGameState();
     let currentPlayerIndex = players.indexOf(players.find(player => player.isFirstPlayer === true));
     let nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
@@ -230,15 +231,26 @@ function swapPlayersFrontEnd(state) {
 
     const currentPlayer = players[nextPlayerIndex]; // new next player
     const nextPlayer = players[currentPlayerIndex]; // player after..
-    state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
+    // state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
 
-    sendMessage(JSON.stringify({
-        type: "updatePlayerState",
-        updateType: "nextPlayer",
-        currentPlayer: JSON.stringify(currentPlayer),
-        nextPlayer: JSON.stringify(nextPlayer),
-        incRow: JSON.stringify(state.incRow)
-    }));
+    const localUser = localStorage.getItem("username");
+    const localUserInfo = JSON.parse(localUser);
+    const localUserId = localUserInfo.userId.toString();
+    console.log("localUserId\t", localUserId);
+    console.log("currentPlayer + userId\t", cp, cp.userId);
+
+
+    if (cp.userId === localUserId) {
+
+        sendMessage(JSON.stringify({
+            type: "updatePlayerState",
+            updateType: "nextPlayer",
+            currentPlayer: JSON.stringify(currentPlayer),
+            nextPlayer: JSON.stringify(nextPlayer),
+            incRow: JSON.stringify(state.incRow)
+            // incRow: state.incRow
+        }));
+    }
 }
 
 function updateServerGameState(state, updateType) { // unused as of 03 27 2025

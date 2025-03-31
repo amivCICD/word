@@ -236,7 +236,13 @@ function updatePlayerState(data) {
                 console.log("It does NOT see a players.isFirstPlayer");
                 allPlayers[0].isFirstPlayer = true;
                 allPlayers[0].currentPlayerIndex = 0;
-                state.currentPlayer = JSON.stringify(allPlayers[0]); // initial first player
+                state.incRow = allPlayers[0].incRow;
+
+
+
+
+                // state.currentPlayer = JSON.stringify(allPlayers[0]); // initial first player // why was this stringified? 03 28 2025
+                state.currentPlayer = allPlayers[0]; // initial first player
 
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
@@ -245,7 +251,11 @@ function updatePlayerState(data) {
                 console.log("currentPlayer wordArrayState\t", currentPlayer);
             }
             else if (allPlayers.find(player => player.isFirstPlayer === true)) {
-                console.log("It sees a players.isFirstPlayer")
+                console.log("It sees a players.isFirstPlayer");
+
+
+                state.incRow = newIncRow;
+                console.log("state.incRow\t", state.incRow)
                 // new 03 23 2025
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
@@ -290,10 +300,16 @@ function updatePlayerState(data) {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
     } else if (data.updateType === "nextPlayer") {
-        state.currentPlayer = data.currentPlayer;
+        console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
+
+        // state.incRow = JSON.parse(data.incRow);
+        state.currentPlayer = JSON.parse(data.currentPlayer); // this will move our next player
+        console.log("state.currentPlayer\t", state.currentPlayer);
+        // state.currentPlayer.incRow = state.incRow;
+        // console.log("state.currentPlayer + incRow\t", state.currentPlayer);
         // 03 26 2025 - 12:16 AM
         // HERES AN IDEA, DITCH THE isFirstPlayer, and just run it off state, state.currentPlayer, and set it each time...then we are not updating anything, we are simply checking if localUserId === state.currentPlayer.userId
-        const player = JSON.parse(state.currentPlayer);
+        const player = state.currentPlayer;
         console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
         const userTurn = document.getElementById("userTurn");
         userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${player.username}</div>`;

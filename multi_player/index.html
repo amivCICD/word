@@ -292,8 +292,10 @@
       document.addEventListener('keydown', e => {
         const playerState = getPlayerState();
         const gameState = getGameState();
-        console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer)
-        let globalCurrentPlayer = JSON.parse(gameState.currentPlayer);
+        console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer);
+        // let globalCurrentPlayer = JSON.parse(gameState.currentPlayer);
+        let globalCurrentPlayer = gameState.currentPlayer;
+        console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer);
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
         // console.log("globalCurrentPlayer\t", globalCurrentPlayer);
 

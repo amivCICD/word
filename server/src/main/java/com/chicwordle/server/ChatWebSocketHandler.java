@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -17,7 +18,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final Map<String, List<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> userMap = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> currentPlayerMap = new ConcurrentHashMap<>();
+    // private final Map<WebSocketSession, JSONObject> incRowGameState = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> matrixArrayMap = new ConcurrentHashMap<>();
+
+    private final AtomicInteger incRow = new AtomicInteger(0);
+
 
 
     @Override
@@ -42,10 +47,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         List<WebSocketSession> roomSessions = rooms.computeIfAbsent(roomId, k -> new ArrayList<>());
 
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("addPlayer")) {
+
             String payload = session.getId();
             String username = msg.getString("username");
             String userId = msg.getString("userId");
-            String incRow = msg.getString("incRow");
+            // String incRow = msg.getString("incRow");
             boolean isFirstPlayer = roomSessions.isEmpty();
 
             JSONObject user = new JSONObject()
@@ -72,7 +78,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                             .put("sessionId", s.getId())
                             .put("username", userInfo != null ? userInfo.getString("username") : "")
                             .put("userId", userInfo != null ? userInfo.getString("userId") : "")
-                            .put("incRow", userInfo != null ? userInfo.getString("incRow") : "")
+                            .put("incRow", userInfo != null ? userInfo.getInt("incRow") : 0)
                             .put("wordRowArrayState", matrixInfo != null ? matrixInfo.getString("wordRowArrayState") : "[]")
                             .put("isFirstPlayer", userInfo != null && userInfo.getBoolean("isFirstPlayer"));
                     }).collect(Collectors.toList()));
@@ -85,12 +91,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
         }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("nextPlayer")) {
+            // incRow.incrementAndGet();
+            // if (incRow.incrementAndGet() == 6) {
+            //     System.out.println("INCROW incremented without necessity");
+            //     incRow.set(0);
+            // }
+            incRow.set(incRow.incrementAndGet() % 6);
             String currentPlayer = msg.getString("currentPlayer");
             String nextPlayer = msg.getString("nextPlayer");
-            String incRow = msg.getString("incRow");
+            // String incRow = msg.getString("incRow");
             System.out.println("@@@@incRow in ServerSide@@@@\t" + incRow);
             JSONObject current_and_next_player = new JSONObject()
                 .put("currentPlayer", currentPlayer)
+                .put("incRow", incRow)
                 .put("nextPlayer", nextPlayer);
             currentPlayerMap.put(session, current_and_next_player);
 
@@ -107,6 +120,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 synchronized (s) {
                     if (s.isOpen()) {
                         s.sendMessage(new TextMessage(playerMessage));
+                    }
+                }
+            }
+        }
+        if (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState")) {
+            String payload = "Resetting game state for all players e.g. NEW GAME";
+            JSONObject gameReset = new JSONObject()
+                .put("payload", payload)
+                .put("reset", true);
+            for(WebSocketSession s : roomSessions) {
+                synchronized(s) {
+                    if (s.isOpen()) {
+                        s.sendMessage(new TextMessage(gameReset.toString()));
                     }
                 }
             }
@@ -136,8 +162,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     session.sendMessage(new TextMessage(syncMatrix.toString()));
                 }
             }
-        }
-        else if (roomSessions != null) {
+        } else if (roomSessions != null) {
             String payload = message.getPayload();
             // System.out.println("Received payload:\t" + payload);
             for(WebSocketSession s : roomSessions) {
