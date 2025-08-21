@@ -32,6 +32,7 @@
         <h1 class="text-2xl sm:text-4xl font-bold text-center text-black italic mx-auto hidden sm:flex">WORDLE</h1>
       </div>
 
+      <!-- GAME BOXES -->
       <div class="grid grid-rows-6 grid-cols-5 place-items-center mx-auto gap-none sm:gap-1 w-fit">
         <div class="word-row bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
         <div class="word-row bg-black row-start-1 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
@@ -69,9 +70,9 @@
         <div class="word-row bg-black row-start-6 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
         <div class="word-row bg-black row-start-6 w-[56px] h-[56px] sm:w-16 sm:h-16 flex items-center border-2 sm:border-3 border-white justify-center text-3xl sm:text-4xl font-bold text-pink-300"></div>
       </div>
-
-
     </div>
+
+    <!-- KEYBOARD -->
     <div class="w-full pt-2 sm:mt-10">
       <div class="my-1 flex justify-center gap-[1px] sm:gap-1 sm:text-xl font-bold select-none">
         <kbd class="kbd text-pink-200 bg-black h-20">Q</kbd>
@@ -111,10 +112,7 @@
         <div id="startNewGameBtn" class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black hidden">Start New Game</div>
 
         <a href="./multi_player/">
-          <div
-
-            class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black"
-            >
+          <div class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">
               Play Multiplayer
           </div>
         </a>
@@ -125,15 +123,16 @@
 
 
     <script type="module">
-      import { typeOutGuess } from "./src/typeOutGuess.ts";
-      import { checkInputValues } from "./src/checkInputValues.ts";
-      import { ResetGameState } from "./src/resetGameState.ts";
-      import { sWords } from "./src/sWords";
-      import { RowGameState } from "./src/rowGameState.ts";
-      import { GuessStarted } from "./src/guessStarted.ts";
-      import { GameOver } from "./src/gameOver.ts";
-      import { CheckCompletionStatus } from "./src/checkCompletionStatus.ts";
-      import { windowAPIURL } from "./src/window_api_url.ts"; // set dev or production API_URL here...
+      import { typeOutGuess } from "./src/multiplayer/guess_related/typeOutGuess_singleplayer.ts"; // in multi player folder but not multiplayer
+      import { checkInputValues } from "./src/checks/checkInputValues.ts";
+      import { ResetGameState } from "./src/gamestate/ResetGameState.ts";
+      import { UIReset } from "./src/gamestate/UIReset.ts";
+      import { sWords } from "./src/data/sWords";
+      import { RowGameState } from "./src/gamestate/RowGameState.ts";
+      import { GuessStarted } from "./src/multiplayer/guess_related/GuessStarted.ts";
+      import { GameOver } from "./src/game_over_related/GameOver.ts";
+      import { CheckCompletionStatus } from "./src/checks/CheckCompletionStatus.ts";
+      import { windowAPIURL } from "./src/multiplayer/window_initializers/window_api_url.ts"; // set dev or production API_URL here...
 
       const apiURL = windowAPIURL;
       // const apiURL = "";
@@ -193,6 +192,7 @@
 
       document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
         resetBtn.addEventListener('click', e => {
+          console.log("new game started button clicked")
           if (e) {
             (async () => {
               try {
@@ -218,6 +218,7 @@
                     gameState.wordOfTheDayLetters
                   );
                   gameState.setResetFalse();
+                  UIReset.resetUI();
                 }
               } catch (error) {
                 console.error(error);
@@ -325,7 +326,7 @@
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script src="./src/fireOffConfetti.ts" type="module"></script>
+    <script src="./src/game_over_related/fireOffConfetti.ts" type="module"></script>
     <!-- <script src="./src/multiplayer/createsocket_changeroom.ts" type="module"></script> -->
     <!-- <script src="./src/reHideStartGameBtn.ts" type="module"></script> -->
 
@@ -335,7 +336,6 @@
         <p class="py-4">The word of the day was: <span class="text-2xl sm:text-4xl text-pink-200 font-bold" id="wordOfTheDay"></span>!</p>
         <div class="modal-action">
           <form method="dialog">
-            <!-- if there is a button in form, it will close the modal -->
             <button class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button>
             <button class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button>
           </form>

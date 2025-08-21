@@ -145,21 +145,21 @@
 
 
     <script type="module">
-      import { typeOutGuess } from "../src/typeOutGuess.ts";
-      import { checkInputValues } from "../src/checkInputValues.ts";
-      import { ResetGameState } from "../src/resetGameState.ts";
-      import { UIReset } from "../src/resetGameState.ts";
-      import { sWords } from "../src/sWords";
-      import { RowGameState } from "../src/rowGameState.ts";
-      import { GuessStarted } from "../src/guessStarted.ts";
-      import { GameOver } from "../src/gameOver.ts";
-      import { CheckCompletionStatus } from "../src/checkCompletionStatus.ts";
-      import { windowAPIURL } from "../src/window_api_url.ts"; // set dev or production API_URL here...
-      import { sendMessage } from "../src/multiplayer/initialize_web_socket.ts";
-      import { setInitialPromptReady } from "../src/multiplayer/setInitialPromptReady.ts";
-      import { userLeavingMessage } from "../src/multiplayer/newUserJoiningMessage.ts";
-      import { getPlayerState } from "../src/multiplayer/initialize_web_socket.ts";
-      import { getGameState } from "../src/multiplayer/initialize_web_socket.ts";
+      import { typeOutGuess } from "../src/multiplayer/guess_related/typeOutGuess.ts";
+      import { sWords } from "../src/data/sWords";
+      import { checkInputValues } from      "../src/checks/checkInputValues.ts";
+      import { CheckCompletionStatus } from "../src/checks/CheckCompletionStatus.ts";
+      import { ResetGameState } from "../src/gamestate/ResetGameState.ts";
+      import { UIReset } from        "../src/gamestate/UIReset.ts";
+      import { RowGameState } from   "../src/gamestate/RowGameState.ts";
+      import { GuessStarted } from   "../src/multiplayer/guess_related/GuessStarted.ts";
+      import { GameOver } from "../src/game_over_related/GameOver.ts";
+      import { windowAPIURL } from "../src/multiplayer/window_initializers/window_api_url.ts"; // set dev or production API_URL here...
+      import { setInitialPromptReady } from "../src/multiplayer/window_initializers/setInitialPromptReady.ts";
+      import { userLeavingMessage } from "../src/multiplayer/chat_related/newUserJoiningMessage.ts";
+      import { sendMessage } from    "../src/multiplayer/socket_related/initialize_web_socket.ts";
+      import { getPlayerState } from "../src/multiplayer/socket_related/initialize_web_socket.ts";
+      import { getGameState } from   "../src/multiplayer/socket_related/initialize_web_socket.ts";
 
       // window.addEventListener("playerStateUpdated", () => {
       //       console.log("Player state UPDATED\t", getPlayerState());
@@ -176,14 +176,15 @@
 
       const apiURL = windowAPIURL;
       // const apiURL = "";
-      console.log('apiURL\t', apiURL);
-      console.log('window.API_URL\t', window.API_URL);
+      // console.log('apiURL\t', apiURL);
+      // console.log('window.API_URL\t', window.API_URL);
 
       const state = getGameState();
       const gameOver = state.gameOver;
       const rowGameState = state.rowGameState;
       const guessStarted = state.guessStarted;
       const checkCompletionStatus = state.checkCompletionStatus;
+
 
       // my lil singletons
       // const gameOver = GameOver.getInstance();
@@ -198,7 +199,7 @@
       (async () => {
         let fetchWord;
         try {
-          if (checkCompletionStatus.isCompleted()) {
+           if (checkCompletionStatus.isCompleted()) {
             fetchWord = await fetch(`${apiURL}/newgameword`, {
                   method: "GET",
                   headers: {
@@ -221,8 +222,12 @@
             resetGameState = new ResetGameState(true, wotd.word);
             resetGameState.setResetFalse();
             if (checkCompletionStatus.isCompleted()) {
-              console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
-              sendMessage(JSON.stringify({ type: "updateGameState", updateType: "checkCompletionStatus", checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false) }));
+              // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
+              sendMessage(JSON.stringify({
+                type: "updateGameState",
+                updateType: "checkCompletionStatus",
+                checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false)
+              }));
                // reveal after game end....
               // checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
             }
@@ -255,7 +260,8 @@
                   console.log('fetchWord\t', w);
                   resetGameState = new ResetGameState(true, w.word);
                   state.gameOver.setGameOverFalse();
-                  sendMessage(JSON.stringify({
+                  /////////
+                  sendMessage(JSON.stringify({ // why here? it should be on new game button click, not on word fetch...though, without this, clicking the start new game btn doesnt work?
                     type: "updateGameState",
                     updateType: "resetGameState",
                     resetGameState: resetGameState, // || reset: true
@@ -264,13 +270,14 @@
                     // gameOver: gameOver.getGameOverStatus(),
                     UIReset: UIReset
                   }));
-                  if (checkCompletionStatus.isCompleted()) { // this is only to unhide the stat new game button
+                  /////////
+                  if (checkCompletionStatus.isCompleted()) { // this is only to unhide the start new game button
                     checkCompletionStatus.setCompletedGame();
-                    console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
+                    // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
                   }
 
                   // sendMessage(JSON.stringify({ type: "updateGameState", updateType: "resetGameState", resetGameState: resetGameState, gameOver: gameOver, UIReset: UIReset }))
-                  console.log('resetGameState.reset is true?\t', resetGameState.reset);
+                  // console.log('resetGameState.reset is true?\t', resetGameState.reset);
                   resetGameState.setResetFalse();
                   typeOutGuess(
                     null,
@@ -292,10 +299,10 @@
       document.addEventListener('keydown', e => {
         const playerState = getPlayerState();
         const gameState = getGameState();
-        console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer);
+        // console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer);
         // let globalCurrentPlayer = JSON.parse(gameState.currentPlayer);
         let globalCurrentPlayer = gameState.currentPlayer;
-        console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer);
+        // console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer);
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
         // console.log("globalCurrentPlayer\t", globalCurrentPlayer);
 
@@ -381,19 +388,21 @@
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script src="../src/fireOffConfetti.ts" type="module"></script>
-    <script src="../src/multiplayer/sendTextMessage.ts" type="module"></script>
-    <script src="../src/checkTextMessageFocus.ts" type="module"></script>
-    <script src="../src/chat_collapse_listeners.ts" type="module"></script>
-    <script src="../src/checkUsernameInputFocus.ts" type="module"></script>
+    <script src="../src/game_over_related/fireOffConfetti.ts" type="module"></script>
 
-    <script src="../src/checkForUsername.ts" type="module"></script>
-    <script src="../src/cancelUsernameDialog.ts" type="module"></script>
+    <script src="../src/multiplayer/chat_related/sendTextMessage.ts" type="module"></script>
+    <script src="../src/multiplayer/chat_related/chat_collapse_listeners.ts" type="module"></script>
 
-    <script src="../src/confirmUsernameBtn.ts" type="module"></script>
-    <script src="../src/checkForUsername.ts" type="module"></script>
-    <script src="../src/multiplayer/initialprompt.ts" type="module"></script>
-    <script src="../src/multiplayer/createsocket_changeroom.ts" type="module"></script>
+    <script src="../src/checks/checkTextMessageFocus.ts" type="module"></script>
+    <script src="../src/checks/checkUsernameInputFocus.ts" type="module"></script>
+    <script src="../src/checks/checkForUsername.ts" type="module"></script>
+    <script src="../src/checks/checkForUsername.ts" type="module"></script>
+
+
+    <script src="../src/multiplayer/user_related/cancelUsernameDialog.ts" type="module"></script>
+    <script src="../src/multiplayer/user_related/confirmUsernameBtn.ts" type="module"></script>
+    <script src="../src/multiplayer/helper_functions/initialprompt.ts" type="module"></script>
+    <script src="../src/multiplayer/socket_related/createsocket_changeroom.ts" type="module"></script>
 
 
     <dialog id="failureModal" class="modal text-black"> <!--START NEW GAME-->
@@ -402,9 +411,8 @@
         <p class="py-4">The word of the day was: <span class="text-2xl sm:text-4xl text-pink-200 font-bold" id="wordOfTheDay"></span>!</p>
         <div class="modal-action">
           <form method="dialog">
-            <!-- if there is a button in form, it will close the modal -->
             <!-- <button class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button> -->
-            <button class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button>
+            <button id="failureModalBtn" class="startNewGame btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Start New Game</button>
             <button class="btn bg-white text-black border-4 border-pink-200 hover:text-pink-200">Close</button>
           </form>
         </div>

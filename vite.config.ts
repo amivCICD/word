@@ -14,7 +14,7 @@ function customRoutingPlugin() {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = req.url || '';
-        console.log("Plugin middleware hit, URL:", url);
+        // console.log("Plugin middleware hit, URL:", url);
         if (url.startsWith('/multi_player/') && !url.endsWith('/multi_player/index.html')) {
           console.log("Rewriting to /multi_player/index.html for:", url);
           req.url = `/multi_player/index.html${url.includes('?') ? url.substring(url.indexOf('?')) : ''}`;

@@ -1,9 +1,11 @@
 package com.chicwordle.server;
 
-import java.util.Map;
 import java.time.LocalDate;
-import com.chicwordle.server.SQLiteSelect;
-import com.chicwordle.server.SQLiteUpdate;
+import java.util.Map;
+
+import com.chicwordle.server.data.AllWords;
+import com.chicwordle.server.sqliterelated.SQLiteSelect;
+import com.chicwordle.server.sqliterelated.SQLiteUpdate;
 
 
 public class WordOfTheDay {
@@ -39,10 +41,6 @@ public class WordOfTheDay {
         }
         return newGameWord;
     }
-
-	// public String newGameWordOfTheDay() {
-	// 	return AllWords.WORDS[randomIndex()];
-	// }
 	public int randomIndex() {
 		return (int) (Math.random() * AllWords.WORDS.length);
 	}
