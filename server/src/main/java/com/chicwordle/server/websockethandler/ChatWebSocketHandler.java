@@ -8,14 +8,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import com.chicwordle.server.WordOfTheDay;
+import com.chicwordle.server.services.NewGameWordService;
 
 public class ChatWebSocketHandler extends TextWebSocketHandler {
+    @Autowired
+    private NewGameWordService newGameWordService;
+
     private final Map<String, List<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> userMap = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> currentPlayerMap = new ConcurrentHashMap<>();
@@ -116,8 +120,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             // String newGameWord = wotd.newGameWordOfDay(); // lets try using what the front end sent?
 
             // String wordOfTheDay = msg.getString("wordOfTheDay"); // old
-            WordOfTheDay newGameWordOfTheDay = new WordOfTheDay();
-            String newGameWord = newGameWordOfTheDay.newGameWordOfDay();
+
+            // WordOfTheDay newGameWordOfTheDay = new WordOfTheDay();
+            // String newGameWord = newGameWordOfTheDay.newGameWordOfDay();
+
+            String newGameWord = newGameWordService.getNewGameWord();
 
             JSONObject newGameWotdObject = new JSONObject()
                 .put("serverWordOfTheDay", newGameWord);
