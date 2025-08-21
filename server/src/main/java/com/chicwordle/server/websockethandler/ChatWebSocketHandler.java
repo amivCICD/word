@@ -13,6 +13,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.chicwordle.server.WordOfTheDay;
+
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final Map<String, List<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> userMap = new ConcurrentHashMap<>();
@@ -112,11 +114,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             System.out.println("SERVER SAW THE RESET GAME STATE!");
             // WordOfTheDay wotd = new WordOfTheDay();
             // String newGameWord = wotd.newGameWordOfDay(); // lets try using what the front end sent?
-            String wordOfTheDay = msg.getString("wordOfTheDay");
+
+            // String wordOfTheDay = msg.getString("wordOfTheDay"); // old
+            WordOfTheDay newGameWordOfTheDay = new WordOfTheDay();
+            String newGameWord = newGameWordOfTheDay.newGameWordOfDay();
+
             JSONObject newGameWotdObject = new JSONObject()
-                .put("serverWordOfTheDay", wordOfTheDay);
+                .put("serverWordOfTheDay", newGameWord);
             newGameWotdMap.put(session, newGameWotdObject);
-            System.out.println("serverWOTD\t" + wordOfTheDay);
+            System.out.println("serverWOTD\t" + newGameWord);
             /////////////////////////
             matrixArrayMap.clear();
             incRow.set(0);
@@ -125,7 +131,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             JSONObject gameReset = new JSONObject()
                 .put("type", "updateGameState")
                 .put("updateType", "wordOfDay")
-                .put("serverWordOfTheDay", wordOfTheDay)
+                .put("serverWordOfTheDay", newGameWord)
                 // .put("newGameWord", newGameWord)
                 .put("whereIsMyShit", "WHERE IS MY SHIT!")
                 // .put("resetGameState", resetGameState)

@@ -10,6 +10,7 @@ import com.chicwordle.server.sqliterelated.SQLiteUpdate;
 
 public class WordOfTheDay {
 	private String dailyWord;
+    private String newGameWord;
 	private LocalDate lastGeneratedDate;
 
 	public String dailyWord() {
@@ -33,14 +34,16 @@ public class WordOfTheDay {
         return this;
     }
     public String newGameWordOfDay() {
-        String newGameWord = "";
         Map<Integer, String> newGameMap = SQLiteSelect.selectWordOfDay();
         if (!newGameMap.isEmpty()) {
             int id = newGameMap.keySet().iterator().next();
-            newGameWord = newGameMap.get(id);
+            setNewGameWordOfDay(newGameMap.get(id));
         }
-        return newGameWord;
+        return getNewGameWordOfDay();
     }
+    public String getNewGameWordOfDay() { return newGameWord; }
+    public void setNewGameWordOfDay(String newGameWord) { this.newGameWord = newGameWord; }
+
 	public int randomIndex() {
 		return (int) (Math.random() * AllWords.WORDS.length);
 	}
