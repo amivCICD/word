@@ -1,22 +1,13 @@
-07 10 2024
 
-    all incoming inoput via switch is to be if (!abcd...) = null - check 7/12
-
-    fix bg size (larger img or bg-w-screen ?) - check 7/11
-
-    setup reset feature - check 7/12
-
-    ensure mobile fits entire screen - check? 7/12
 
     add credit to confetti
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
-    consider a server with a single word of the day... check 08 10 2024
+    08 22 2025 - we are calling the server twice on game end. NOTE: issue not in handleGuess.ts
 
-    change front-end endpoints to query server
-
-    03 26 2025 - on new game start (modal click), players do not start with the same word...
+    consider a server with a single word of the day... CHECK √ 08 10 2024 @ActuallyCompleted 08 22 2025, added word service to spread word to /newgameword endpoint
+    03 26 2025 - on new game start (modal click), players do not start with the same word... - CHECK √ 08 22 2025
     03 26 2025 - on new game start, must clear the cache of the server for users, and onMessage needs to perform a reset for the other players..
     03 24 2025 - on new game start, must clear the cache of the server for users, its pulling down the previous games data...
     03 21 2025 - add padding to current player turn so it doesnt bump the words down, also maybe a loading skeleton for newly joining users...
@@ -28,8 +19,13 @@
     03 04 2025 - NOTE: START NEW GAME button is only revealed for 1080+ monitors...consider revising...
     02 23 2025 - provide dictionary definition of the word after game end
     03 04 2025 - MAIN ISSUE: we are not resetting the state for all players when we start a new game... e.g.clearing everyhthing
-    02 25 2025 - cannot use enter to confirm name change // quick fixed with setting input val to current name...  - CHHECK
-    02 25 2025 - need to confirm that "Start new game" resets match - CHECK
-    02 25 2025 - see why the first chat message doesnt reach the other end... - CHECK
-    02 25 2025 - UI updates on both screens, but it is not synced, need to sync the users to the word count on message.... - CHECK
-    03 04 2025 - current is, firefox_dev doesnt show start new game button after game is won || firefox regs... // line 223 index.html //multiplayer - CHECK
+    02 25 2025 - cannot use enter to confirm name change // quick fixed with setting input val to current name...  - CHECK √
+    02 25 2025 - need to confirm that "Start new game" resets match - CHECK √
+    02 25 2025 - see why the first chat message doesnt reach the other end... - CHECK √
+    02 25 2025 - UI updates on both screens, but it is not synced, need to sync the users to the word count on message.... - CHECK √
+    03 04 2025 - current is, firefox_dev doesnt show start new game button after game is won || firefox regs... // line 223 index.html //multiplayer - CHECK √
+    07 10 2024
+    all incoming inoput via switch is to be if (!abcd...) = null - CHECK √ 7/12
+    fix bg size (larger img or bg-w-screen ?) - CHECK √ 7/11
+    setup reset feature - CHECK √ 7/12
+    ensure mobile fits entire screen - CHECK √? 7/12 √

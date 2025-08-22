@@ -1,5 +1,6 @@
 import { fireOffConfetti } from "../../game_over_related/fireOffConfetti";
 import { showFailureModal } from "../../game_over_related/showFailureModal";
+import { sendMessage } from "../socket_related/initialize_web_socket";
 import { appendGuess } from "./appendGuess";
 
 export async function handleGuess(state, data, gameOver, checkCompletionStatus) {
@@ -23,6 +24,9 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
         state.checkCompletionStatus.setCompletedGame();
         // console.log('You can now restart the game...');
         fireOffConfetti();
+        setNewWordOnServer();
+        console.log("%%%%%%%%%%%%%%%resetting the game ONCE");
+
     }
     if (gameOver.getGameOverStatus()) {
         state.gameComplete = true;
@@ -30,5 +34,14 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
         // console.log("You did not get the word...fire off modal...");
         showFailureModal(state.wordOfTheDay);
         state.userInput = "";
+        // setNewWordOnServer();
+        console.log("%%%%%%%%%%%%%%%resetting the game TWICE");
     }
+}
+
+function setNewWordOnServer() {
+    sendMessage(JSON.stringify({ // new and temporary
+        type: "updateServerWord",
+        updateType: "generateNewGameWord"
+    }));
 }

@@ -226,10 +226,10 @@
               sendMessage(JSON.stringify({ // commented out temporarily 08 22 2025??
                 type: "updateGameState",
                 updateType: "checkCompletionStatus",
-                checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false)
+                checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(true)
               }));
                // reveal after game end....
-              checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
+              // checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
             }
             // checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
             typeOutGuess(
@@ -246,11 +246,6 @@
 
       document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
         resetBtn.addEventListener('click', e => {
-          sendMessage(JSON.stringify({ // new and temporary
-            type: "updateServerWord",
-            updateType: "generateNewGameWord",
-            // checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false)
-          }));
           checkCompletionStatus.hideRevealStartBtn(true)
           if (e) {
             (async () => {
@@ -282,7 +277,7 @@
                   /////////
                   if (checkCompletionStatus.isCompleted()) { // this is only to unhide the start new game button
                     checkCompletionStatus.setCompletedGame();
-                    checkCompletionStatus.hideRevealStartBtn(false)
+                    checkCompletionStatus.hideRevealStartBtn(true);
                     // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
                   }
 

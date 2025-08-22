@@ -10,7 +10,6 @@ import com.chicwordle.server.sqliterelated.SQLiteUpdate;
 
 public class WordOfTheDay {
 	private String dailyWord;
-    private String newGameWord;
 	private LocalDate lastGeneratedDate;
 
 	public String dailyWord() {

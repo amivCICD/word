@@ -19,7 +19,7 @@ public class SQLiteSelect {
             Statement stmt = conn.createStatement();
             var rs = stmt.executeQuery(sql)) {
                 while (rs.next()) {
-                    System.out.printf("%-5s%-25s%-10s%n",
+                    System.out.printf("IN SQLiteSelect.java:\tid: %-5s word: %-25s used: %-10s%n",
                         rs.getInt("id"),
                         rs.getString("word"),
                         rs.getBoolean("used")

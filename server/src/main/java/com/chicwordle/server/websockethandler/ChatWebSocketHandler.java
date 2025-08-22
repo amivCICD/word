@@ -92,7 +92,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             String currentPlayer = msg.getString("currentPlayer");
             String nextPlayer = msg.getString("nextPlayer");
             // String incRow = msg.getString("incRow");
-            System.out.println("@@@@incRow in ServerSide@@@@\t" + incRow);
+            // System.out.println("@@@@incRow in ServerSide@@@@\t" + incRow);
             JSONObject current_and_next_player = new JSONObject()
                 .put("currentPlayer", currentPlayer)
                 .put("incRow", incRow)
@@ -116,6 +116,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
+        if (msg.getString("type").equals("updateServerWord") && msg.getString("updateType").equals("generateNewGameWord")) {
+            System.out.println("Generating a new word for a new game on button click");
+            newGameWordService.generateNewGameWord();
+        }
         if (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState")) {
             System.out.println("SERVER SAW THE RESET GAME STATE!");
             // WordOfTheDay wotd = new WordOfTheDay();
@@ -128,7 +132,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 
             String newGameWord = newGameWordService.getNewGameWord();
-            System.out.println("@@@@@@@@@@@ngword in websockerHandler@@@@@@@@\t" + newGameWord + "\t@@@@@@@@@@@@@@@@");
+            System.out.println("@@@@@@@@@@@ngword in websockerHandler@@@@@@@@\t" + newGameWord + "\t@@@@@@@@");
             // if (newGameWord == null) {
             //     newGameWordService.generateNewGameWord();
             //     newGameWord = newGameWordService.getNewGameWord();
@@ -137,7 +141,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             JSONObject newGameWotdObject = new JSONObject()
                 .put("serverWordOfTheDay", newGameWord);
             newGameWotdMap.put(session, newGameWotdObject);
-            System.out.println("serverWOTD\t" + newGameWord);
+            // System.out.println("serverWOTD\t" + newGameWord);
             /////////////////////////
             matrixArrayMap.clear();
             incRow.set(0);
@@ -160,10 +164,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-        if (msg.getString("type").equals("updateServerWord") && msg.getString("updateType").equals("generateNewGameWord")) {
-            System.out.println("Generating a new word for a new game on button click");
-            newGameWordService.generateNewGameWord();
-        }
+
         // state.resetGameState = data.resetGameState;
         // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
         // state.wordOfTheDay = data.wordOfTheDay;
