@@ -6,8 +6,21 @@ import com.chicwordle.server.WordOfTheDay;
 
 @Service
 public class NewGameWordService {
+    private volatile String newGameWord;
+
     public String getNewGameWord() {
+        return newGameWord;
+    }
+    public void generateNewGameWord() {
         WordOfTheDay newGameWordOfTheDay = new WordOfTheDay();
-        return newGameWordOfTheDay.newGameWordOfDay();
+        setNewGameWord(newGameWordOfTheDay.newGameWordOfDay());
+    }
+    public void setNewGameWord(String newGameWord) {
+        this.newGameWord = newGameWord;
+    }
+    public void initNewGameWord() {
+        if (newGameWord == null) {
+            generateNewGameWord();
+        }
     }
 }

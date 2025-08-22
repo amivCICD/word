@@ -89,6 +89,8 @@ export function initializeSocket(roomId) {
             updateTextState(eventData);
         } else if (eventData.type === "updateGameState") {
             updateGameState({ ...typeOutGuessGameState, ...eventData });
+        } else if (eventData.type === "updateServerWord") {
+            console.log("updatedServer word fired in socket.onmessage")
         }
         messageCallBacks.forEach(callback => callback(e.data));
     }

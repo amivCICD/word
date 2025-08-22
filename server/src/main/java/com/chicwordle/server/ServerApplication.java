@@ -1,5 +1,7 @@
 package com.chicwordle.server;
 
+import java.io.File;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,12 +14,20 @@ import com.chicwordle.server.sqliterelated.SQLiteSelect;
 
 @SpringBootApplication
 public class ServerApplication {
+	private static String dbPath = "../../../../../../../chicwordle.db";
 	public static void main(String[] args) {
 		SpringApplication.run(ServerApplication.class, args);
-		Connect.connect(); // these were commented out from last build 30-34
-		CreateDB.initDB();
-		SQLiteCreateTable.createWordTable("words");
-		InsertWordsToDB.insertManyWords(AllWords.WORDS);
+		File dbFile = new File(dbPath);
+		if (!dbFile.exists()) {
+			System.out.println("dbFile.exists()\t" + dbFile.exists());
+			System.out.println("Generating database...");
+			Connect.connect(); // these were commented out from last build 30-34
+			CreateDB.initDB();
+			SQLiteCreateTable.createWordTable("words");
+			InsertWordsToDB.insertManyWords(AllWords.WORDS);
+		} else {
+			System.out.println("DB Exists!");
+		}
 		SQLiteSelect.selectWordOfDay();
 	}
 }

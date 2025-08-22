@@ -176,7 +176,7 @@
 
       const apiURL = windowAPIURL;
       // const apiURL = "";
-      // console.log('apiURL\t', apiURL);
+      console.log('apiURL\t', apiURL);
       // console.log('window.API_URL\t', window.API_URL);
 
       const state = getGameState();
@@ -216,27 +216,28 @@
               }
             });
           }
-
           if (fetchWord.ok) {
             const wotd = await fetchWord.json();
+            console.log("wotd.word in IIFE fetchWord.ok\t", wotd.word);
             resetGameState = new ResetGameState(true, wotd.word);
             resetGameState.setResetFalse();
             if (checkCompletionStatus.isCompleted()) {
               // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
-              sendMessage(JSON.stringify({
+              sendMessage(JSON.stringify({ // commented out temporarily 08 22 2025??
                 type: "updateGameState",
                 updateType: "checkCompletionStatus",
                 checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false)
               }));
                // reveal after game end....
-              // checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
+              checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
             }
+            // checkCompletionStatus.hideRevealStartBtn(false); // reveal after game end....
             typeOutGuess(
-                null,
-                resetGameState,
-                resetGameState.wordOfTheDay,
-                resetGameState.wordOfTheDayLetters
-              );
+              null,
+              resetGameState,
+              resetGameState.wordOfTheDay,
+              resetGameState.wordOfTheDayLetters
+            );
           }
         } catch (error) {
           console.error(error);
@@ -245,6 +246,12 @@
 
       document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
         resetBtn.addEventListener('click', e => {
+          sendMessage(JSON.stringify({ // new and temporary
+            type: "updateServerWord",
+            updateType: "generateNewGameWord",
+            // checkCompletionStatus: checkCompletionStatus.hideRevealStartBtn(false)
+          }));
+          checkCompletionStatus.hideRevealStartBtn(true)
           if (e) {
             (async () => {
               try {
@@ -261,6 +268,7 @@
                   resetGameState = new ResetGameState(true, w.word);
                   state.gameOver.setGameOverFalse();
                   /////////
+                  ////// server: (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState"))
                   sendMessage(JSON.stringify({ // why here? it should be on new game button click, not on word fetch...though, without this, clicking the start new game btn doesnt work?
                     type: "updateGameState",
                     updateType: "resetGameState",
@@ -268,11 +276,13 @@
                     wordOfTheDay: w.word,
                     wordOfTheDayLetters: resetGameState.wordOfTheDayLetters,
                     // gameOver: gameOver.getGameOverStatus(),
+
                     UIReset: UIReset
                   }));
                   /////////
                   if (checkCompletionStatus.isCompleted()) { // this is only to unhide the start new game button
                     checkCompletionStatus.setCompletedGame();
+                    checkCompletionStatus.hideRevealStartBtn(false)
                     // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
                   }
 

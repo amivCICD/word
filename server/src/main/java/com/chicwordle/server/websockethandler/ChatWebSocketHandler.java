@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -16,6 +17,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.chicwordle.server.services.NewGameWordService;
 
+@Component
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private NewGameWordService newGameWordService;
@@ -32,7 +34,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         String roomId = getRoomId(session);
         List<WebSocketSession> roomSessions = rooms.computeIfAbsent(roomId, k -> new ArrayList<>()); // added 03 02 2025
         roomSessions.add(session);
-        System.out.println("Session connected to room: " + roomId + ": " + session.getId());
+        System.out.println("Session connected to room: " + roomId + " , sessionId:\t" + session.getId());
     }
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -124,7 +126,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             // WordOfTheDay newGameWordOfTheDay = new WordOfTheDay();
             // String newGameWord = newGameWordOfTheDay.newGameWordOfDay();
 
+
             String newGameWord = newGameWordService.getNewGameWord();
+            System.out.println("@@@@@@@@@@@ngword in websockerHandler@@@@@@@@\t" + newGameWord + "\t@@@@@@@@@@@@@@@@");
+            // if (newGameWord == null) {
+            //     newGameWordService.generateNewGameWord();
+            //     newGameWord = newGameWordService.getNewGameWord();
+            // }
 
             JSONObject newGameWotdObject = new JSONObject()
                 .put("serverWordOfTheDay", newGameWord);
@@ -151,6 +159,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     }
                 }
             }
+        }
+        if (msg.getString("type").equals("updateServerWord") && msg.getString("updateType").equals("generateNewGameWord")) {
+            System.out.println("Generating a new word for a new game on button click");
+            newGameWordService.generateNewGameWord();
         }
         // state.resetGameState = data.resetGameState;
         // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);

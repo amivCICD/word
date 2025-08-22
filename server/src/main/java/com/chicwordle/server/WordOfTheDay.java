@@ -33,16 +33,28 @@ public class WordOfTheDay {
         }
         return this;
     }
+    //new///////////////////////
+    // public String newGameWordOfDay() {
+    //     Map<Integer, String> newGameMap = SQLiteSelect.selectWordOfDay();
+    //     if (!newGameMap.isEmpty()) {
+    //         int id = newGameMap.keySet().iterator().next();
+    //         setNewGameWordOfDay(newGameMap.get(id));
+    //     }
+    //     return getNewGameWordOfDay();
+    // }
+    // public String getNewGameWordOfDay() { return newGameWord; }
+    // public void setNewGameWordOfDay(String newGameWord) { this.newGameWord = newGameWord; }
+
+    //original////////////////////
     public String newGameWordOfDay() {
+        String newGameWord = "";
         Map<Integer, String> newGameMap = SQLiteSelect.selectWordOfDay();
         if (!newGameMap.isEmpty()) {
             int id = newGameMap.keySet().iterator().next();
-            setNewGameWordOfDay(newGameMap.get(id));
+            newGameWord = newGameMap.get(id);
         }
-        return getNewGameWordOfDay();
+        return newGameWord;
     }
-    public String getNewGameWordOfDay() { return newGameWord; }
-    public void setNewGameWordOfDay(String newGameWord) { this.newGameWord = newGameWord; }
 
 	public int randomIndex() {
 		return (int) (Math.random() * AllWords.WORDS.length);
