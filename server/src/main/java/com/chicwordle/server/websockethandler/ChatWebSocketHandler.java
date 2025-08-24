@@ -164,12 +164,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-
-        // state.resetGameState = data.resetGameState;
-        // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
-        // state.wordOfTheDay = data.wordOfTheDay;
-        // state.wordOfTheDayLetters = data.wordOfTheDayLetters;
-
         if (msg.getString("type").equals("syncWordRowArrayState")) {
             String payload = session.getId();
             String matrixArrayStr = msg.optString("wordRowArrayState", "[[{class: '', value: ''}]]");

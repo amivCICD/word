@@ -55,14 +55,12 @@ let textMessageState = {
     messageId: "",
 };
 let allMessagesState = [];
-
 let player = {
     username: null,
     userId: null,
     isCurrentPlayer: false,
     score: { letters: [] },
 }
-
 let allPlayers = [];
 
 export function initializeSocket(roomId) {
@@ -243,9 +241,6 @@ function updatePlayerState(data) {
                 allPlayers[0].wasInitialFirstPlayer = true;
                 state.incRow = allPlayers[0].incRow;
 
-
-
-
                 // state.currentPlayer = JSON.stringify(allPlayers[0]); // initial first player // why was this stringified? 03 28 2025
                 state.currentPlayer = allPlayers[0]; // initial first player
 
@@ -364,7 +359,7 @@ onMessage((e) => {
         state.restart = data.restart;
         return;
     } else if (data.updateType === "wordOfDay") {
-        console.log("data WORD OF DAY \t", data)
+        console.log("data WORD OF DAY \t", data);
     }
 });
 
