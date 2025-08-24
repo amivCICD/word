@@ -8,17 +8,17 @@
     08 22 2025 - we are calling the server once per user that is connected to room, try to send one call only if it is necessary
     consider a server with a single word of the day... CHECK √ 08 10 2024 @ActuallyCompleted 08 22 2025, added word service to spread word to /newgameword endpoint
     03 10 2025 - if is current users turn and they leave, must move to next player....add block to ChatWebSocketHandler
-    03 26 2025 - on new game start (modal click), players do not start with the same word... - CHECK √ 08 22 2025
+    03 21 2025 - so if a user joins without a localStorage userId, currentPlayersTurn fails because it is getting the player state === isCurrentPlayer...
     03 26 2025 - on new game start, must clear the cache of the server for users, and onMessage needs to perform a reset for the other players..
     03 24 2025 - on new game start, must clear the cache of the server for users, its pulling down the previous games data...
-    03 21 2025 - add padding to current player turn so it doesnt bump the words down, also maybe a loading skeleton for newly joining users... - CHECK √
-    03 21 2025 - so if a user joins without a localStorage userId, currentPlayersTurn fails because it is getting the player state === isCurrentPlayer...
     03 04 2025 - Upon user rejoining or joining mid game, must post game state
     03 04 2025 - ResetGameState is where everything gets set after start new game buttton, so we need to add it to a message?
-    02 27 2025 - add an initial setup window event listener to cancel input on appendGuess.ts when use is going through the modal process, e.g. for enter button on startGameButton, closeModalButton, possibly usernameBtn
-    03 04 2025 - NOTE: START NEW GAME button is only revealed for 1080+ monitors...consider revising...
+    02 27 2025 - add an initial setup window event listener to cancel input on appendGuess.ts when user is going through the modal process, e.g. for enter button on startGameButton, closeModalButton, possibly usernameBtn
     02 23 2025 - provide dictionary definition of the word after game end
+    03 04 2025 - NOTE: START NEW GAME button is only revealed for 1080+ monitors...consider revising... - CHECK √
     03 04 2025 - MAIN ISSUE: we are not resetting the state for all players when we start a new game... e.g.clearing everyhthing
+    03 26 2025 - on new game start (modal click), players do not start with the same word... - CHECK √ 08 22 2025
+    03 21 2025 - add padding to current player turn so it doesnt bump the words down, also maybe a loading skeleton for newly joining users... - CHECK √
     02 25 2025 - cannot use enter to confirm name change // quick fixed with setting input val to current name...  - CHECK √
     02 25 2025 - need to confirm that "Start new game" resets match - CHECK √
     02 25 2025 - see why the first chat message doesnt reach the other end... - CHECK √
