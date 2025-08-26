@@ -244,8 +244,8 @@ function updatePlayerState(data) {
                 state.incRow = allPlayers[0].incRow;
 
                 // state.currentPlayer = JSON.stringify(allPlayers[0]); // initial first player // why was this stringified? 03 28 2025
-                state.currentPlayer = allPlayers[0]; // initial first player
 
+                state.currentPlayer = allPlayers[0]; // initial first player
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
                 const userTurn = document.getElementById("userTurn");
                 userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
@@ -412,11 +412,24 @@ function updateTextState(data) {
 
 function checkForPlayerCount(data) {
     console.log("checkForPlayerCount DATA\t", data);
-        if (data.count < 2) {
-            // set current user to only person left
-            console.log("@@@@FIND THE FINAL PLAYER!@@@@");
-        }
+    let gameState = getGameState();
+    if (data.userCount < 2) {
+        // const allPlayers = getPlayerState();
+        // set current user to only person left
+        console.log("@@@@FIND THE FINAL PLAYER!@@@@");
+        console.log("allPlayers\t", allPlayers);
+        allPlayers = allPlayers.filter(player => parseInt(player.userId) !== parseInt(data.userId));
+        allPlayers[0].isFirstPlayer = true;
 
+        gameState.currentPlayer = allPlayers[0]; // initial first player
+        const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+        const userTurn = document.getElementById("userTurn");
+        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+
+         let globalCurrentPlayer = gameState.currentPlayer;
+         console.log("globalCurrentPlayer in initialize_web_sockets", globalCurrentPlayer);
+
+    }
 }
 
 

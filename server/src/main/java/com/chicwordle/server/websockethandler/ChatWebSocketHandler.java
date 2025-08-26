@@ -181,7 +181,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("sessionId", session.getId())
                 // .put("incRow", incRow)
                 .put("wordRowArrayState", matrixArrayStr);
-            String syncMessage = syncMatrix.toString();
             // System.out.println("syncMatrix\t" + syncMessage + " SessionId Payload:\t" + payload);
             synchronized (session) {
                 if (session.isOpen()) { // this works without all the other bull shit....ORIGINAL
@@ -189,30 +188,36 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-        // else if (roomSessions != null) { // does this need to be here? what exactly does this do... 08 25 2025 I Believe this was creating your duplicate server logs...
-        //     String payload = message.getPayload();
-        //     // System.out.println("Received payload:\t" + payload);
-        //     for(WebSocketSession s : roomSessions) {
-        //         synchronized(s) {
-        //             if (s.isOpen()) {
-        //                 s.sendMessage(new TextMessage(payload));
-        //             }
-        //         }
-        //     }
-        // }
+        else if (roomSessions != null) { // does this need to be here? what exactly does this do... 08 25 2025 I Believe this was creating your duplicate server logs...
+            String payload = message.getPayload();
+            // System.out.println("Received payload:\t" + payload);
+            for(WebSocketSession s : roomSessions) {
+                synchronized(s) {
+                    if (s.isOpen()) {
+                        s.sendMessage(new TextMessage(payload));
+                    }
+                }
+            }
+        }
         if (msg.getString("type").equals("userleaving")) {
+            System.out.println("@@@@ msg.getString('type').equals('userleaving' FIRED OFF");
             roomSessions.remove(session);
             int userCount = roomSessions.size();
+            String userId = msg.getString("userId");
+            String username = msg.getString("username");
 
-            // JSONObject playerCountAndData = new JSONObject()
-            //     .put("type", "playerCount")
-            //     .put("userCount", userCount);
+            JSONObject playerCountAndData = new JSONObject()
+                .put("type", "userleaving")
+                .put("userId", userId)
+                .put("username", username)
+                .put("userCount", userCount);
 
             String payload = String.format("{\"type\" : \"userleaving\", \"count\":%d}", userCount);
             for(WebSocketSession s : roomSessions) {
                 synchronized(s) {
                     if (s.isOpen()) {
-                        s.sendMessage(new TextMessage(payload));
+                        // s.sendMessage(new TextMessage(payload));
+                        s.sendMessage(new TextMessage(playerCountAndData.toString()));
                     }
                 }
             }

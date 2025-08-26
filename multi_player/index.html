@@ -165,13 +165,20 @@
       //       console.log("Player state UPDATED\t", getPlayerState());
       //   });
 
-      const localStorageUser = localStorage.getItem("username");
-      let localCurrentPlayer;
-      let localCurrentPlayerId;
-      if (localStorageUser !== null) {
-        localCurrentPlayer = JSON.parse(localStorageUser);
-        localCurrentPlayerId = localCurrentPlayer.userId;
+      function setLocalCurrentPlayer() {
+        const localStorageUser = localStorage.getItem("username");
+        let localCurrentPlayer;
+        let localCurrentPlayerId;
+        if (localStorageUser !== null) {
+          localCurrentPlayer = JSON.parse(localStorageUser);
+          localCurrentPlayerId = localCurrentPlayer.userId;
+          console.log("localCurrentPlayerId\t", localCurrentPlayerId);
+          return localCurrentPlayerId;
+        } else {
+          throw new Error("Local Current Player Id not found");
+        }
       }
+      let localCurrentPlayerId = setLocalCurrentPlayer();
 
 
       const apiURL = windowAPIURL;
@@ -302,6 +309,7 @@
       });
 
       document.addEventListener('keydown', e => {
+        // localCurrentPlayerId = setLocalCurrentPlayer();
         const playerState = getPlayerState();
         const gameState = getGameState();
         // console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer);
@@ -309,9 +317,15 @@
         let globalCurrentPlayer = gameState.currentPlayer;
         // console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer);
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
-        // console.log("globalCurrentPlayer\t", globalCurrentPlayer);
+        console.log("globalCurrentPlayer in index.html\t", globalCurrentPlayer);
+        console.log("globalCurrentPlayer.userId === localCurrentPlayerId.toString()\t", globalCurrentPlayer.userId === localCurrentPlayerId.toString());
 
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
+        if (window.textMessageOnly
+          || window.usernameInputOnly
+          || !window.WEB_SOCKET_READY
+          || !window.initialPromptReady
+          || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
+            console.log("SOMETHING IS FAILING HERE...")
           return;
         }
         if (rowGameState.getRowLetterCount() === 5 && guessStarted.getGuessStarted()) {

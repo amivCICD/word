@@ -38,7 +38,7 @@ export const userLeavingMessage =  (function() {
         if (localStorage.getItem("username") !== null) {
             const userinfo = JSON.parse(localStorage.getItem("username"));
             const username = userinfo.username;
-            const userID = userinfo.userId;
+            const userID = userinfo.userId.toString();
             sendMessage(JSON.stringify({ type: "userleaving", username: username, userId: userID }));
             // sendMessage(JSON.stringify({ type: "updatePlayerState", updateType: "removePlayer", userId: userID })); // remove for now 03 02 2025
         }
