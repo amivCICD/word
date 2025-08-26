@@ -89,6 +89,8 @@ export function initializeSocket(roomId) {
             updateGameState({ ...typeOutGuessGameState, ...eventData });
         } else if (eventData.type === "updateServerWord") {
             console.log("updatedServer word fired in socket.onmessage")
+        } else if (eventData.type === "userleaving") {
+            checkForPlayerCount(eventData);
         }
         messageCallBacks.forEach(callback => callback(e.data));
     }
@@ -407,5 +409,17 @@ function updateTextState(data) {
         allMessagesState.push({ ...textMessageState });
     }
 }
+
+function checkForPlayerCount(data) {
+    console.log("checkForPlayerCount DATA\t", data);
+        if (data.count < 2) {
+            // set current user to only person left
+            console.log("@@@@FIND THE FINAL PLAYER!@@@@");
+        }
+
+}
+
+
+
 
 

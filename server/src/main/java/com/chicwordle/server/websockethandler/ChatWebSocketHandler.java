@@ -188,9 +188,27 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     session.sendMessage(new TextMessage(syncMatrix.toString()));
                 }
             }
-        } else if (roomSessions != null) {
-            String payload = message.getPayload();
-            // System.out.println("Received payload:\t" + payload);
+        }
+        // else if (roomSessions != null) { // does this need to be here? what exactly does this do... 08 25 2025 I Believe this was creating your duplicate server logs...
+        //     String payload = message.getPayload();
+        //     // System.out.println("Received payload:\t" + payload);
+        //     for(WebSocketSession s : roomSessions) {
+        //         synchronized(s) {
+        //             if (s.isOpen()) {
+        //                 s.sendMessage(new TextMessage(payload));
+        //             }
+        //         }
+        //     }
+        // }
+        if (msg.getString("type").equals("userleaving")) {
+            roomSessions.remove(session);
+            int userCount = roomSessions.size();
+
+            // JSONObject playerCountAndData = new JSONObject()
+            //     .put("type", "playerCount")
+            //     .put("userCount", userCount);
+
+            String payload = String.format("{\"type\" : \"userleaving\", \"count\":%d}", userCount);
             for(WebSocketSession s : roomSessions) {
                 synchronized(s) {
                     if (s.isOpen()) {

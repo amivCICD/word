@@ -1,4 +1,4 @@
-import { sendMessage, getPlayerState } from "../socket_related/initialize_web_socket";
+import { sendMessage, getPlayerState, onMessage } from "../socket_related/initialize_web_socket";
 import { getGameState } from "../socket_related/initialize_web_socket";
 
 export function newUserJoiningMessage() {
