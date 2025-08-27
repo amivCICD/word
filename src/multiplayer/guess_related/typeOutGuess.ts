@@ -72,10 +72,11 @@ export async function typeOutGuess(
     // state.rowGameState = rowGameState;
     state.wordOfTheDayLetters = wordOfTheDayLetters;
     // who passes type out guess its stuff?
-    console.log("wordOfTheDay in appendGuess.ts\t", wordOfTheDay)
+    console.log("wordOfTheDay in typeOutGuess.ts\t", wordOfTheDay)
 
     if (gameStateParam.reset) {
         const currentUser = getLocalCurrentUser();
+        console.log("WE HIT THE gameStateParam.reset in typeOutGuess.ts")
         // if (state.currentUser.userId === currentUser.userId.toString()) { // YES but then it doesnt reset the others state, only issue is really the word of the day matching...get from server...
             // sendMessage(JSON.stringify({
             //     type: "updateGameState",

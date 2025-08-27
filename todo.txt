@@ -7,7 +7,7 @@
     08 27 2025 - word is staying synced between users, but here are the issues:
                     ♣ incRow at times is not properly reset for a user that rejoins (it increments)
                     ♣ game does not get set as complete on initial puzzle: check for comparison to ResetGame.wotd perhaps?
-                    ♣
+                    ♣ when game ends in a loss, reset was not working properly, look into it
         notes: you modified appendGuess() in index.html to replace the params with current: typeOutGuessGameState.wotd instead of resetGameState.wotd
 
     08 23 2025 - refactoring: extract as many sendMessage() as possible

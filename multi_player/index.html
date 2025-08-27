@@ -228,6 +228,9 @@
             console.log("wotd.word in IIFE fetchWord.ok\t", wotd.word);
             resetGameState = new ResetGameState(true, wotd.word);
             resetGameState.setResetFalse();
+            typeOutGuessGameState.wordOfTheDay = resetGameState.wordOfTheDay;
+            typeOutGuessGameState.wordOfTheDayLetters = resetGameState.wordOfTheDayLetters;
+
             if (checkCompletionStatus.isCompleted()) {
               // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
               sendMessage(JSON.stringify({ // commented out temporarily 08 22 2025??
@@ -242,8 +245,8 @@
             typeOutGuess( // 08 27 2025 commented out, because why is the word of the day coming from reset game state?
               null,
               resetGameState, // gamestate param
-              resetGameState.wordOfTheDay,
-              resetGameState.wordOfTheDayLetters
+              typeOutGuessGameState.wordOfTheDay,
+              typeOutGuessGameState.wordOfTheDayLetters
             );
             // typeOutGuess(null, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
           }
@@ -272,14 +275,16 @@
                   console.log('fetchWord\t', w);
                   resetGameState = new ResetGameState(true, w.word);
                   state.gameOver.setGameOverFalse();
+                  typeOutGuessGameState.wordOfTheDay = resetGameState.wordOfTheDay;
+                  typeOutGuessGameState.wordOfTheDayLetters = resetGameState.wordOfTheDayLetters;
                   /////////
                   ////// server: (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState"))
                   sendMessage(JSON.stringify({ // why here? it should be on new game button click, not on word fetch...though, without this, clicking the start new game btn doesnt work?
                     type: "updateGameState",
                     updateType: "resetGameState",
                     resetGameState: resetGameState, // || reset: true
-                    wordOfTheDay: resetGameState.wordOfTheDay,
-                    wordOfTheDayLetters: resetGameState.wordOfTheDayLetters,
+                    wordOfTheDay: typeOutGuessGameState.wordOfTheDay,
+                    wordOfTheDayLetters: typeOutGuessGameState.wordOfTheDayLetters,
                     // gameOver: gameOver.getGameOverStatus(),
                     UIReset: UIReset
                   }));

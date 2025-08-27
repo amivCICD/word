@@ -36,7 +36,7 @@ export async function appendGuess(
     for (const letter of divEl) {
         letter.classList.toggle('box');
         await new Promise(res => setTimeout(res, 500));
-        // console.log(letter.innerHTML);
+        // console.log("gameState.appendGuess\t", gameState.appendGuess);
 
         gameState.appendGuess += letter.innerHTML;
 

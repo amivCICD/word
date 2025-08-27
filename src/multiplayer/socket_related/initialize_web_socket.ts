@@ -89,9 +89,9 @@ export function initializeSocket(roomId) {
         } else if (eventData.type === "updateGameState") {
             const typeOutGuessGameState = getGameState();
             updateGameState({ ...typeOutGuessGameState, ...eventData });
-            console.log("typeOutGuessGameState in onmessage handler\t", typeOutGuessGameState);
-            console.log("eventData in onmessage handler\t", eventData);
-            console.log("typeOutGuessGameState && eventData in onmessage handler\t", {...typeOutGuessGameState, ...eventData});
+            // console.log("typeOutGuessGameState in onmessage handler\t", typeOutGuessGameState);
+            // console.log("eventData in onmessage handler\t", eventData);
+            // console.log("typeOutGuessGameState && eventData in onmessage handler\t", {...typeOutGuessGameState, ...eventData});
             // updateGameState(eventData); 08 27 2025 look into this, perhaps we need to send everything from the server...
         } else if (eventData.type === "updateServerWord") {
             console.log("updatedServer word fired in socket.onmessage")
