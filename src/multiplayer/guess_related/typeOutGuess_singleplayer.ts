@@ -34,7 +34,7 @@ export async function typeOutGuess(
         letterCount = 0;
         row = 0;
         guess = "";
-        await appendGuess(null, null, null, null, gameState);
+        await appendGuess(null, null, null, null, gameState.reset);
         gameComplete = false;
     }
 

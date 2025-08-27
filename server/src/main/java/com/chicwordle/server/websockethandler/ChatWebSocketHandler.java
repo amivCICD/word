@@ -130,7 +130,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             // WordOfTheDay newGameWordOfTheDay = new WordOfTheDay();
             // String newGameWord = newGameWordOfTheDay.newGameWordOfDay();
 
-
             String newGameWord = newGameWordService.getNewGameWord();
             System.out.println("@@@@@@@@@@@ngword in websockerHandler@@@@@@@@\t" + newGameWord + "\t@@@@@@@@");
             // if (newGameWord == null) {
@@ -145,15 +144,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             /////////////////////////
             matrixArrayMap.clear();
             incRow.set(0);
+            boolean resetGameState = true;
             // String resetGameState = msg.getString("resetGameState");
             // String wordOfTheDayLetters = msg.optString("wordOfTheDayLetters", "['', '', '', '', '']");
             JSONObject gameReset = new JSONObject()
                 .put("type", "updateGameState")
                 .put("updateType", "wordOfDay")
                 .put("serverWordOfTheDay", newGameWord)
+                .put("incRow", incRow)
                 // .put("newGameWord", newGameWord)
                 .put("whereIsMyShit", "WHERE IS MY SHIT!")
-                // .put("resetGameState", resetGameState)
+                .put("resetGameState", resetGameState)
                 // .put("wordOfTheDayLetters", wordOfTheDayLetters)
                 .put("reset", true);
             for(WebSocketSession s : roomSessions) {
@@ -188,7 +189,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-        else if (roomSessions != null) { // does this need to be here? what exactly does this do... 08 25 2025 I Believe this was creating your duplicate server logs...
+        else if (roomSessions != null) { // 08 26 2025, this is what is letting your append letters go through...
             String payload = message.getPayload();
             // System.out.println("Received payload:\t" + payload);
             for(WebSocketSession s : roomSessions) {

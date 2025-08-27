@@ -4,12 +4,12 @@ import { getLocalCurrentUser } from "../multiplayer/helper_functions/getLocalCur
 export function showFailureModal(wordOfTheDay) {
     const gameState = getGameState();
     const failureModal = document.getElementById('failureModal') as HTMLDialogElement | null;
-    if (failureModal) { failureModal.showModal; }
+    if (failureModal) { failureModal.showModal(); }
     const wordOfTheDayElement = document.getElementById('wordOfTheDay');
     if (wordOfTheDayElement) { wordOfTheDayElement.innerHTML = wordOfTheDay; }
 
     const localCurrentUser = getLocalCurrentUser();
     if (localCurrentUser.userId.toString() !== gameState.currentPlayer.userId) {
-        document.getElementById("failureModalBtn")?.classList.add('hidden');
+        document.getElementById("failureModalBtn")?.classList.add('hidden'); // this hides the "Start New Game" button from other users...
     }
 }

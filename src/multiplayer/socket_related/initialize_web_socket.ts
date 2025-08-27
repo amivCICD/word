@@ -5,6 +5,7 @@ import { ResetGameState } from "../../gamestate/ResetGameState";
 import { UIReset } from "../../gamestate/UIReset";
 import { RowGameState } from "../../gamestate/RowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "../chat_related/newUserJoiningMessage";
+import { swapPlayersFrontEnd } from "../guess_related/typeOutGuess";
 
 
 
@@ -86,7 +87,12 @@ export function initializeSocket(roomId) {
         } else if (eventData.type === "text") {
             updateTextState(eventData);
         } else if (eventData.type === "updateGameState") {
+            const typeOutGuessGameState = getGameState();
             updateGameState({ ...typeOutGuessGameState, ...eventData });
+            console.log("typeOutGuessGameState in onmessage handler\t", typeOutGuessGameState);
+            console.log("eventData in onmessage handler\t", eventData);
+            console.log("typeOutGuessGameState && eventData in onmessage handler\t", {...typeOutGuessGameState, ...eventData});
+            // updateGameState(eventData); 08 27 2025 look into this, perhaps we need to send everything from the server...
         } else if (eventData.type === "updateServerWord") {
             console.log("updatedServer word fired in socket.onmessage")
         } else if (eventData.type === "userleaving") {
@@ -148,6 +154,7 @@ export function getCurrentArrowOfRowArrays(): [][] {
 }
 
 function updateGameState(data) {
+    const typeOutGuessGameState = getGameState();
     if (data.updateType === "backspace") {
         const currentRowArrayState = getCurrentArrowOfRowArrays();
         typeOutGuessGameState.row = data.row;
@@ -195,10 +202,10 @@ function updateGameState(data) {
         console.log("IN GUESS ATTEMPT typeOutGuessGameState.wordRowArrayState\t", typeOutGuessGameState.wordRowArrayState);
 
     } else if (data.updateType === "resetGameState") {
-        console.log("DATA FROM RESETGAMESTATE\t", data);
-        typeOutGuessGameState.resetGameState = data.resetGameState;
-        typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
-        typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
+        // console.log("DATA FROM RESETGAMESTATE\t", data);
+        // typeOutGuessGameState.resetGameState = data.resetGameState.reset;
+        // typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
+        // typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
     } else if (data.updateType === "checkCompletionStatus") {
         typeOutGuessGameState.checkCompletionStatus = data.checkCompletionStatus
     } else if (data.updateType === "syncStateToServer") {
@@ -219,14 +226,15 @@ function updatePlayerState(data) {
             userId: data.userId,
             isCurrentUser: data.isCurrentPlayer,
             score: { letters: [] },
-            currentPlayerIndex: null
+            currentPlayerIndex: null,
+            isFirstPlayer: false
         }
         allPlayers = [player];
     } else if (data.updateType === "addPlayer") {
 
         if (Array.isArray(data.playerCount)) {
-            const incomingPlayers = JSON.stringify(data.playerCount)
-            const currentPlayers = JSON.stringify(allPlayers)
+            const incomingPlayers = JSON.stringify(data.playerCount);
+            const currentPlayers = JSON.stringify(allPlayers);
             if (incomingPlayers !== currentPlayers) {
                 allPlayers.length = 0;
                 data.playerCount?.forEach((player) => {
@@ -302,10 +310,10 @@ function updatePlayerState(data) {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
     } else if (data.updateType === "nextPlayer") {
-        console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
+        // console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
         // state.incRow = JSON.parse(data.incRow);
         state.currentPlayer = JSON.parse(data.currentPlayer); // this will move our next player
-        console.log("state.currentPlayer\t", state.currentPlayer);
+        // console.log("state.currentPlayer\t", state.currentPlayer);
         // state.currentPlayer.incRow = state.incRow;
         // console.log("state.currentPlayer + incRow\t", state.currentPlayer);
         // 03 26 2025 - 12:16 AM
@@ -316,11 +324,12 @@ function updatePlayerState(data) {
     }
 }
 onMessage((e) => {
-    const state = getGameState();
+    const typeOutGuessGameState = getGameState();
     const data = JSON.parse(e);
     if (data.updateType === "addPlayer") {
         const localUserInfo = localStorage.getItem("username");
         const userInfo = JSON.parse(localUserInfo);
+        // ??
     } else if (data.updateType === "removePlayer") { // whoever sees two players first?
         console.log('playerState AFTER REMOVE PLAYER \t', player);
     } else if (data.updateType === "checkForTwoPlayers" && allPlayers.length >= 2) {
@@ -328,8 +337,9 @@ onMessage((e) => {
     } else if (data.updateType === "checkCompletionStatus") {
 
     } else if (data.updateType === "resetGameState") {
-        console.log("state.currentPlayer IN RESET GAME STATE AFTER GAME OVER\t", state.currentPlayer);
-        state.wordRowArrayState = [
+        console.log("typeOutGuessGameState.wordOfTheDay IN RESET GAME STATE AFTER GAME OVER\t", typeOutGuessGameState.wordOfTheDay);
+        // console.log("state.currentPlayer IN RESET GAME STATE AFTER GAME OVER\t", typeOutGuessGameState.currentPlayer);
+        typeOutGuessGameState.wordRowArrayState = [
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
@@ -337,28 +347,37 @@ onMessage((e) => {
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
         ];
-        console.log("data AFTER RESETTING GAME STATE\t", data);
-        state.resetGameState = data.resetGameState;
+        console.log("data @@@@AFTER@@@@ resetGameState\t", data);
+
+        // from the other resetGameState
+        typeOutGuessGameState.resetGameState = data.resetGameState.reset;
+        typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
+        typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
+
+        console.log("typeOutGuessGameState.wordOfTheDay AFTER APPLIED DATA\t", typeOutGuessGameState.wordOfTheDay);
+
+
+        typeOutGuessGameState.resetGameState = data.resetGameState.reset;
         // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
-        state.wordOfTheDay = data.wordOfTheDay;
-        state.wordOfTheDayLetters = data.wordOfTheDayLetters;
+        typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
+        typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
         // state.gameOver =  data.gameOver;
-        state.letterCount = 0;
-        state.row = 0;
-        state.guess = "";
-        state.gameComplete = data.gameComplete;
-        state.rowGameState.startFromZero();
-        state.incRow = 0;
-        state.appendGuess = "";
-        state.c = 0;
-        state.restart = false // added later
+        typeOutGuessGameState.letterCount = 0;
+        typeOutGuessGameState.row = 0;
+        typeOutGuessGameState.guess = "";
+        typeOutGuessGameState.gameComplete = data.gameComplete;
+        typeOutGuessGameState.rowGameState.startFromZero();
+        typeOutGuessGameState.incRow = 0;
+        typeOutGuessGameState.appendGuess = "";
+        typeOutGuessGameState.c = 0;
+        typeOutGuessGameState.restart = false // added later
         UIReset.resetUI();
         return;
     } else if (data.updateType === "resetGuessState") {
-        state.incRow = data.incRow;
-        state.appendGuess = data.appendGuess;
-        state.c = data.c;
-        state.restart = data.restart;
+        typeOutGuessGameState.incRow = data.incRow;
+        typeOutGuessGameState.appendGuess = data.appendGuess;
+        typeOutGuessGameState.c = data.c;
+        typeOutGuessGameState.restart = data.restart;
         return;
     } else if (data.updateType === "wordOfDay") {
         console.log("data WORD OF DAY \t", data);
@@ -412,25 +431,30 @@ function updateTextState(data) {
 
 function checkForPlayerCount(data) {
     console.log("checkForPlayerCount DATA\t", data);
-    let gameState = getGameState();
-    if (data.userCount < 2) {
-        // const allPlayers = getPlayerState();
-        // set current user to only person left
-        console.log("@@@@FIND THE FINAL PLAYER!@@@@");
-        console.log("allPlayers\t", allPlayers);
-        allPlayers = allPlayers.filter(player => parseInt(player.userId) !== parseInt(data.userId));
-        allPlayers[0].isFirstPlayer = true;
+    const state = getGameState();
+    swapPlayersFrontEnd(state, true, data);
 
-        gameState.currentPlayer = allPlayers[0]; // initial first player
-        const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
-        const userTurn = document.getElementById("userTurn");
-        userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+    // let gameState = getGameState();
+    // let allPlayersOriginalLength = allPlayers.length;
+    // const indexOfLeavingUser = allPlayers.findIndex(user => user.userId === data.userId);
 
-         let globalCurrentPlayer = gameState.currentPlayer;
-         console.log("globalCurrentPlayer in initialize_web_sockets", globalCurrentPlayer);
+    // const nextPlayersIndex = (indexOfLeavingUser + 1) % allPlayersOriginalLength;
+    // console.log("nextPlayersIndex", nextPlayersIndex);
+    // console.log("allPlayers[nextPlayersIndex]", allPlayers[nextPlayersIndex]);
 
-    }
+    // allPlayers = allPlayers.filter(player => parseInt(player.userId) !== parseInt(data.userId));
+    // allPlayers[nextPlayersIndex].isFirstPlayer = true;
+
+    // gameState.currentPlayer = allPlayers[nextPlayersIndex]; // initial first player
+    // const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+    // const userTurn = document.getElementById("userTurn");
+    // userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
+
+    // let globalCurrentPlayer = gameState.currentPlayer;
+    // console.log("globalCurrentPlayer in initialize_web_sockets", globalCurrentPlayer);
+
 }
+
 
 
 

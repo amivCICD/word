@@ -51,14 +51,11 @@ onMessage(async (messageData) => {
                     syncNewCss(state.wordRowArrayState);
                 })
                 .then(() => {
-                    swapPlayersFrontEnd(state);
+                    swapPlayersFrontEnd(state, false, null);
                 })
                 .catch((e) => console.log(`Error for setting sync word array state in guess attempt\t${e}`));
 
         }
-    } else if (data.updateType === "resetGameState") { // we have resetGameState in initialize_web_sockets.ts
-        // resetGameState(state);
-        console.log("we hit the data.updateType in our onmessage in typeoutGuess.ts")
     }
 });
 
@@ -74,7 +71,7 @@ export async function typeOutGuess(
     const playerState = getPlayerState();
     // state.rowGameState = rowGameState;
     state.wordOfTheDayLetters = wordOfTheDayLetters;
-
+    // who passes type out guess its stuff?
     console.log("wordOfTheDay in appendGuess.ts\t", wordOfTheDay)
 
     if (gameStateParam.reset) {
@@ -90,7 +87,7 @@ export async function typeOutGuess(
             //     gameComplete: false
             // }));
         // }
-        await appendGuess(null, null, null, null, gameStateParam);
+        await appendGuess(null, null, null, null, gameStateParam.reset);
     }
 
     // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
@@ -110,7 +107,7 @@ export async function typeOutGuess(
             userInput: userInput,
             wordOfTheDay: wordOfTheDay,
             wordOfTheDayLetters: state.wordOfTheDayLetters,
-            gameStateParam: gameStateParam,
+            gameStateParam: gameStateParam.reset,
             arrayOfRowArrays: state.arrayOfRowArrays,
             letterCount: state.letterCount,
             wordRowArrayState: state.wordRowArrayState
@@ -162,38 +159,61 @@ export function syncNewCss(updatedWordRowArrayState: [][]) { // in then()
     }));
 }
 
-function swapPlayersFrontEnd(state) {
+export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeftData) {
     // console.log("state.incRow in swapPlayersFrontEnd()\t", state.incRow);
-    const players = getPlayerState();
-    const cp = players.find(player => player.isFirstPlayer);
-    // const state = getGameState();
-    let currentPlayerIndex = players.indexOf(players.find(player => player.isFirstPlayer === true));
-    let nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    let players = getPlayerState();
+    if (playerHasLeft) {
+        let indexOfLeaver = players.findIndex(player => player.userId === playerHasLeftData.userId);
+        let nextIndex = (indexOfLeaver + 1) % players.length;
+        players.splice(indexOfLeaver, 1);
+        if (players.length > 0) {
+            if (nextIndex >= players.length) nextIndex = 0;
+            players[nextIndex].isFirstPlayer = true;
+            console.log("players[nextIndex]\t", players[nextIndex]);
+        }
+    }
 
-    players[currentPlayerIndex].isFirstPlayer = false;
-    players[nextPlayerIndex].isFirstPlayer = true;
-
-    const currentPlayer = players[nextPlayerIndex]; // new next player
-    const nextPlayer = players[currentPlayerIndex]; // player after..
-    // state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
-
-    const localUser = localStorage.getItem("username");
-    const localUserInfo = JSON.parse(localUser);
+    const localUserInfo = JSON.parse(localStorage.getItem("username"));
     const localUserId = localUserInfo.userId.toString();
 
+    if (players.length > 1) {
+        let cp = players.find(player => player.isFirstPlayer);
+        if (!cp) return;
 
+        let currentPlayerIndex = players.indexOf(cp);
+        let nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
 
-    if (cp.userId === localUserId) {
+        players[currentPlayerIndex].isFirstPlayer = false;
+        players[nextPlayerIndex].isFirstPlayer = true;
 
-        sendMessage(JSON.stringify({
-            type: "updatePlayerState",
-            updateType: "nextPlayer",
-            currentPlayer: JSON.stringify(currentPlayer),
-            nextPlayer: JSON.stringify(nextPlayer),
-            incRow: JSON.stringify(state.incRow)
-            // incRow: state.incRow
-        }));
+        const currentPlayer = players[nextPlayerIndex]; // new next player
+        const nextPlayer = players[currentPlayerIndex]; // player after..
+        // state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
+
+        if (cp.userId === localUserId) { // ??
+            sendMessage(JSON.stringify({
+                type: "updatePlayerState",
+                updateType: "nextPlayer",
+                currentPlayer: JSON.stringify(currentPlayer),
+                nextPlayer: JSON.stringify(nextPlayer),
+                incRow: JSON.stringify(state.incRow)
+                // incRow: state.incRow
+            }));
+        }
+    } else if (players.length === 1) {
+        console.log("Only player left\t", players[0])
+        if (players[0].userId === localUserId) {
+            sendMessage(JSON.stringify({
+                type: "updatePlayerState",
+                updateType: "nextPlayer",
+                currentPlayer: JSON.stringify(players[0]),
+                nextPlayer: JSON.stringify(players[0]),
+                incRow: JSON.stringify(state.incRow)
+                // incRow: state.incRow
+            }));
+        }
     }
+
 }
 
 function resetGameState(state) {

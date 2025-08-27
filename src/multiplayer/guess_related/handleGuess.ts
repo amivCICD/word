@@ -3,20 +3,20 @@ import { showFailureModal } from "../../game_over_related/showFailureModal";
 import { sendMessage } from "../socket_related/initialize_web_socket";
 import { appendGuess } from "./appendGuess";
 
-export async function handleGuess(state, data, gameOver, checkCompletionStatus) {
+export async function handleGuess(state, data, gameOver, checkCompletionStatus) { // used in typeOutGuess.ts #40
     const newRow = await appendGuess(
         state.arrayOfRowArrays[state.row],
         state.guess,
-        state.wordOfTheDay,
-        state.wordOfTheDayLetters,
-        data.gameStateParam
+        data.wordOfTheDay,
+        data.wordOfTheDayLetters,
+        data.gameStateParam // was data.gameStateParam
     );
     if (state.row !== 5) {
         state.arrayOfRowArrays[state.row+1][0].innerHTML = "";
         state.row = newRow.incRow;
         state.letterCount = 0;
         state.rowGameState.startFromZero();
-        state.userInput = ""; // this fixed it for now 03 03 2025
+        state.userInput = ""; // this fixed it for now 03 03 2025 // 08 27 2025 fixed WHAT?
         state.guess = "";
     }
     if (newRow.restart) {
@@ -30,7 +30,7 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
     }
     if (gameOver.getGameOverStatus()) {
         state.gameComplete = true;
-        checkCompletionStatus.setCompletedGame();
+        checkCompletionStatus.setCompletedGame(); // added state. 08 27 2025 // removed state, not sure why this messes it up
         // console.log("You did not get the word...fire off modal...");
         showFailureModal(state.wordOfTheDay);
         state.userInput = "";

@@ -12,13 +12,15 @@ export async function appendGuess(
     guessFromPrev: string,
     wordOfTheDay: string,
     wordOfTheDayLetters: string[],
-    gameStateParam
+    gameStateParam: boolean
 ): Promise<number> {
     guessStarted.setGuessStartedTrue();
     if (gameStateParam.reset) {
         gameState.incRow = 0;
         gameState.appendGuess = "";
         gameState.c = 0;
+        gameState.wordOfTheDay = wordOfTheDay;
+        gameState.wordOfTheDayLetters = wordOfTheDayLetters;
         illuminateKeys("", "", gameStateParam.reset);
         gameState.restart = false;
         guessStarted.setGuessStartedFalse();

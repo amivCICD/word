@@ -4,6 +4,12 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
+    08 27 2025 - word is staying synced between users, but here are the issues:
+                    ♣ incRow at times is not properly reset for a user that rejoins (it increments)
+                    ♣ game does not get set as complete on initial puzzle: check for comparison to ResetGame.wotd perhaps?
+                    ♣
+        notes: you modified appendGuess() in index.html to replace the params with current: typeOutGuessGameState.wotd instead of resetGameState.wotd
+
     08 23 2025 - refactoring: extract as many sendMessage() as possible
     08 22 2025 - we are calling the server once per user that is connected to room, try to send one call only if it is necessary
     consider a server with a single word of the day... CHECK √ 08 10 2024 @ActuallyCompleted 08 22 2025, added word service to spread word to /newgameword endpoint
