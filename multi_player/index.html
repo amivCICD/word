@@ -341,13 +341,14 @@
         //   resetGameState.wordOfTheDay,
         //   resetGameState.wordOfTheDayLetters,
         // );
-        typeOutGuess(filteredValue, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
-
         document.querySelectorAll('.kbd').forEach((keys) => {
           if (filteredValue === keys.innerHTML) {
-            keys.classList.add('bg-pink-200')
+            keys.classList.add("bg-pink-200");
           }
         });
+        typeOutGuess(filteredValue, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
+
+
       }); // initial listener
 
       const allKeysExceptBSEnter = Array.from(document.querySelectorAll('.kbd')).filter((key) => {
