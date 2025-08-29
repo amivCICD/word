@@ -4,16 +4,19 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
-    08 28 2025 - on game end, actual word of the day (server one), is not reset on loss, it plays through again... - CHECK √
+    08 29 2025 - word state is syncing with new user joining, but not Keyboard colors...
+                    ♣ only ONE user clicks restart, so it doesnt actually send the gameStateParam.reset to the other users... CHECK √
+        notes: I believe the reset on click is not fully resetting both users, on a fresh game it works CHECK √
+
     08 27 2025 - word is staying synced between users, but here are the issues:
                     ♣ incRow at times is not properly reset for a user that rejoins (it increments)
                     ♣ game does not get set as complete on initial puzzle: check for comparison to ResetGame.wotd perhaps?
                     ♣ when game ends in a loss, reset was not working properly, look into it
         notes: you modified appendGuess() in index.html to replace the params with current: typeOutGuessGameState.wotd instead of resetGameState.wotd
 
+    08 29 2025 - add loading spinners on game reset and socket load...
     08 23 2025 - refactoring: extract as many sendMessage() as possible
     08 22 2025 - we are calling the server once per user that is connected to room, try to send one call only if it is necessary
-    consider a server with a single word of the day... CHECK √ 08 10 2024 @ActuallyCompleted 08 22 2025, added word service to spread word to /newgameword endpoint
     03 10 2025 - if is current users turn and they leave, must move to next player....add block to ChatWebSocketHandler
     03 21 2025 - so if a user joins without a localStorage userId, currentPlayersTurn fails because it is getting the player state === isCurrentPlayer...
     03 26 2025 - on new game start, must clear the cache of the server for users, and onMessage needs to perform a reset for the other players..
@@ -22,6 +25,8 @@
     03 04 2025 - ResetGameState is where everything gets set after start new game buttton, so we need to add it to a message?
     02 27 2025 - add an initial setup window event listener to cancel input on appendGuess.ts when user is going through the modal process, e.g. for enter button on startGameButton, closeModalButton, possibly usernameBtn
     02 23 2025 - provide dictionary definition of the word after game end
+    consider a server with a single word of the day... CHECK √ 08 10 2024 @ActuallyCompleted 08 22 2025, added word service to spread word to /newgameword endpoint
+    08 28 2025 - on game end, actual word of the day (server one), is not reset on loss, it plays through again... - CHECK √
     03 04 2025 - NOTE: START NEW GAME button is only revealed for 1080+ monitors...consider revising... - CHECK √
     03 04 2025 - MAIN ISSUE: we are not resetting the state for all players when we start a new game... e.g.clearing everyhthing
     03 26 2025 - on new game start (modal click), players do not start with the same word... - CHECK √ 08 22 2025

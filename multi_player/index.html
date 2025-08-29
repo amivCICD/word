@@ -174,7 +174,8 @@
           localCurrentPlayerId = localCurrentPlayer.userId;
           return localCurrentPlayerId;
         } else {
-          throw new Error("Local Current Player Id not found");
+          // throw new Error("Local Current Player Id not found");
+          return;
         }
       }
 
@@ -280,7 +281,8 @@
                     wordOfTheDay: typeOutGuessGameState.wordOfTheDay,
                     wordOfTheDayLetters: typeOutGuessGameState.wordOfTheDayLetters,
                     // gameOver: gameOver.getGameOverStatus(),
-                    UIReset: UIReset
+                    UIReset: UIReset,
+
                   }));
                   // console.log("resetGameState.wordOfTheDay\t", resetGameState.wordOfTheDay);
                   /////////
@@ -296,6 +298,7 @@
                     //   resetGameState.wordOfTheDay,
                     //   resetGameState.wordOfTheDayLetters
                     // );
+
                     typeOutGuess(null, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
                     resetGameState.setResetFalse();
                 }
@@ -329,6 +332,8 @@
         }
         let filteredValue = checkInputValues(e.key.toUpperCase());
         const typeOutGuessGameState = getGameState();
+        console.log("typeOutGuessGameState.incRow\t", typeOutGuessGameState.incRow);
+        console.log("typeOutGuessGameState.row\t", typeOutGuessGameState.row);
         // typeOutGuess(
         //   filteredValue,
         //   resetGameState,

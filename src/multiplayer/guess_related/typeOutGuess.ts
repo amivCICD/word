@@ -11,6 +11,7 @@ export async function typeOutGuess( // used mostly in index.html
 
     const state = getGameState();
     state.wordOfTheDayLetters = wordOfTheDayLetters;
+    console.log("HELLO FROM typeOutGuess BY THE PERSON WHO CLICKED!");
     // who passes type out guess its stuff?
     console.log("wordOfTheDay in typeOutGuess.ts\t", wordOfTheDay)
 

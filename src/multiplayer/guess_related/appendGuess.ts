@@ -24,25 +24,19 @@ export async function appendGuess( // used in: handleGuess.ts as: const newRow =
         gameState.appendGuess = "";
         gameState.guess = "";
         gameState.c = 0;
-        gameState.wordOfTheDay = wordOfTheDay;
-        gameState.wordOfTheDayLetters = wordOfTheDayLetters;
+        // gameState.wordOfTheDay = wordOfTheDay;
+        // gameState.wordOfTheDayLetters = wordOfTheDayLetters;
         illuminateKeys("", "", gameStateParam.reset);
-        // checkForCorrectLetter(gameStateParam.reset);
         gameState.restart = false;
         guessStarted.setGuessStartedFalse();
         return { incRow: gameState.incRow, restart: gameState.restart };
         // return;
     }
-    console.log("guessFromPrev\t", guessFromPrev);
 
     const guessAsArray = guessFromPrev?.split("");
     let filt = guessAsArray.filter(letter => wordOfTheDayLetters.includes(letter));
     let yellowWorthy = [...new Set(filt)];
     let correctPositionArr = checkForCorrectPosition(wordOfTheDayLetters, guessAsArray).aux;
-
-    console.log("correctPositionArr\t", correctPositionArr);
-    console.log("yellowWorthy\t", yellowWorthy);
-
 
     for (const letter of divEl) {
         letter.classList.toggle('box');
@@ -53,7 +47,6 @@ export async function appendGuess( // used in: handleGuess.ts as: const newRow =
 
         checkForCorrectLetter(letter, yellowWorthy, correctPositionArr, gameState.c);
         letter.classList.toggle('box');
-        console.log("should be a misse\t", letter.innerHTML)
         illuminateKeys(letter.innerHTML, "miss");
 
         gameState.c++;

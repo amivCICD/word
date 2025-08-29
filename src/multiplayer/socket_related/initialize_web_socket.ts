@@ -6,6 +6,7 @@ import { UIReset } from "../../gamestate/UIReset";
 import { RowGameState } from "../../gamestate/RowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "../chat_related/newUserJoiningMessage";
 import { swapPlayersFrontEnd } from "../guess_related/typeOutGuess";
+import { typeOutGuess } from "../guess_related/typeOutGuess";
 
 
 
@@ -202,11 +203,6 @@ function updateGameState(data) {
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
         // console.log("IN GUESS ATTEMPT typeOutGuessGameState.wordRowArrayState\t", typeOutGuessGameState.wordRowArrayState);
 
-    } else if (data.updateType === "resetGameState") {
-        // console.log("DATA FROM RESETGAMESTATE\t", data);
-        // typeOutGuessGameState.resetGameState = data.resetGameState.reset;
-        // typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
-        // typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
     } else if (data.updateType === "checkCompletionStatus") {
         typeOutGuessGameState.checkCompletionStatus = data.checkCompletionStatus
     } else if (data.updateType === "syncStateToServer") {
@@ -351,15 +347,17 @@ onMessage((e) => {
         console.log("data @@@@AFTER@@@@ resetGameState\t", data);
 
         // from the other resetGameState
-        typeOutGuessGameState.resetGameState = data.resetGameState.reset;
+        typeOutGuessGameState.resetGameState = data.resetGameState; // 08 29 2025 was .reset
         typeOutGuessGameState.wordOfTheDay = data.resetGameState.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
 
         console.log("typeOutGuessGameState.wordOfTheDay AFTER APPLIED DATA\t", typeOutGuessGameState.wordOfTheDay);
 
 
-        typeOutGuessGameState.resetGameState = data.resetGameState.reset;
+
+
         // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
+        typeOutGuessGameState.resetGameState = data.resetGameState.reset;
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
         // state.gameOver =  data.gameOver;
@@ -373,6 +371,11 @@ onMessage((e) => {
         typeOutGuessGameState.c = 0;
         typeOutGuessGameState.restart = false // added later
         UIReset.resetUI();
+
+        const hard_reset = { reset: true };
+        console.log("typeOutGuessGameState.wordOfTheDay\t", typeOutGuessGameState.wordOfTheDay)
+        console.log("typeOutGuessGameState.wordOfTheDayLetters\t", typeOutGuessGameState.wordOfTheDayLetters)
+        typeOutGuess(null, hard_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
         return;
     } else if (data.updateType === "resetGuessState") {
         typeOutGuessGameState.incRow = data.incRow;
