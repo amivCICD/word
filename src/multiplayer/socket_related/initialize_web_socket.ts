@@ -400,6 +400,7 @@ onMessage((e) => {
         UIReset.resetUI();
         typeOutGuessGameState.checkCompletionStatus.setCompletedGame();
         typeOutGuessGameState.checkCompletionStatus.hideRevealStartBtn(true);
+        typeOutGuessGameState.gameOver.setGameOverFalse();
 
         const hard_reset = { reset: true };
         typeOutGuess(null, hard_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);

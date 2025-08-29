@@ -88,9 +88,6 @@ export function syncWordRowArrayState(state) { // to append and backspace
     sendMessage(JSON.stringify({ // send to server
         type: "syncWordRowArrayState",
         wordRowArrayState: JSON.stringify(state.wordRowArrayState),
-        // keyboardState: state.keyboardState
-        // gameState: JSON.stringify(state), // new // overloads server, w/out TEXT PARTIAL WRITING
-        // incRow: JSON.stringify(state.incRow) // disable for now....03 27 2025
     }));
 }
 

@@ -30,7 +30,7 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
     }
     if (gameOver.getGameOverStatus()) {
         state.gameComplete = true;
-        checkCompletionStatus.setCompletedGame(); // added state. 08 27 2025 // removed state, not sure why this messes it up
+        state.checkCompletionStatus.setCompletedGame(); // added state. 08 27 2025 // removed state, not sure why this messes it up
         // console.log("You did not get the word...fire off modal...");
         showFailureModal(state.wordOfTheDay);
         state.userInput = "";
