@@ -398,6 +398,8 @@ onMessage((e) => {
         typeOutGuessGameState.c = 0;
         typeOutGuessGameState.restart = false // added later
         UIReset.resetUI();
+        typeOutGuessGameState.checkCompletionStatus.setCompletedGame();
+        typeOutGuessGameState.checkCompletionStatus.hideRevealStartBtn(true);
 
         const hard_reset = { reset: true };
         typeOutGuess(null, hard_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);

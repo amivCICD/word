@@ -275,8 +275,11 @@
                   typeOutGuessGameState.wordOfTheDay = resetGameState.wordOfTheDay;
                   typeOutGuessGameState.wordOfTheDayLetters = resetGameState.wordOfTheDayLetters;
                   /////////
+                  // if (checkCompletionStatus.isCompleted()) { // this is only to unhide the start new game button
+                  //   checkCompletionStatus.setCompletedGame();
+                  //   checkCompletionStatus.hideRevealStartBtn(true);
+                  // }
                   const user = JSON.parse(localStorage.getItem("username")).username;
-                  ////// server: (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState"))
                   sendMessage(JSON.stringify({ // why here? it should be on new game button click, not on word fetch...though, without this, clicking the start new game btn doesnt work?
                     type: "updateGameState",
                     updateType: "resetGameState",
@@ -286,23 +289,8 @@
                     // gameOver: gameOver.getGameOverStatus(),
                     userWhoClicked: user,
                     UIReset: UIReset,
+                    checkCompletionStatus: checkCompletionStatus
                   }));
-
-                  // console.log("resetGameState.wordOfTheDay\t", resetGameState.wordOfTheDay);
-                  /////////
-                  if (checkCompletionStatus.isCompleted()) { // this is only to unhide the start new game button
-                    checkCompletionStatus.setCompletedGame();
-                    checkCompletionStatus.hideRevealStartBtn(true);
-                    // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
-                  }
-
-                  // typeOutGuess(
-                    //   null,
-                    //   resetGameState,
-                    //   resetGameState.wordOfTheDay,
-                    //   resetGameState.wordOfTheDayLetters
-                    // );
-
                     typeOutGuess(null, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
                     resetGameState.setResetFalse();
                 }
