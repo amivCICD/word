@@ -22,6 +22,7 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
     if (newRow.restart) {
         state.gameComplete = true;
         state.checkCompletionStatus.setCompletedGame();
+
         // console.log('You can now restart the game...');
         fireOffConfetti();
         setNewWordOnServer();

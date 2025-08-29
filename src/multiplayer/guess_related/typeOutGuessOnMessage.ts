@@ -47,10 +47,6 @@ document.addEventListener("websocket-ready", () => {
                                 col.value = state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML || "";
                             });
                         });
-                        // document.querySelectorAll("kbd").forEach((key, i) => {
-                        //     console.log("fired off")
-                        //     key.className = state.keyboardState[i].classList.value;
-                        // });
                         state.keyboardState = getCurrentKeyboardState().map((k) => ({ class: k.classList.value }));
 
                         syncNewCss(state.wordRowArrayState);
