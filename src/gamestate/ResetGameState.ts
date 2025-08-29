@@ -19,5 +19,6 @@ export class ResetGameState {
     setResetFalse(): void  {
         this.reset = false;
     }
+
 }
 

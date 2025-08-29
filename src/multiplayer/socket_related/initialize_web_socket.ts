@@ -95,7 +95,7 @@ export function initializeSocket(roomId) {
             // console.log("typeOutGuessGameState && eventData in onmessage handler\t", {...typeOutGuessGameState, ...eventData});
             // updateGameState(eventData); 08 27 2025 look into this, perhaps we need to send everything from the server...
         } else if (eventData.type === "updateServerWord") {
-            console.log("updatedServer word fired in socket.onmessage")
+            // console.log("updatedServer word fired in socket.onmessage")
         } else if (eventData.type === "userleaving") {
             checkForPlayerCount(eventData);
         }
@@ -200,7 +200,7 @@ function updateGameState(data) {
         typeOutGuessGameState.gameStateParam = data.gameStateParam;
         typeOutGuessGameState.rowGameState = data.rowGameState;
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
-        console.log("IN GUESS ATTEMPT typeOutGuessGameState.wordRowArrayState\t", typeOutGuessGameState.wordRowArrayState);
+        // console.log("IN GUESS ATTEMPT typeOutGuessGameState.wordRowArrayState\t", typeOutGuessGameState.wordRowArrayState);
 
     } else if (data.updateType === "resetGameState") {
         // console.log("DATA FROM RESETGAMESTATE\t", data);
@@ -338,7 +338,7 @@ onMessage((e) => {
     } else if (data.updateType === "checkCompletionStatus") {
 
     } else if (data.updateType === "resetGameState") {
-        console.log("typeOutGuessGameState.wordOfTheDay IN RESET GAME STATE AFTER GAME OVER\t", typeOutGuessGameState.wordOfTheDay);
+        // console.log("typeOutGuessGameState.wordOfTheDay IN RESET GAME STATE AFTER GAME OVER\t", typeOutGuessGameState.wordOfTheDay);
         // console.log("state.currentPlayer IN RESET GAME STATE AFTER GAME OVER\t", typeOutGuessGameState.currentPlayer);
         typeOutGuessGameState.wordRowArrayState = [
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
@@ -381,7 +381,7 @@ onMessage((e) => {
         typeOutGuessGameState.restart = data.restart;
         return;
     } else if (data.updateType === "wordOfDay") {
-        console.log("data WORD OF DAY \t", data);
+        // console.log("data WORD OF DAY \t", data);
     }
 });
 

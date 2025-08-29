@@ -1,68 +1,8 @@
 import { appendGuess } from "./appendGuess.ts";
-import { arrayOfDivRows } from "../helper_functions/arrayOfDivRows.ts";
-import { checkIfWordInWordList } from "../../checks/checkIfWordInWordList.ts";
-import { handleWiggleAnimation } from "../../ui_handlers/handleWiggleAnimation.ts";
-import { sendMessage, onMessage, getGameState, getPlayerState } from "../socket_related/initialize_web_socket.ts";
-import { getLocalCurrentUser } from "../helper_functions/getLocalCurrentUser.ts";
-import { handleGuess } from "./handleGuess.ts";
+import { sendMessage, getGameState, getPlayerState } from "../socket_related/initialize_web_socket.ts";
 
 
-let arrayOfRowArrays;
-
-document.addEventListener("DOMContentLoaded", () => {
-    arrayOfRowArrays = arrayOfDivRows();
-});
-document.addEventListener("websocket-ready", () => {
-    onMessage(async (messageData) => {
-        const state = getGameState();
-        state.arrayOfRowArrays = arrayOfRowArrays;
-        const data = JSON.parse(messageData);
-        if (data.updateType === "backspace" && data.userInput === 'BACKSPACE') {
-            if (state.letterCount >= 0 && state.letterCount < 5) {
-                state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
-                // syncMatrixArrayToServer(state);
-                syncWordRowArrayState(state);
-            } else if (state.letterCount === 5 || state.letterCount === 0) {
-                return;
-            }
-        } else if (data.updateType === 'append') {
-            if (state.letterCount <= 5 && state.rowLetterCount < 6) {
-                state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
-                // syncMatrixArrayToServer(state);
-                syncWordRowArrayState(state);
-
-            }
-        } else if (data.updateType === "guessAttempt" && data.userInput === "ENTER") {
-            if (state.letterCount === 5) {
-                if (!checkIfWordInWordList(state.guess)) {
-                    handleWiggleAnimation(state.arrayOfRowArrays[state.row]);
-                    return;
-                }
-                await handleGuess(state, data, state.gameOver, state.checkCompletionStatus)
-                    .then(() => {
-                        state.wordRowArrayState.forEach((row, rowIdx) => {
-                            row.forEach((col, colIdx) => {
-                                if (state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML === "") {
-                                    return;
-                                }
-                                col.class = state.arrayOfRowArrays[rowIdx][colIdx]?.className || "";
-                                col.value = state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML || "";
-                            })
-                        })
-                        syncNewCss(state.wordRowArrayState);
-                    })
-                    .then(() => {
-                        swapPlayersFrontEnd(state, false, null);
-                    })
-                    .catch((e) => console.log(`Error for setting sync word array state in guess attempt\t${e}`));
-
-            }
-        }
-    });
-});
-
-let gameComplete = false;
-export async function typeOutGuess(
+export async function typeOutGuess( // used mostly in index.html
     userInput: string,
     gameStateParam: boolean,
     wordOfTheDay: string,
@@ -70,14 +10,11 @@ export async function typeOutGuess(
 ): Promise<void> {
 
     const state = getGameState();
-    const playerState = getPlayerState();
-    // state.rowGameState = rowGameState;
     state.wordOfTheDayLetters = wordOfTheDayLetters;
     // who passes type out guess its stuff?
     console.log("wordOfTheDay in typeOutGuess.ts\t", wordOfTheDay)
 
     if (gameStateParam.reset) {
-        const currentUser = getLocalCurrentUser();
         console.log("WE HIT THE gameStateParam.reset in typeOutGuess.ts")
         // if (state.currentUser.userId === currentUser.userId.toString()) { // YES but then it doesnt reset the others state, only issue is really the word of the day matching...get from server...
             // sendMessage(JSON.stringify({
@@ -90,7 +27,7 @@ export async function typeOutGuess(
             //     gameComplete: false
             // }));
         // }
-        await appendGuess(null, null, null, null, gameStateParam.reset);
+        await appendGuess(null, null, null, null, gameStateParam);
     }
 
     // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
@@ -103,6 +40,7 @@ export async function typeOutGuess(
 
 
     if (state.letterCount === 5 && userInput === "ENTER" && state.guess !== "ENTER") {
+        console.log("gameStateParam.reset\t", gameStateParam.reset)
         sendMessage(JSON.stringify({
             type: "updateGameState",
             updateType: "guessAttempt",
@@ -204,7 +142,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
             }));
         }
     } else if (players.length === 1) {
-        console.log("Only player left\t", players[0])
+        // console.log("Only player left\t", players[0]);
         if (players[0].userId === localUserId) {
             sendMessage(JSON.stringify({
                 type: "updatePlayerState",

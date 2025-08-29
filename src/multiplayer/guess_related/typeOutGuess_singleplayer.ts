@@ -1,4 +1,4 @@
-import { appendGuess } from "./appendGuess.ts";
+import { appendGuess } from "./appendGuess_singleplayer.ts";
 import { arrayOfDivRows } from "../helper_functions/arrayOfDivRows.ts";
 import { checkIfWordInWordList } from "../../checks/checkIfWordInWordList.ts";
 import { fireOffConfetti } from "../../game_over_related/fireOffConfetti.ts";
@@ -29,12 +29,11 @@ export async function typeOutGuess(
     console.log('wordOfTheDay\t', wordOfTheDay);
     console.log('rowGameState.getRowLetterCount()\t', rowGameState.getRowLetterCount());
 
-
     if (gameState.reset) {
         letterCount = 0;
         row = 0;
         guess = "";
-        await appendGuess(null, null, null, null, gameState.reset);
+        await appendGuess(null, null, null, null, gameState);
         gameComplete = false;
     }
 

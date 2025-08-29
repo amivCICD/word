@@ -143,7 +143,7 @@
       </div>
     </div>
 
-
+    <script type="module" src="../src/multiplayer/guess_related/typeOutGuessOnMessage.ts"></script>
     <script type="module">
       import { typeOutGuess } from "../src/multiplayer/guess_related/typeOutGuess.ts";
       import { sWords } from "../src/data/sWords";
@@ -192,17 +192,10 @@
       const checkCompletionStatus = state.checkCompletionStatus;
 
 
-      // my lil singletons
-      // const gameOver = GameOver.getInstance();
-      // const rowGameState = RowGameState.getInstance(); // rowLetterCount
-      // const guessStarted = GuessStarted.getInstance();
-      // const checkCompletionStatus = CheckCompletionStatus.getInstance();
-      // rowGameState.getMethods();
-
-      let resetGameState = state.resetGameState;
 
       // INIT
       (async () => {
+        let resetGameState = state.resetGameState;
         let fetchWord;
         const typeOutGuessGameState = getGameState();
         try {
@@ -257,6 +250,7 @@
 
       document.querySelectorAll('.startNewGame').forEach((resetBtn) => {
         resetBtn.addEventListener('click', e => {
+          let resetGameState;
           const typeOutGuessGameState = getGameState();
           checkCompletionStatus.hideRevealStartBtn(true); // perhaps have server do this
           if (e) {
@@ -274,7 +268,7 @@
                   const w = await fetchWord.json();
                   console.log('fetchWord\t', w);
                   resetGameState = new ResetGameState(true, w.word);
-                  state.gameOver.setGameOverFalse();
+                  // state.gameOver.setGameOverFalse();
                   typeOutGuessGameState.wordOfTheDay = resetGameState.wordOfTheDay;
                   typeOutGuessGameState.wordOfTheDayLetters = resetGameState.wordOfTheDayLetters;
                   /////////
@@ -288,7 +282,7 @@
                     // gameOver: gameOver.getGameOverStatus(),
                     UIReset: UIReset
                   }));
-                  console.log("resetGameState.wordOfTheDay\t", resetGameState.wordOfTheDay);
+                  // console.log("resetGameState.wordOfTheDay\t", resetGameState.wordOfTheDay);
                   /////////
                   if (checkCompletionStatus.isCompleted()) { // this is only to unhide the start new game button
                     checkCompletionStatus.setCompletedGame();
@@ -296,14 +290,14 @@
                     // console.log("checkCompletionStatus.isCompleted() in INDEX.HTML********\t", checkCompletionStatus.isCompleted());
                   }
 
-                  resetGameState.setResetFalse();
                   // typeOutGuess(
-                  //   null,
-                  //   resetGameState,
-                  //   resetGameState.wordOfTheDay,
-                  //   resetGameState.wordOfTheDayLetters
-                  // );
-                  typeOutGuess(null, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
+                    //   null,
+                    //   resetGameState,
+                    //   resetGameState.wordOfTheDay,
+                    //   resetGameState.wordOfTheDayLetters
+                    // );
+                    typeOutGuess(null, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
+                    resetGameState.setResetFalse();
                 }
               } catch (error) {
                 console.error(error);
@@ -312,7 +306,7 @@
           }
         });
       });
-
+      const no_reset = { reset: false };
       document.addEventListener('keydown', e => {
         let localCurrentPlayerId = setLocalCurrentPlayer();
         const playerState = getPlayerState();
@@ -346,7 +340,7 @@
             keys.classList.add("bg-pink-200");
           }
         });
-        typeOutGuess(filteredValue, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
+        typeOutGuess(filteredValue, no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
 
 
       }); // initial listener
@@ -368,7 +362,7 @@
           //   resetGameState.wordOfTheDay,
           //   resetGameState.wordOfTheDayLetters
           // );
-          typeOutGuess(filteredValue, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
+          typeOutGuess(filteredValue, no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
         });
         keys.addEventListener('mousedown', e => {
           let letter = e.target.classList.add('bg-pink-200');
@@ -389,7 +383,7 @@
         //   resetGameState.wordOfTheDayLetters
         // );
         const typeOutGuessGameState = getGameState();
-        typeOutGuess("BACKSPACE", resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
+        typeOutGuess("BACKSPACE", no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
       });
       document?.getElementById('enter').addEventListener('click', e => {
         if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
@@ -402,7 +396,7 @@
         //   resetGameState.wordOfTheDayLetters
         // );
         const typeOutGuessGameState = getGameState();
-        typeOutGuess("ENTER", resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
+        typeOutGuess("ENTER", no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
       });
       document?.getElementById('backspace').addEventListener('mousedown', e => {
         e.target.classList.add('bg-pink-200');

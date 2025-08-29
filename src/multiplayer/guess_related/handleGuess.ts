@@ -6,10 +6,10 @@ import { appendGuess } from "./appendGuess";
 export async function handleGuess(state, data, gameOver, checkCompletionStatus) { // used in typeOutGuess.ts #40
     const newRow = await appendGuess(
         state.arrayOfRowArrays[state.row],
-        state.guess,
+        state.guess, // guessFromPrev param...
         data.wordOfTheDay,
         data.wordOfTheDayLetters,
-        data.gameStateParam // was data.gameStateParam
+        data.gameStateParam
     );
     if (state.row !== 5) {
         state.arrayOfRowArrays[state.row+1][0].innerHTML = "";
@@ -25,7 +25,7 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
         // console.log('You can now restart the game...');
         fireOffConfetti();
         setNewWordOnServer();
-        console.log("%%%%%%%%%%%%%%%resetting the game ONCE");
+        // console.log("%%%%%%%%%%%%%%%resetting the game ONCE");
 
     }
     if (gameOver.getGameOverStatus()) {
@@ -35,7 +35,7 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
         showFailureModal(state.wordOfTheDay);
         state.userInput = "";
         setNewWordOnServer();
-        console.log("%%%%%%%%%%%%%%%resetting the game TWICE");
+        // console.log("%%%%%%%%%%%%%%%resetting the game TWICE");
     }
 }
 
