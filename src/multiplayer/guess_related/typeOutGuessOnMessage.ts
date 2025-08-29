@@ -4,7 +4,7 @@ import { arrayOfDivRows } from "../helper_functions/arrayOfDivRows";
 import { getCurrentKeyboardState, getGameState, onMessage } from "../socket_related/initialize_web_socket";
 import { handleGuess } from "./handleGuess";
 import { swapPlayersFrontEnd, syncNewCss, syncKeyboardCSS, syncWordRowArrayState } from "./typeOutGuess";
-
+import { stopLoadingSpinner } from "../helper_functions/loadingSpinners";
 
 
 
@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     arrayOfRowArrays = arrayOfDivRows();
 });
 document.addEventListener("websocket-ready", () => {
+    stopLoadingSpinner();
     onMessage(async (messageData) => {
         const state = getGameState();
         state.arrayOfRowArrays = arrayOfRowArrays;

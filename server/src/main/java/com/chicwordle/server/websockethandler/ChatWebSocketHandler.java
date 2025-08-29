@@ -126,6 +126,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
         if (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState")) {
             System.out.println("SERVER SAW THE RESET GAME STATE!");
+            String userWhoClicked = msg.getString("userWhoClicked");
             // WordOfTheDay wotd = new WordOfTheDay();
             // String newGameWord = wotd.newGameWordOfDay(); // lets try using what the front end sent?
 
@@ -156,6 +157,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("updateType", "wordOfDay")
                 .put("serverWordOfTheDay", newGameWord)
                 .put("incRow", incRow)
+                .put("userWhoClicked", userWhoClicked)
                 // .put("newGameWord", newGameWord)
                 .put("whereIsMyShit", "WHERE IS MY SHIT!")
                 .put("resetGameState", resetGameState)

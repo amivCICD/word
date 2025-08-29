@@ -160,6 +160,7 @@
       import { sendMessage } from    "../src/multiplayer/socket_related/initialize_web_socket.ts";
       import { getPlayerState } from "../src/multiplayer/socket_related/initialize_web_socket.ts";
       import { getGameState } from   "../src/multiplayer/socket_related/initialize_web_socket.ts";
+      import { startLoadingSpinner, stopLoadingSpinner } from "../src/multiplayer/helper_functions/loadingSpinners.ts";
 
       // window.addEventListener("playerStateUpdated", () => {
       //       console.log("Player state UPDATED\t", getPlayerState());
@@ -254,6 +255,7 @@
           let resetGameState;
           const typeOutGuessGameState = getGameState();
           checkCompletionStatus.hideRevealStartBtn(true); // perhaps have server do this
+
           if (e) {
             const typeOutGuessGameState = getGameState();
             (async () => {
@@ -273,6 +275,7 @@
                   typeOutGuessGameState.wordOfTheDay = resetGameState.wordOfTheDay;
                   typeOutGuessGameState.wordOfTheDayLetters = resetGameState.wordOfTheDayLetters;
                   /////////
+                  const user = JSON.parse(localStorage.getItem("username")).username;
                   ////// server: (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState"))
                   sendMessage(JSON.stringify({ // why here? it should be on new game button click, not on word fetch...though, without this, clicking the start new game btn doesnt work?
                     type: "updateGameState",
@@ -281,9 +284,10 @@
                     wordOfTheDay: typeOutGuessGameState.wordOfTheDay,
                     wordOfTheDayLetters: typeOutGuessGameState.wordOfTheDayLetters,
                     // gameOver: gameOver.getGameOverStatus(),
+                    userWhoClicked: user,
                     UIReset: UIReset,
-
                   }));
+
                   // console.log("resetGameState.wordOfTheDay\t", resetGameState.wordOfTheDay);
                   /////////
                   if (checkCompletionStatus.isCompleted()) { // this is only to unhide the start new game button

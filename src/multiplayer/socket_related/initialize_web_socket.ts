@@ -7,6 +7,7 @@ import { RowGameState } from "../../gamestate/RowGameState";
 import { newUserJoiningMessage, userLeavingMessage } from "../chat_related/newUserJoiningMessage";
 import { swapPlayersFrontEnd } from "../guess_related/typeOutGuess";
 import { typeOutGuess } from "../guess_related/typeOutGuess";
+import { startLoadingSpinner, stopLoadingSpinner } from "../helper_functions/loadingSpinners";
 
 
 
@@ -72,6 +73,7 @@ let player = {
 let allPlayers = [];
 
 export function initializeSocket(roomId) {
+    startLoadingSpinner(false);
     if (socket && socket.readyState === WebSocket.OPEN && currentRoomId === roomId) {
         return socket;
     }
@@ -407,7 +409,11 @@ onMessage((e) => {
         typeOutGuessGameState.restart = data.restart;
         return;
     } else if (data.updateType === "wordOfDay") {
+        console.log("data in wordOfDay\t", data)
+        const userWhoClicked = data.userWhoClicked;
+        startLoadingSpinner(true, `${userWhoClicked} restarted the game!`);
         // console.log("data WORD OF DAY \t", data);
+        stopLoadingSpinner(2500);
     }
 });
 
@@ -432,6 +438,7 @@ onMessage((e) => {
     const state = getGameState();
     const data = JSON.parse(e);
     if (data.type === "newuserjoining") {
+        startLoadingSpinner(true, `${data.username} has joined!`);
         const joinedChat = document.getElementById("textMessages");
         const div = document.createElement('div');
         div.innerHTML = `<div class="chat-footer">
@@ -441,6 +448,7 @@ onMessage((e) => {
         joinedChat.appendChild(div);
         const textMessages = document.getElementById("textMessages");
         textMessages.scrollTo(0, textMessages.scrollHeight);
+        stopLoadingSpinner(2000);
     }
 });
 
