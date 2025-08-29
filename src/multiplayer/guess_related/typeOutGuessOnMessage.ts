@@ -1,9 +1,9 @@
 import { checkIfWordInWordList } from "../../checks/checkIfWordInWordList";
 import { handleWiggleAnimation } from "../../ui_handlers/handleWiggleAnimation";
 import { arrayOfDivRows } from "../helper_functions/arrayOfDivRows";
-import { getGameState, onMessage } from "../socket_related/initialize_web_socket";
+import { getCurrentKeyboardState, getGameState, onMessage } from "../socket_related/initialize_web_socket";
 import { handleGuess } from "./handleGuess";
-import { swapPlayersFrontEnd, syncNewCss, syncWordRowArrayState } from "./typeOutGuess";
+import { swapPlayersFrontEnd, syncNewCss, syncKeyboardCSS, syncWordRowArrayState } from "./typeOutGuess";
 
 
 
@@ -20,7 +20,6 @@ document.addEventListener("websocket-ready", () => {
         if (data.updateType === "backspace" && data.userInput === 'BACKSPACE') {
             if (state.letterCount >= 0 && state.letterCount < 5) {
                 state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = "";
-                // syncMatrixArrayToServer(state);
                 syncWordRowArrayState(state);
             } else if (state.letterCount === 5 || state.letterCount === 0) {
                 return;
@@ -28,7 +27,6 @@ document.addEventListener("websocket-ready", () => {
         } else if (data.updateType === 'append') {
             if (state.letterCount <= 5 && state.rowLetterCount < 6) {
                 state.arrayOfRowArrays[state.row][state.rowLetterCount].innerHTML = state.userInput;
-                // syncMatrixArrayToServer(state);
                 syncWordRowArrayState(state);
             }
         } else if (data.updateType === "guessAttempt" && data.userInput === "ENTER") {
@@ -46,9 +44,16 @@ document.addEventListener("websocket-ready", () => {
                                 }
                                 col.class = state.arrayOfRowArrays[rowIdx][colIdx]?.className || "";
                                 col.value = state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML || "";
-                            })
-                        })
+                            });
+                        });
+                        // document.querySelectorAll("kbd").forEach((key, i) => {
+                        //     console.log("fired off")
+                        //     key.className = state.keyboardState[i].classList.value;
+                        // });
+                        state.keyboardState = getCurrentKeyboardState().map((k) => ({ class: k.classList.value }));
+
                         syncNewCss(state.wordRowArrayState);
+                        syncKeyboardCSS(state.keyboardState);
                     })
                     .then(() => {
                         swapPlayersFrontEnd(state, false, null);

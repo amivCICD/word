@@ -48,6 +48,12 @@ let typeOutGuessGameState = {
         [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
         [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
         [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
+    ],
+    keyboardState: [
+        // { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""},
+        // { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""},
+        // { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""},
+        // { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""}, { class: ""},
     ]
 };
 let textMessageState = {
@@ -154,6 +160,9 @@ export function getCurrentArrowOfRowArrays(): [][] {
     }
     return arrayOfRowArrays;
 }
+export function getCurrentKeyboardState(): [] {
+    return Array.from(document.querySelectorAll("kbd"));
+}
 
 function updateGameState(data) {
     const typeOutGuessGameState = getGameState();
@@ -187,6 +196,8 @@ function updateGameState(data) {
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount - 1].class = currentRowArrayState[data.row][data.letterCount - 1].classList.value;
             typeOutGuessGameState.wordRowArrayState[typeOutGuessGameState.row][typeOutGuessGameState.letterCount - 1].value = data.userInput;
         }
+        // typeOutGuessGameState.keyboardState = getCurrentKeyboardState();
+
     } else if (data.updateType === "setWOTD_and_params") {
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
@@ -201,6 +212,7 @@ function updateGameState(data) {
         typeOutGuessGameState.gameStateParam = data.gameStateParam;
         typeOutGuessGameState.rowGameState = data.rowGameState;
         typeOutGuessGameState.arrayOfRowArrays = data.arrayOfRowArrays;
+        typeOutGuessGameState.keyboardState = data.keyboardState
         // console.log("IN GUESS ATTEMPT typeOutGuessGameState.wordRowArrayState\t", typeOutGuessGameState.wordRowArrayState);
 
     } else if (data.updateType === "checkCompletionStatus") {
@@ -209,6 +221,14 @@ function updateGameState(data) {
         console.log('typeOutGuessGameState.matrixArray from updateState\t', typeOutGuessGameState.matrixArray)
     } else if (data.updateType === "syncMatrix") {
         const state = getGameState();
+        // if (state.keyboardState.length) {
+        //     document.querySelectorAll("kbd").forEach((key, i) => {
+        //         console.log("fired off")
+        //         key.className = state.keyboardState[i].classList.value;
+        //     });
+        // }
+        // console.log("data from SYNCMATRIX\t", data.keyboardState);
+        // console.log("state data from SYNCMATRIX\t", state.keyboardState);
         // console.log("@updateType syncMatrix: data.incRow\t", data.incRow);
         // console.log("state.currentPlayer\t", state.currentPlayer)
         // typeOutGuessGameState.incRow = data.incRow; // didnt work, but did reset incRow for both players...
@@ -228,6 +248,7 @@ function updatePlayerState(data) {
         }
         allPlayers = [player];
     } else if (data.updateType === "addPlayer") {
+        // console.log("data from addPlayer\t", data);
 
         if (Array.isArray(data.playerCount)) {
             const incomingPlayers = JSON.stringify(data.playerCount);
@@ -291,6 +312,14 @@ function updatePlayerState(data) {
                             });
                         });
                     }
+
+                }
+
+                const kbState = JSON.parse(currentPlayer.keyboardState);
+                if (localUserId !== currentPlayer.userId && kbState.length > 1) {
+                    document.querySelectorAll("kbd").forEach((key, i) => {
+                        key.className = kbState[i].class;
+                    });
                 }
             }
         }
@@ -324,9 +353,7 @@ onMessage((e) => {
     const typeOutGuessGameState = getGameState();
     const data = JSON.parse(e);
     if (data.updateType === "addPlayer") {
-        const localUserInfo = localStorage.getItem("username");
-        const userInfo = JSON.parse(localUserInfo);
-        // ??
+
     } else if (data.updateType === "removePlayer") { // whoever sees two players first?
         console.log('playerState AFTER REMOVE PLAYER \t', player);
     } else if (data.updateType === "checkForTwoPlayers" && allPlayers.length >= 2) {
@@ -344,6 +371,7 @@ onMessage((e) => {
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
             [ { class: "", value: "", }, { class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", },{ class: "", value: "", } ],
         ];
+        typeOutGuessGameState.keyboardState = [];
         console.log("data @@@@AFTER@@@@ resetGameState\t", data);
 
         // from the other resetGameState
@@ -352,9 +380,6 @@ onMessage((e) => {
         typeOutGuessGameState.wordOfTheDayLetters = data.resetGameState.wordOfTheDayLetters;
 
         console.log("typeOutGuessGameState.wordOfTheDay AFTER APPLIED DATA\t", typeOutGuessGameState.wordOfTheDay);
-
-
-
 
         // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
         typeOutGuessGameState.resetGameState = data.resetGameState.reset;
@@ -373,8 +398,6 @@ onMessage((e) => {
         UIReset.resetUI();
 
         const hard_reset = { reset: true };
-        console.log("typeOutGuessGameState.wordOfTheDay\t", typeOutGuessGameState.wordOfTheDay)
-        console.log("typeOutGuessGameState.wordOfTheDayLetters\t", typeOutGuessGameState.wordOfTheDayLetters)
         typeOutGuess(null, hard_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
         return;
     } else if (data.updateType === "resetGuessState") {
@@ -434,7 +457,7 @@ function updateTextState(data) {
 }
 
 function checkForPlayerCount(data) {
-    console.log("checkForPlayerCount DATA\t", data);
+    // console.log("checkForPlayerCount DATA\t", data);
     const state = getGameState();
     swapPlayersFrontEnd(state, true, data);
 

@@ -27,6 +27,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final Map<WebSocketSession, JSONObject> currentPlayerMap = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> newGameWotdMap = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> matrixArrayMap = new ConcurrentHashMap<>();
+    private final Map<WebSocketSession, JSONObject> keyboardStateMap = new ConcurrentHashMap<>();
     private final AtomicInteger incRow = new AtomicInteger(0);
 
     @Override
@@ -69,6 +70,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     .map(s -> {
                         JSONObject userInfo = userMap.get(s);
                         JSONObject matrixInfo = matrixArrayMap.get(s);
+                        JSONObject keyboardInfo = keyboardStateMap.get(s);
                         JSONObject newGameWord = newGameWotdMap.get(s);
                         return new JSONObject()
                             .put("sessionId", s.getId())
@@ -77,11 +79,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                             .put("incRow", userInfo != null ? userInfo.getInt("incRow") : 0)
                             .put("addPlayerWOTD", newGameWord != null ? newGameWord.getString("serverWordOfTheDay") : "")
                             .put("wordRowArrayState", matrixInfo != null ? matrixInfo.getString("wordRowArrayState") : "[]")
+                            .put("keyboardState", keyboardInfo != null ? keyboardInfo.getString("keyboardState") : "[]")
                             .put("isFirstPlayer", userInfo != null && userInfo.getBoolean("isFirstPlayer"));
                     }).collect(Collectors.toList()));
             for(WebSocketSession s : roomSessions) {
                 synchronized (s) {
                     if (s.isOpen()) {
+                        System.out.println(sessionId.toString());
                         s.sendMessage(new TextMessage(sessionId.toString()));
                     }
                 }
@@ -168,7 +172,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         if (msg.getString("type").equals("syncWordRowArrayState")) {
             String payload = session.getId();
             String matrixArrayStr = msg.optString("wordRowArrayState", "[[{class: '', value: ''}]]");
-            // String incRow = msg.getString("incRow");
 
             JSONObject matrix = new JSONObject().put("wordRowArrayState", matrixArrayStr);
             matrixArrayMap.put(session, matrix);
@@ -186,6 +189,20 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             synchronized (session) {
                 if (session.isOpen()) { // this works without all the other bull shit....ORIGINAL
                     session.sendMessage(new TextMessage(syncMatrix.toString()));
+                }
+            }
+        }
+        if (msg.getString("type").equals("updateKeyboardState")) {
+            String payload = session.getId();
+            String keyboardStateStr = msg.optString("keyboardState", "[{ class: '' }]");
+            JSONObject kbState = new JSONObject().put("keyboardState", keyboardStateStr);
+            keyboardStateMap.put(session, kbState);
+
+            JSONObject syncKeyboardState = new JSONObject()
+                .put("keyboardState", keyboardStateStr);
+            synchronized (session) {
+                if (session.isOpen()) { // this works without all the other bull shit....ORIGINAL
+                    session.sendMessage(new TextMessage(syncKeyboardState.toString()));
                 }
             }
         }

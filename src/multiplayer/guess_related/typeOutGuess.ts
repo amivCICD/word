@@ -11,7 +11,6 @@ export async function typeOutGuess( // used mostly in index.html
 
     const state = getGameState();
     state.wordOfTheDayLetters = wordOfTheDayLetters;
-    console.log("HELLO FROM typeOutGuess BY THE PERSON WHO CLICKED!");
     // who passes type out guess its stuff?
     console.log("wordOfTheDay in typeOutGuess.ts\t", wordOfTheDay)
 
@@ -52,7 +51,8 @@ export async function typeOutGuess( // used mostly in index.html
             gameStateParam: gameStateParam.reset,
             arrayOfRowArrays: state.arrayOfRowArrays,
             letterCount: state.letterCount,
-            wordRowArrayState: state.wordRowArrayState
+            wordRowArrayState: state.wordRowArrayState,
+            keyboardState: state.keyboardState
         }));
     } else if (userInput === "BACKSPACE" && state.letterCount !== 0) {
         state.rowGameState.decRowLetterCount();
@@ -87,8 +87,8 @@ export async function typeOutGuess( // used mostly in index.html
 export function syncWordRowArrayState(state) { // to append and backspace
     sendMessage(JSON.stringify({ // send to server
         type: "syncWordRowArrayState",
-        // updateType: "syncMatrix",
         wordRowArrayState: JSON.stringify(state.wordRowArrayState),
+        // keyboardState: state.keyboardState
         // gameState: JSON.stringify(state), // new // overloads server, w/out TEXT PARTIAL WRITING
         // incRow: JSON.stringify(state.incRow) // disable for now....03 27 2025
     }));
@@ -98,6 +98,12 @@ export function syncNewCss(updatedWordRowArrayState: [][]) { // in then()
     sendMessage(JSON.stringify({
         type: "syncWordRowArrayState",
         wordRowArrayState: JSON.stringify(updatedWordRowArrayState)
+    }));
+}
+export function syncKeyboardCSS(updatedKeyboardState: []) {
+    sendMessage(JSON.stringify({
+        type: "updateKeyboardState",
+        keyboardState: JSON.stringify(updatedKeyboardState)
     }));
 }
 
@@ -111,7 +117,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         if (players.length > 0) {
             if (nextIndex >= players.length) nextIndex = 0;
             players[nextIndex].isFirstPlayer = true;
-            console.log("players[nextIndex]\t", players[nextIndex]);
+            // console.log("players[nextIndex]\t", players[nextIndex]);
         }
     }
 
@@ -156,35 +162,4 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         }
     }
 
-}
-
-function resetGameState(state) {
-        state.letterCount = 0;
-        state.row = 0;
-        state.guess = "";
-        state.gameComplete = false;
-        // state.userInput = "";
-}
-
-function syncMatrixArrayToServer(state) {
-    sendMessage(JSON.stringify({ // send to server
-        type: "syncMatrixArray",
-        matrixArray: JSON.stringify(state.matrixArray)
-    }));
-    // console.log("JSON.stringify(state.matrixArray) inside syncMatrixArray()\t", JSON.stringify(state.matrixArray));
-}
-
-function updateServerGameState(state, updateType) { // unused as of 03 27 2025
-    sendMessage(JSON.stringify({
-        type: "updateServerGameState",
-        updateType: updateType,
-        gameState: state
-    }));
-}
-
-function gameCompleteClearServerCache() {
-    sendMessage(JSON.stringify({
-        type: "gameComplete",
-        updateType: "resetPlayerServerState"
-    }));
 }

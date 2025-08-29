@@ -4,7 +4,7 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
-    08 29 2025 - word state is syncing with new user joining, but not Keyboard colors...
+    08 29 2025 - word state is syncing with new user joining, but not Keyboard colors... CHECK √
                     ♣ only ONE user clicks restart, so it doesnt actually send the gameStateParam.reset to the other users... CHECK √
         notes: I believe the reset on click is not fully resetting both users, on a fresh game it works CHECK √
 
