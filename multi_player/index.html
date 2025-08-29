@@ -105,37 +105,37 @@
     </div>
     <div class="w-full pt-2 sm:mt-10">
       <div class="my-1 flex justify-center gap-[1px] sm:gap-1 sm:text-xl font-bold select-none">
-        <kbd class="kbd text-pink-200 bg-black h-20">Q</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">W</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">E</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">R</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">T</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">Y</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">U</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">I</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">O</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">P</kbd>
+        <kbd data-key="Q" class="kbd text-pink-200 bg-black h-20">Q</kbd>
+        <kbd data-key="W" class="kbd text-pink-200 bg-black h-20">W</kbd>
+        <kbd data-key="E" class="kbd text-pink-200 bg-black h-20">E</kbd>
+        <kbd data-key="R" class="kbd text-pink-200 bg-black h-20">R</kbd>
+        <kbd data-key="T" class="kbd text-pink-200 bg-black h-20">T</kbd>
+        <kbd data-key="Y" class="kbd text-pink-200 bg-black h-20">Y</kbd>
+        <kbd data-key="U" class="kbd text-pink-200 bg-black h-20">U</kbd>
+        <kbd data-key="I" class="kbd text-pink-200 bg-black h-20">I</kbd>
+        <kbd data-key="O" class="kbd text-pink-200 bg-black h-20">O</kbd>
+        <kbd data-key="P" class="kbd text-pink-200 bg-black h-20">P</kbd>
       </div>
       <div class="my-1 flex w-full justify-center gap-[1px] sm:gap-1 sm:text-xl font-bold select-none">
-        <kbd class="kbd text-pink-200 bg-black h-20">A</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">S</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">D</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">F</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">G</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">H</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">J</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">K</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">L</kbd>
+        <kbd data-key="A" class="kbd text-pink-200 bg-black h-20">A</kbd>
+        <kbd data-key="S" class="kbd text-pink-200 bg-black h-20">S</kbd>
+        <kbd data-key="D" class="kbd text-pink-200 bg-black h-20">D</kbd>
+        <kbd data-key="F" class="kbd text-pink-200 bg-black h-20">F</kbd>
+        <kbd data-key="G" class="kbd text-pink-200 bg-black h-20">G</kbd>
+        <kbd data-key="H" class="kbd text-pink-200 bg-black h-20">H</kbd>
+        <kbd data-key="J" class="kbd text-pink-200 bg-black h-20">J</kbd>
+        <kbd data-key="K" class="kbd text-pink-200 bg-black h-20">K</kbd>
+        <kbd data-key="L" class="kbd text-pink-200 bg-black h-20">L</kbd>
       </div>
       <div class="my-1 flex w-full justify-center gap-[1px] sm:gap-1 sm:text-xl font-bold select-none">
         <kbd id="enter" class="kbd text-pink-200 bg-black hover:cursor-pointer h-20">Enter</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">Z</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">X</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">C</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">V</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">B</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">N</kbd>
-        <kbd class="kbd text-pink-200 bg-black h-20">M</kbd>
+        <kbd data-key="Z" class="kbd text-pink-200 bg-black h-20">Z</kbd>
+        <kbd data-key="X" class="kbd text-pink-200 bg-black h-20">X</kbd>
+        <kbd data-key="C" class="kbd text-pink-200 bg-black h-20">C</kbd>
+        <kbd data-key="V" class="kbd text-pink-200 bg-black h-20">V</kbd>
+        <kbd data-key="B" class="kbd text-pink-200 bg-black h-20">B</kbd>
+        <kbd data-key="N" class="kbd text-pink-200 bg-black h-20">N</kbd>
+        <kbd data-key="M" class="kbd text-pink-200 bg-black h-20">M</kbd>
         <kbd id="backspace" class="kbd text-pink-200 bg-black font-bold w-16 sm:w-[73px] hover:cursor-pointer h-20">&lBarr;</kbd>
       </div>
       <div class="items-center justify-center pt-6 sm:mt-5 pb-24 flex">
@@ -320,7 +320,7 @@
         // console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer);
         // let globalCurrentPlayer = JSON.parse(gameState.currentPlayer);
         let globalCurrentPlayer = gameState.currentPlayer;
-        console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer);
+        // console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer); // 08 28 2025 come back to this later to check why null when users leave
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
 
         if (window.textMessageOnly

@@ -34,7 +34,7 @@ export async function handleGuess(state, data, gameOver, checkCompletionStatus) 
         // console.log("You did not get the word...fire off modal...");
         showFailureModal(state.wordOfTheDay);
         state.userInput = "";
-        // setNewWordOnServer();
+        setNewWordOnServer();
         console.log("%%%%%%%%%%%%%%%resetting the game TWICE");
     }
 }

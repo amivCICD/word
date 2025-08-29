@@ -8,11 +8,11 @@ import { handleGuess } from "./handleGuess.ts";
 
 
 let arrayOfRowArrays;
+
 document.addEventListener("DOMContentLoaded", () => {
     arrayOfRowArrays = arrayOfDivRows();
 });
-
-if (window.WEB_SOCKET_READY === true) {
+document.addEventListener("websocket-ready", () => {
     onMessage(async (messageData) => {
         const state = getGameState();
         state.arrayOfRowArrays = arrayOfRowArrays;
@@ -59,7 +59,7 @@ if (window.WEB_SOCKET_READY === true) {
             }
         }
     });
-}
+});
 
 let gameComplete = false;
 export async function typeOutGuess(

@@ -7,7 +7,7 @@ const gameState = getGameState();
 const guessStarted = gameState.guessStarted;
 
 const gameOver = gameState.gameOver;
-export async function appendGuess(
+export async function appendGuess( // used in:
     divEl: HTMLDivElement[],
     guessFromPrev: string,
     wordOfTheDay: string,

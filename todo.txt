@@ -4,6 +4,7 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
+    08 28 2025 - on game end, actual word of the day (server one), is not reset on loss, it plays through again... - CHECK √
     08 27 2025 - word is staying synced between users, but here are the issues:
                     ♣ incRow at times is not properly reset for a user that rejoins (it increments)
                     ♣ game does not get set as complete on initial puzzle: check for comparison to ResetGame.wotd perhaps?

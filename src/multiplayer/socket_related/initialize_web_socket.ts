@@ -78,6 +78,7 @@ export function initializeSocket(roomId) {
         console.log("Connected to web socket!");
         newUserJoiningMessage();
         window.WEB_SOCKET_READY = true;
+        document.dispatchEvent(new Event("websocket-ready"));
     };
     socket.onmessage = e => {
         let eventData = JSON.parse(e.data);
