@@ -56,6 +56,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("incRow", incRow)
                 .put("isFirstPlayer", isFirstPlayer);
 
+            currentPlayerMap.put(session, user);
+
             userMap.put(session, user);
             System.out.println("username: " + username + " SessionId Payload:\t" + payload);
 
@@ -91,12 +93,33 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
+        if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("getSyncedKeyboardCSS")) {
+            JSONObject keyboardState = keyboardStateMap.get(session);
+            if (keyboardState == null) {
+                System.out.println("keyboardState is empty");
+            }
+            JSONObject syncedKeyboard = new JSONObject()
+                .put("type", "updatePlayerState")
+                .put("updateType", "getSyncedKeyboardCSS")
+                .put("test", "test")
+                .put("keyboardState", keyboardState);
+
+            synchronized (session) {
+                if (session.isOpen()) {
+                    System.out.println("@@@@syncedKeyboard.toString()\t" + syncedKeyboard.toString());
+                    session.sendMessage(new TextMessage(syncedKeyboard.toString()));
+                }
+            }
+        }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("nextPlayer")) {
+            String frontEndIncRow = msg.getString("incRow");
+            System.out.println("@@@@frontEndIncRow in ServerSide@@@@\t" + frontEndIncRow);
+            System.out.println("@@@@incRow in ServerSide Before Increment@@@@\t" + incRow);
             incRow.set(incRow.incrementAndGet() % 6);
+            System.out.println("@@@@incRow in ServerSide@@@@\t" + incRow);
             String currentPlayer = msg.getString("currentPlayer");
             String nextPlayer = msg.getString("nextPlayer");
             // String incRow = msg.getString("incRow");
-            // System.out.println("@@@@incRow in ServerSide@@@@\t" + incRow);
             JSONObject current_and_next_player = new JSONObject()
                 .put("currentPlayer", currentPlayer)
                 .put("incRow", incRow)
@@ -127,41 +150,25 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         if (msg.getString("type").equals("updateGameState") && msg.getString("updateType").equals("resetGameState")) {
             System.out.println("SERVER SAW THE RESET GAME STATE!");
             String userWhoClicked = msg.getString("userWhoClicked");
-            // WordOfTheDay wotd = new WordOfTheDay();
-            // String newGameWord = wotd.newGameWordOfDay(); // lets try using what the front end sent?
-
-            // String wordOfTheDay = msg.getString("wordOfTheDay"); // old
-
-            // WordOfTheDay newGameWordOfTheDay = new WordOfTheDay();
-            // String newGameWord = newGameWordOfTheDay.newGameWordOfDay();
-
             String newGameWord = newGameWordService.getNewGameWord();
             System.out.println("@@@@@@@@@@@ngword in websockerHandler@@@@@@@@\t" + newGameWord + "\t@@@@@@@@");
-            // if (newGameWord == null) {
-            //     newGameWordService.generateNewGameWord();
-            //     newGameWord = newGameWordService.getNewGameWord();
-            // }
 
             JSONObject newGameWotdObject = new JSONObject()
                 .put("serverWordOfTheDay", newGameWord);
             newGameWotdMap.put(session, newGameWotdObject);
-            // System.out.println("serverWOTD\t" + newGameWord);
-            /////////////////////////
+
             matrixArrayMap.clear();
+            keyboardStateMap.clear();
             incRow.set(0);
             boolean resetGameState = true;
-            // String resetGameState = msg.getString("resetGameState");
-            // String wordOfTheDayLetters = msg.optString("wordOfTheDayLetters", "['', '', '', '', '']");
             JSONObject gameReset = new JSONObject()
                 .put("type", "updateGameState")
                 .put("updateType", "wordOfDay")
                 .put("serverWordOfTheDay", newGameWord)
                 .put("incRow", incRow)
                 .put("userWhoClicked", userWhoClicked)
-                // .put("newGameWord", newGameWord)
                 .put("whereIsMyShit", "WHERE IS MY SHIT!")
                 .put("resetGameState", resetGameState)
-                // .put("wordOfTheDayLetters", wordOfTheDayLetters)
                 .put("reset", true);
             for(WebSocketSession s : roomSessions) {
                 synchronized(s) {
@@ -174,43 +181,36 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         if (msg.getString("type").equals("syncWordRowArrayState")) {
             String payload = session.getId();
             String matrixArrayStr = msg.optString("wordRowArrayState", "[[{class: '', value: ''}]]");
-
             JSONObject matrix = new JSONObject().put("wordRowArrayState", matrixArrayStr);
             matrixArrayMap.put(session, matrix);
-            matrixArrayMap.forEach((key, val) -> {
-                // System.out.println("matrixArrayMap updates: " + val.toString()); // shows word row array state
-            });
-            // System.out.println("matrixArray\t" + matrixArrayStr + " SessionId Payload:\t" + payload);
-            JSONObject syncMatrix = new JSONObject()
-                .put("type", "updateGameState")
-                .put("updateType", "syncMatrix")
-                .put("sessionId", session.getId())
-                // .put("incRow", incRow)
-                .put("wordRowArrayState", matrixArrayStr);
-            // System.out.println("syncMatrix\t" + syncMessage + " SessionId Payload:\t" + payload);
-            synchronized (session) {
-                if (session.isOpen()) { // this works without all the other bull shit....ORIGINAL
-                    session.sendMessage(new TextMessage(syncMatrix.toString()));
-                }
-            }
+
+            // JSONObject syncMatrix = new JSONObject() // 08 31 2025 commented these out, why do we need to send it back, it is just for syncing to Map!
+            //     .put("type", "updateGameState")
+            //     .put("updateType", "syncMatrix")
+            //     .put("sessionId", session.getId())
+            //     .put("wordRowArrayState", matrixArrayStr);
+            // synchronized (session) {
+            //     if (session.isOpen()) { // this works without all the other bull shit....ORIGINAL
+            //         session.sendMessage(new TextMessage(syncMatrix.toString()));
+            //     }
+            // }
         }
         if (msg.getString("type").equals("updateKeyboardState")) {
             String payload = session.getId();
-            String keyboardStateStr = msg.optString("keyboardState", "[{ class: '' }]");
+            String keyboardStateStr = msg.optString("keyboardState", "[{ class: '', value: '' }]");
             JSONObject kbState = new JSONObject().put("keyboardState", keyboardStateStr);
             keyboardStateMap.put(session, kbState);
 
-            JSONObject syncKeyboardState = new JSONObject()
-                .put("keyboardState", keyboardStateStr);
-            synchronized (session) {
-                if (session.isOpen()) { // this works without all the other bull shit....ORIGINAL
-                    session.sendMessage(new TextMessage(syncKeyboardState.toString()));
-                }
-            }
+            // JSONObject syncKeyboardState = new JSONObject() // 08 31 2025 commented these out, why do we need to send it back, it is just for syncing to Map!
+            //     .put("keyboardState", keyboardStateStr);
+            // synchronized (session) {
+            //     if (session.isOpen()) { // this works without all the other bull shit....ORIGINAL
+            //         session.sendMessage(new TextMessage(syncKeyboardState.toString()));
+            //     }
+            // }
         }
         else if (roomSessions != null) { // 08 26 2025, this is what is letting your append letters go through...
             String payload = message.getPayload();
-            // System.out.println("Received payload:\t" + payload);
             for(WebSocketSession s : roomSessions) {
                 synchronized(s) {
                     if (s.isOpen()) {
@@ -245,7 +245,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        incRow.set(0);
+        // incRow.set(0);
         String roomId = getRoomId(session);
         List<WebSocketSession> roomSessions = rooms.get(roomId);
         if (roomSessions != null) {

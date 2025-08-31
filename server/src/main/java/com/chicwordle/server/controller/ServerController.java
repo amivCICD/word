@@ -1,6 +1,7 @@
 package com.chicwordle.server.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chicwordle.server.WordOfTheDay;
 import com.chicwordle.server.services.NewGameWordService;
+import com.chicwordle.server.wotddefinition.WordDefinitionFetch;
 
 import jakarta.annotation.PostConstruct;
 
@@ -27,18 +29,42 @@ public class ServerController {
     public void initNewGameWord() { newGameWordService.initNewGameWord(); }
 
 	@GetMapping(value = "/wordoftheday", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, String> dailyWordMap() {
+	public Map<String, Object> dailyWordMap() {
          // prepare service to have a word on new game click
-		Map<String, String> response = new HashMap<>();
-		response.put("word", wordOfTheDay.setSQLWordOfDay().dailyWord());
+		Map<String, Object> response = new HashMap<>();
+		String word = wordOfTheDay.setSQLWordOfDay().dailyWord();
+		response.put("word", word);
+
+		WordDefinitionFetch wordDefinitionFetch = new WordDefinitionFetch(word);
+		try {
+			wordDefinitionFetch.fetchDefinition();
+			List<String> wordDefinition = wordDefinitionFetch.getDefinition();
+			response.put("wordDefinition", wordDefinition);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("wordDefinition", "Definition Unavailable");
+		}
+
 		return response;
 	}
 	@GetMapping(value = "/newgameword", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, String> newGameWordMap() {
-		Map<String, String> response = new HashMap<>();
+	public Map<String, Object> newGameWordMap() {
+		Map<String, Object> response = new HashMap<>();
 
-        System.out.println("```newGameWordService.getNewGameWord()```\t" + newGameWordService.getNewGameWord());
-        response.put("word", newGameWordService.getNewGameWord());
+		String word = newGameWordService.getNewGameWord();
+        System.out.println("```newGameWordService.getNewGameWord()```\t" + word);
+        response.put("word", word);
+
+		WordDefinitionFetch wordDefinitionFetch = new WordDefinitionFetch(word);
+		try {
+			wordDefinitionFetch.fetchDefinition();
+			List<String> wordDefinition = wordDefinitionFetch.getDefinition();
+			response.put("wordDefinition", wordDefinition);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("wordDefinition", "Definition Unavailable");
+		}
 		// response.put("word", wordOfTheDay.newGameWordOfDay()); // old, generates too many random words.. 08 22 2025
 		return response;
 	}

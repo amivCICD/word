@@ -26,6 +26,7 @@ let typeOutGuessGameState = {
     userInput: "",
     letterCount: 0,
     wordOfTheDay: "",
+    wordDefinition: [],
     gameComplete: false,
     rowLetterCount: 0,
     gameStateParam: undefined,
@@ -222,18 +223,7 @@ function updateGameState(data) {
     } else if (data.updateType === "syncStateToServer") {
         console.log('typeOutGuessGameState.matrixArray from updateState\t', typeOutGuessGameState.matrixArray)
     } else if (data.updateType === "syncMatrix") {
-        const state = getGameState();
-        // if (state.keyboardState.length) {
-        //     document.querySelectorAll("kbd").forEach((key, i) => {
-        //         console.log("fired off")
-        //         key.className = state.keyboardState[i].classList.value;
-        //     });
-        // }
         // console.log("data from SYNCMATRIX\t", data.keyboardState);
-        // console.log("state data from SYNCMATRIX\t", state.keyboardState);
-        // console.log("@updateType syncMatrix: data.incRow\t", data.incRow);
-        // console.log("state.currentPlayer\t", state.currentPlayer)
-        // typeOutGuessGameState.incRow = data.incRow; // didnt work, but did reset incRow for both players...
     }
 }
 
@@ -251,6 +241,7 @@ function updatePlayerState(data) {
         allPlayers = [player];
     } else if (data.updateType === "addPlayer") {
         // console.log("data from addPlayer\t", data);
+        // console.log("data from addPlayer data.playerCount\t", data.playerCount);
 
         if (Array.isArray(data.playerCount)) {
             const incomingPlayers = JSON.stringify(data.playerCount);
@@ -314,16 +305,23 @@ function updatePlayerState(data) {
                             });
                         });
                     }
-
                 }
-
                 const kbState = JSON.parse(currentPlayer.keyboardState);
                 if (localUserId !== currentPlayer.userId && kbState.length > 1) {
-                    document.querySelectorAll("kbd").forEach((key, i) => {
-                        key.className = kbState[i].class;
+                    kbState.forEach((changedKey: { value: string, class: string }) => {
+                        const currentKeys = Array.from(document.querySelectorAll("kbd"))
+                            .find((k) => k.innerHTML === changedKey.value)
+                        if (currentKeys) {
+                            currentKeys.className = changedKey.class;
+                        }
                     });
                 }
             }
+            // const localUser = localStorage.getItem("username");
+            // const localUserData = JSON.parse(localUser);
+            // const localUserId = localUserData.userId.toString();
+            // const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+
         }
 
         const localUserInfo = localStorage.getItem("username");
@@ -338,18 +336,45 @@ function updatePlayerState(data) {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
     } else if (data.updateType === "nextPlayer") {
-        // console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
-        // state.incRow = JSON.parse(data.incRow);
+        console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
+        console.log("JSON.parse(data.nextPlayer)\t", JSON.parse(data.nextPlayer));
+        console.log("JSON.parse(data.incRow)\t", JSON.parse(data.incRow));
+        state.incRow = JSON.parse(data.incRow);
         state.currentPlayer = JSON.parse(data.currentPlayer); // this will move our next player
-        // console.log("state.currentPlayer\t", state.currentPlayer);
-        // state.currentPlayer.incRow = state.incRow;
+        state.currentPlayer.incRow = data.incRow;
         // console.log("state.currentPlayer + incRow\t", state.currentPlayer);
         // 03 26 2025 - 12:16 AM
         // HERES AN IDEA, DITCH THE isFirstPlayer, and just run it off state, state.currentPlayer, and set it each time...then we are not updating anything, we are simply checking if localUserId === state.currentPlayer.userId
         const player = state.currentPlayer;
         const userTurn = document.getElementById("userTurn");
         userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${player.username}</div>`;
+
+    } else if (data.updateType === "getSyncedKeyboardCSS") {
+        console.log("syncKeyboardCSS FIRED OFFF@@@@@@@@@@@@@@");
+        const typeOutGuessGameState = getGameState();
+        // const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+        // console.log("allPlayers\t", allPlayers)
+        // console.log("currentPlayer\t", currentPlayer);
+        // const kbState = JSON.parse(currentPlayer.keyboardState);
+        // const kbState = false;
+        // console.log("data from syncKeyboardCSS\t", data)
+        // if (kbState) {
+        //     console.log("kbState data.keyboardState\t", kbState);
+        //     const localUserId = JSON.parse(localStorage.getItem("username")).userId;
+        //     if (localUserId !== currentPlayer.userId && kbState.length > 1) {
+        //         kbState.forEach((changedKey: { value: string, class: string }) => {
+        //             const currentKeys = Array.from(document.querySelectorAll("kbd"))
+        //                 .find((k) => k.innerHTML === changedKey.value)
+        //             if (currentKeys) {
+        //                 currentKeys.className = changedKey.class;
+        //             }
+        //         });
+        //     }
+        // }
+
+
     }
+
 }
 onMessage((e) => {
     const typeOutGuessGameState = getGameState();
@@ -386,6 +411,7 @@ onMessage((e) => {
         // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
         typeOutGuessGameState.resetGameState = data.resetGameState.reset;
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
+        typeOutGuessGameState.wordDefinition = data.wordDefinition;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
         // state.gameOver =  data.gameOver;
         typeOutGuessGameState.letterCount = 0;
@@ -468,7 +494,7 @@ function updateTextState(data) {
 }
 
 function checkForPlayerCount(data) {
-    // console.log("checkForPlayerCount DATA\t", data);
+    console.log("checkForPlayerCount DATA\t", data);
     const state = getGameState();
     swapPlayersFrontEnd(state, true, data);
 

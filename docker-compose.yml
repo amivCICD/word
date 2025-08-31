@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.8"
 
 services:
   chicwordle:
@@ -8,4 +8,10 @@ services:
       dockerfile: ./Dockerfile
       ports:
         - 1985:1985
+      volumes:
+        - chicwordle_data:/app/data
+      environment:
+        - APP_DBPATH=/app/data/chicwordle.db
+volumes:
+  chicwordle_data
 

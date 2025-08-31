@@ -4,6 +4,11 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
+    08 31 2925 - when user joins toward end of match, game over does not fire if they miss all characters...
+    08 31 2925 - keyboard state was left over on a server error, to only 1 player, even after game restart
+    08 30 2025 - add "HINT" button, provides dictionary definition, perhaps uses word in a sentence
+    02 23 2025 - provide dictionary definition of the word after game end CHECK √
+
     08 29 2025 - word state is syncing with new user joining, but not Keyboard colors... CHECK √
                     ♣ only ONE user clicks restart, so it doesnt actually send the gameStateParam.reset to the other users... CHECK √
         notes: I believe the reset on click is not fully resetting both users, on a fresh game it works CHECK √
@@ -22,7 +27,6 @@
     03 04 2025 - Upon user rejoining or joining mid game, must post game state
     02 27 2025 - add an initial setup window event listener to cancel input on appendGuess.ts when user is going through the modal process, e.g. for enter button on startGameButton, closeModalButton, possibly usernameBtn
     03 04 2025 - ResetGameState is where everything gets set after start new game buttton, so we need to add it to a message? CHECK √
-    02 23 2025 - provide dictionary definition of the word after game end
     03 10 2025 - if is current users turn and they leave, must move to next player....add block to ChatWebSocketHandler CHECK √
     08 29 2025 - add loading spinners on game reset and socket load... CHECK √
     consider a server with a single word of the day... CHECK √ 08 10 2024 @ActuallyCompleted 08 22 2025, added word service to spread word to /newgameword endpoint

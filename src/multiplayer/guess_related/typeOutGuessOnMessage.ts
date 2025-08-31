@@ -47,7 +47,9 @@ document.addEventListener("websocket-ready", () => {
                                 col.value = state.arrayOfRowArrays[rowIdx][colIdx]?.innerHTML || "";
                             });
                         });
-                        state.keyboardState = getCurrentKeyboardState().map((k) => ({ class: k.classList.value }));
+                        state.keyboardState = getCurrentKeyboardState()
+                            .filter((keys) => keys.classList.value !== "kbd text-pink-200 bg-black h-20")
+                            .map((k) => ({ class: k.classList.value, value: k.innerHTML }));
 
                         syncNewCss(state.wordRowArrayState);
                         syncKeyboardCSS(state.keyboardState);
