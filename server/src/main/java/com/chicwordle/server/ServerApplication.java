@@ -25,7 +25,7 @@ public class ServerApplication {
 	@PostConstruct
 	public void init() {
 		File dbFile = new File(dbPath);
-		System.out.println("@@@@@@@@@@@@@@@@SQLite DB Path@@@@@@@@@@@@@@@@@@@@@\t" + dbFile.getAbsolutePath());
+		// System.out.println("@@@@@@@@@@@@@@@@SQLite DB Path@@@@@@@@@@@@@@@@@@@@@\t" + dbFile.getAbsolutePath());
 		try {
 			if (!dbFile.exists()) {
 				System.out.println("DB does not Exist! Generating database...");

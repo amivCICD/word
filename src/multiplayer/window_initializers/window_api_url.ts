@@ -1,5 +1,5 @@
-window.API_URL = "http://localhost:1985"; // development
-// window.API_URL = ""; // production
+// window.API_URL = "http://localhost:1985"; // development
+window.API_URL = ""; // production
 export const windowAPIURL = window.API_URL;
 
 

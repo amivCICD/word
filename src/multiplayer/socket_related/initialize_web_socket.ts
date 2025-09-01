@@ -336,9 +336,9 @@ function updatePlayerState(data) {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
     } else if (data.updateType === "nextPlayer") {
-        console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
-        console.log("JSON.parse(data.nextPlayer)\t", JSON.parse(data.nextPlayer));
-        console.log("JSON.parse(data.incRow)\t", JSON.parse(data.incRow));
+        // console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
+        // console.log("JSON.parse(data.nextPlayer)\t", JSON.parse(data.nextPlayer));
+        // console.log("JSON.parse(data.incRow)\t", JSON.parse(data.incRow));
         //////////////08 31 2025 leave these off, was changing the inc row dramatically
         // state.incRow = JSON.parse(data.incRow);
         // state.currentPlayer.incRow = data.incRow;

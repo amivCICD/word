@@ -183,9 +183,9 @@
 
 
 
-      const apiURL = windowAPIURL;
-      // const apiURL = "";
-      console.log('apiURL\t', apiURL);
+      // const apiURL = windowAPIURL; // 09 01 2025 previously set window.API_URL here
+      // const apiURL = ""; // production
+      // console.log('apiURL\t', apiURL);
       // console.log('window.API_URL\t', window.API_URL);
 
       const state = getGameState();
@@ -193,7 +193,7 @@
       const rowGameState = state.rowGameState;
       const guessStarted = state.guessStarted;
       const checkCompletionStatus = state.checkCompletionStatus;
-
+      // console.log(window.API_URL)
 
 
       // INIT
@@ -203,7 +203,7 @@
         const typeOutGuessGameState = getGameState();
         try {
            if (checkCompletionStatus.isCompleted()) {
-            fetchWord = await fetch(`${apiURL}/newgameword`, {
+            fetchWord = await fetch(`${windowAPIURL}/newgameword`, {
                   method: "GET",
                   headers: {
                     "mode": "cors",
@@ -211,7 +211,7 @@
                   }
                 });
           } else {
-            fetchWord = await fetch(`${apiURL}/wordoftheday`, {
+            fetchWord = await fetch(`${windowAPIURL}/wordoftheday`, {
               method: "GET",
               headers: {
                 "mode": "cors",
@@ -222,7 +222,6 @@
           if (fetchWord.ok) {
             const wotd = await fetchWord.json();
             console.log("wotd\t", wotd);
-            console.log("wotd.word in IIFE fetchWord.ok\t", wotd.word);
             resetGameState = new ResetGameState(true, wotd.word, wotd.wordDefinition);
             resetGameState.setResetFalse();
             typeOutGuessGameState.wordOfTheDay = resetGameState.wordOfTheDay;
@@ -264,7 +263,7 @@
             const typeOutGuessGameState = getGameState();
             (async () => {
               try {
-                const fetchWord = await fetch(`${apiURL}/newgameword`, {
+                const fetchWord = await fetch(`${windowAPIURL}/newgameword`, {
                   method: "GET",
                   headers: {
                     "mode": "cors",

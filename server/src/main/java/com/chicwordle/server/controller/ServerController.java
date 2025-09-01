@@ -17,8 +17,8 @@ import com.chicwordle.server.wotddefinition.WordDefinitionFetch;
 import jakarta.annotation.PostConstruct;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173") // use for dev
-// @CrossOrigin(origins = "http://localhost:1985") // remove for production
+// @CrossOrigin(origins = "http://localhost:5173") // use for dev
+@CrossOrigin(origins = "http://localhost:1985") // remove for production
 public class ServerController {
 	private final WordOfTheDay wordOfTheDay = new WordOfTheDay();
 

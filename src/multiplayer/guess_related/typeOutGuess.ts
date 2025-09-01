@@ -12,10 +12,10 @@ export async function typeOutGuess( // used mostly in index.html
     const state = getGameState();
     state.wordOfTheDayLetters = wordOfTheDayLetters;
     // who passes type out guess its stuff?
-    console.log("wordOfTheDay in typeOutGuess.ts\t", wordOfTheDay)
+    // console.log("wordOfTheDay in typeOutGuess.ts\t", wordOfTheDay);
 
     if (gameStateParam.reset) {
-        console.log("WE HIT THE gameStateParam.reset in typeOutGuess.ts")
+        // console.log("WE HIT THE gameStateParam.reset in typeOutGuess.ts");
         // if (state.currentUser.userId === currentUser.userId.toString()) { // YES but then it doesnt reset the others state, only issue is really the word of the day matching...get from server...
             // sendMessage(JSON.stringify({
             //     type: "updateGameState",
@@ -135,10 +135,10 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         const currentPlayer = players[nextPlayerIndex]; // new next player
         const nextPlayer = players[currentPlayerIndex]; // player after..
         // state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
-        console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
-        console.log("nextPlayer\t", nextPlayer);
+        // console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
+        // console.log("nextPlayer\t", nextPlayer);
 
-        console.log("state.incRow in typeOutGuess swapPlayersFrontEnd\t", state?.incRow)
+        // console.log("state.incRow in typeOutGuess swapPlayersFrontEnd\t", state?.incRow)
 
         if (cp.userId === localUserId) { // ??
             sendMessage(JSON.stringify({

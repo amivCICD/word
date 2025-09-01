@@ -8,7 +8,7 @@ export function wordDefinitionProvider() {
     if (definitions.length >= 1) {
         paragraphs.forEach(p => {
             p.innerHTML = definitions.map((def) => {
-                return `<span class="italic">${def.charAt(0).toUpperCase()}${def.slice(1)}.</span>`;
+                return `<span class="italic">${def.charAt(0).toUpperCase()}${def.slice(1)}. </span>`;
             }).join("");
         });
     }
