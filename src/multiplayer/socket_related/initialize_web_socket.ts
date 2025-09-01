@@ -339,9 +339,11 @@ function updatePlayerState(data) {
         console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
         console.log("JSON.parse(data.nextPlayer)\t", JSON.parse(data.nextPlayer));
         console.log("JSON.parse(data.incRow)\t", JSON.parse(data.incRow));
-        state.incRow = JSON.parse(data.incRow);
+        //////////////08 31 2025 leave these off, was changing the inc row dramatically
+        // state.incRow = JSON.parse(data.incRow);
+        // state.currentPlayer.incRow = data.incRow;
+        //////////////////////////
         state.currentPlayer = JSON.parse(data.currentPlayer); // this will move our next player
-        state.currentPlayer.incRow = data.incRow;
         // console.log("state.currentPlayer + incRow\t", state.currentPlayer);
         // 03 26 2025 - 12:16 AM
         // HERES AN IDEA, DITCH THE isFirstPlayer, and just run it off state, state.currentPlayer, and set it each time...then we are not updating anything, we are simply checking if localUserId === state.currentPlayer.userId

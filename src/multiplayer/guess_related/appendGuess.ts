@@ -62,7 +62,7 @@ export async function appendGuess( // used in: handleGuess.ts as: const newRow =
         gameState.appendGuess = "";
     }
     gameState.c = 0;
-    gameState.incRow++;
+    gameState.incRow = gameState.incRow + 1;
     guessStarted.setGuessStartedFalse();
     return { incRow: gameState.incRow, restart: gameState.restart, wordOfTheDay };
 }

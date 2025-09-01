@@ -138,6 +138,8 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
         console.log("nextPlayer\t", nextPlayer);
 
+        console.log("state.incRow in typeOutGuess swapPlayersFrontEnd\t", state?.incRow)
+
         if (cp.userId === localUserId) { // ??
             sendMessage(JSON.stringify({
                 type: "updatePlayerState",
