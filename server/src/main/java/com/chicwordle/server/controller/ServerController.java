@@ -18,7 +18,8 @@ import jakarta.annotation.PostConstruct;
 
 @RestController
 // @CrossOrigin(origins = "http://localhost:5173") // use for dev
-@CrossOrigin(origins = { "http://localhost:1985", "https://word.es9.app" }) // remove for production
+// @CrossOrigin(origins = "http://localhost:1985") // use for dev
+@CrossOrigin(origins = { "http://localhost:1985", "https://word.es9.app", "http://localhost:5173" }) // remove for production
 public class ServerController {
 	private final WordOfTheDay wordOfTheDay = new WordOfTheDay();
 
