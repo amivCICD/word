@@ -1,5 +1,6 @@
 package com.chicwordle.server.websockethandler;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -102,14 +103,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                             .put("keyboardState", keyboardInfo != null ? keyboardInfo.optString("keyboardState", "[]") : "[]")
                             .put("isFirstPlayer", currentPlayerInfo != null && currentPlayerInfo.optBoolean("isFirstPlayer", false));
                     }).collect(Collectors.toList()));
-                    System.out.println("playerDataPayload\t" + playerDataPayload.toString());
-            for(WebSocketSession s : roomSessions) {
-                synchronized (s) {
-                    if (s.isOpen()) {
-                        s.sendMessage(new TextMessage(playerDataPayload.toString()));
+                    // System.out.println("playerDataPayload\t" + playerDataPayload.toString());
+                    System.out.println("Payload size: " + playerDataPayload.toString().getBytes(StandardCharsets.UTF_8).length + " bytes");
+
+            // for(WebSocketSession s : roomSessions) { // when this is turned off, we don't swap users
+                synchronized (session) {
+                    if (session.isOpen()) {
+                        session.sendMessage(new TextMessage(playerDataPayload.toString()));
                     }
                 }
-            }
+            // }
         }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("getSyncedKeyboardCSS")) {
             JSONObject keyboardState = keyboardStateMap.get(session);
@@ -130,13 +133,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
         }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("nextPlayer")) {
-            // we are calling this when a player leaves in order to move to next player, and therefore incrementing twice, but front end doesnt stick with this inc row
-            // happens in typeout guess, the player swap
+
             String frontEndIncRow = msg.getString("incRow");
-            System.out.println("@@@@nextPlayer frontEndIncRow in ServerSide@@@@\t" + frontEndIncRow);
-            System.out.println("@@@@nextPlayer incRow in ServerSide Before Increment@@@@\t" + incRow);
-            incRow.set(incRow.incrementAndGet() % 6);
-            System.out.println("@@@@nextPlayer incRow in ServerSide@@@@\t" + incRow);
+            // if (msg.getString("didQuit").equals("false")) {
+                System.out.println("@@@@nextPlayer frontEndIncRow in ServerSide@@@@\t" + frontEndIncRow);
+                System.out.println("@@@@nextPlayer incRow in ServerSide Before Increment@@@@\t" + incRow);
+                incRow.set(incRow.incrementAndGet() % 6);
+                System.out.println("@@@@nextPlayer incRow in ServerSide@@@@\t" + incRow);
+            // }
+            // we are calling this when a player leaves in order to move to next player, and therefore incrementing twice, but front end doesnt stick with this inc row
+            // happens in typeout guess, the player_swap()
 
             ////////////////
             String currentPlayer = msg.getString("currentPlayer");
@@ -185,6 +191,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             matrixArrayMap.clear();
             keyboardStateMap.clear();
             incRow.set(0);
+            System.out.println("incRow.get() in resetGameState\t" + incRow.get());
             boolean resetGameState = true;
             JSONObject gameReset = new JSONObject()
                 .put("type", "updateGameState")
