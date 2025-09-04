@@ -106,13 +106,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     // System.out.println("playerDataPayload\t" + playerDataPayload.toString());
                     System.out.println("Payload size: " + playerDataPayload.toString().getBytes(StandardCharsets.UTF_8).length + " bytes");
 
-            // for(WebSocketSession s : roomSessions) { // when this is turned off, we don't swap users
+            for(WebSocketSession s : roomSessions) { // when this is turned off, we don't swap users
                 synchronized (session) {
                     if (session.isOpen()) {
                         session.sendMessage(new TextMessage(playerDataPayload.toString()));
                     }
                 }
-            // }
+            }
         }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("getSyncedKeyboardCSS")) {
             JSONObject keyboardState = keyboardStateMap.get(session);
