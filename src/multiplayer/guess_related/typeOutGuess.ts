@@ -106,7 +106,6 @@ export function syncKeyboardCSS(updatedKeyboardState: []) {
 }
 
 export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeftData) {
-    // console.log("state.incRow in swapPlayersFrontEnd()\t", state.incRow);
     let players = getPlayerState();
     if (playerHasLeft) {
         let indexOfLeaver = players.findIndex(player => player.userId === playerHasLeftData.userId);
@@ -138,7 +137,6 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         // console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
         // console.log("nextPlayer\t", nextPlayer);
 
-        // console.log("state.incRow in typeOutGuess swapPlayersFrontEnd\t", state?.incRow)
 
         if (cp.userId === localUserId) { // ??
             sendMessage(JSON.stringify({
@@ -146,8 +144,9 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
                 updateType: "nextPlayer",
                 currentPlayer: JSON.stringify(currentPlayer),
                 nextPlayer: JSON.stringify(nextPlayer),
-                incRow: JSON.stringify(state.incRow)
-                // incRow: state.incRow
+                incRow: JSON.stringify(state.incRow),
+                didQuit: JSON.stringify(false)
+                // incRow: JSON.stringify(state.row)
             }));
         }
     } else if (players.length === 1) {
@@ -158,7 +157,9 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
                 updateType: "nextPlayer",
                 currentPlayer: JSON.stringify(players[0]),
                 nextPlayer: JSON.stringify(players[0]),
-                incRow: JSON.stringify(state.incRow)
+                incRow: JSON.stringify(state.incRow),
+                didQuit: JSON.stringify(true)
+                // incRow: JSON.stringify(state.row)
                 // incRow: state.incRow
             }));
         }

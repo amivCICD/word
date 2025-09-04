@@ -4,7 +4,18 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
-    08 31 2925 - when user joins toward end of match, game over does not fire if they miss all characters...
+    09 04 2025 - temporary HACK on line 336 in initialize_web_sockets.ts
+                ♣ incRow is going off of index.html gamestate (row)
+                ♣ when user leaves, we are calling swapPlayers() (to swap back to player, but it does incRow on swap?)
+                ♣ JSON.parse(data.currentPlayer) in init_web_socket.ts 393 has a huge data load even after new game start (probably a redrawn blank state)
+                ♣
+
+    09 01 2025 - (in live)
+                ♣ incRow is getting screwed up when a user joins and rejoins
+                ♣ user can type when it is not their turn
+                ♣ server crashes on large payloads of UI data
+                ♣ investigate if two users in different rooms can change the word of day and if we need to store that word per room
+    08 31 2925 - when user joins toward end of match, game over does not fire if they miss all characters...(I believe because server was crashing)
     08 31 2925 - keyboard state was left over on a server error, to only 1 player, even after game restart
     08 30 2025 - add "HINT" button, provides dictionary definition, perhaps uses word in a sentence
     02 23 2025 - provide dictionary definition of the word after game end CHECK √

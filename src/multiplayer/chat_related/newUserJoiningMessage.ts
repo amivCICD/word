@@ -23,8 +23,8 @@ export function newUserJoiningMessage() {
             userId: userId.toString(),
             score: { letters: [] },
             wordRowArrayState: JSON.stringify(state.wordRowArrayState),
-            keyboardState: JSON.stringify(getCurrentKeyboardState().map((key) => ({ class: key.className.value })))
-            // incRow: JSON.stringify(state.incRow) // the server is handling incRow, shouldnt need this 03 31 2025
+            keyboardState: JSON.stringify(getCurrentKeyboardState().map((key) => ({ class: key.className.value }))),
+            // incRow: state.incRow // the server is handling incRow, shouldnt need this 03 31 2025
             // gameState: JSON.stringify(state)
             // matrixArray: JSON.stringify(state.matrixArray) // was working, moving to above 03 05 2025
             // isCurrentPlayer: !playerState.allPlayers.length

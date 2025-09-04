@@ -35,10 +35,10 @@
 
       </div>
 
-        <div id="chatBar" class="collapse bg-white absolute right-2 top-2 w-80 text-pink-300">
+        <div id="chatBar" class="collapse bg-white absolute right-2 top-2 w-24 lg:w-80 text-pink-300">
           <input id="arrowBar" type="checkbox" />
           <div class="collapse-title text-xl font-medium">
-            <div class="flex flex-row justify-between">
+            <div class="flex flex-row justify-start lg:justify-between">
               <div>Chat</div>
               <div id="arrowDown" class="text-xl font-bold">&#9660;</div>
               <div id="arrowUp" class="text-xl font-bold hidden">&#9650;</div>
@@ -169,6 +169,8 @@
 
       function setLocalCurrentPlayer() {
         const localStorageUser = localStorage.getItem("username");
+        // console.log("index.html localStorageUser\t", localStorageUser); // this is fine
+
         let localCurrentPlayer;
         let localCurrentPlayerId;
         if (localStorageUser !== null) {
@@ -176,25 +178,17 @@
           localCurrentPlayerId = localCurrentPlayer.userId;
           return localCurrentPlayerId;
         } else {
+          console.error("Local Current Player Id not found");
           // throw new Error("Local Current Player Id not found");
           return;
         }
       }
-
-
-
-      // const apiURL = windowAPIURL; // 09 01 2025 previously set window.API_URL here
-      // const apiURL = ""; // production
-      // console.log('apiURL\t', apiURL);
-      // console.log('window.API_URL\t', window.API_URL);
 
       const state = getGameState();
       const gameOver = state.gameOver;
       const rowGameState = state.rowGameState;
       const guessStarted = state.guessStarted;
       const checkCompletionStatus = state.checkCompletionStatus;
-      // console.log(window.API_URL)
-
 
       // INIT
       (async () => {
@@ -314,7 +308,9 @@
         const gameState = getGameState();
         // console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer);
         // let globalCurrentPlayer = JSON.parse(gameState.currentPlayer);
+        console.log("INDEX.HTML gameState\t", gameState)
         let globalCurrentPlayer = gameState.currentPlayer;
+        console.log("globalCurrentPlayer\t", globalCurrentPlayer)
         // console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer); // 08 28 2025 come back to this later to check why null when users leave
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
 
@@ -331,13 +327,7 @@
         let filteredValue = checkInputValues(e.key.toUpperCase());
         const typeOutGuessGameState = getGameState();
         console.log("typeOutGuessGameState.incRow\t", typeOutGuessGameState.incRow);
-        // console.log("typeOutGuessGameState.row\t", typeOutGuessGameState.row);
-        // typeOutGuess(
-        //   filteredValue,
-        //   resetGameState,
-        //   resetGameState.wordOfTheDay,
-        //   resetGameState.wordOfTheDayLetters,
-        // );
+
         document.querySelectorAll('.kbd').forEach((keys) => {
           if (filteredValue === keys.innerHTML) {
             keys.classList.add("bg-pink-200");
@@ -359,12 +349,7 @@
           let letter = e.target.innerHTML;
           let filteredValue = checkInputValues(letter);
           const typeOutGuessGameState = getGameState();
-          // typeOutGuess(
-          //   filteredValue,
-          //   resetGameState,
-          //   resetGameState.wordOfTheDay,
-          //   resetGameState.wordOfTheDayLetters
-          // );
+
           typeOutGuess(filteredValue, no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
         });
         keys.addEventListener('mousedown', e => {
@@ -379,12 +364,7 @@
         if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
           return;
         }
-        // typeOutGuess(
-        //   "BACKSPACE",
-        //   resetGameState,
-        //   resetGameState.wordOfTheDay,
-        //   resetGameState.wordOfTheDayLetters
-        // );
+
         const typeOutGuessGameState = getGameState();
         typeOutGuess("BACKSPACE", no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
       });
@@ -392,12 +372,7 @@
         if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
           return;
         }
-        // typeOutGuess(
-        //   "ENTER",
-        //   resetGameState,
-        //   resetGameState.wordOfTheDay,
-        //   resetGameState.wordOfTheDayLetters
-        // );
+
         const typeOutGuessGameState = getGameState();
         typeOutGuess("ENTER", no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
       });

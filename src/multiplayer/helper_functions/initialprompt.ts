@@ -9,6 +9,8 @@ import { setInitialPromptReady } from "../window_initializers/setInitialPromptRe
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const initialRoomId = urlParams.get("room");
+    console.log("window.location.pathname.includes('/multi_player/chat')\t", window.location.pathname.includes('/multi_player/chat'));
+
     if (initialRoomId && window.location.pathname.includes('/multi_player/chat')) {
         initializeSocket(initialRoomId);
         document.getElementById("usernamePrompt").showModal();
@@ -45,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } else {
         console.log("WE ARE HITTING THE ELSE IN INITIAL PROMPT");
-
+        console.log("usernameExists\t", usernameExists)
         document.getElementById("usernamePrompt").showModal();
         if (usernameExists) {
             playMultiPlayerAfterUsername(roomId);
