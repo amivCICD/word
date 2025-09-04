@@ -130,6 +130,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
         }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("nextPlayer")) {
+            // we are calling this when a player leaves in order to move to next player, and therefore incrementing twice, but front end doesnt stick with this inc row
+            // happens in typeout guess, the player swap
             String frontEndIncRow = msg.getString("incRow");
             System.out.println("@@@@nextPlayer frontEndIncRow in ServerSide@@@@\t" + frontEndIncRow);
             System.out.println("@@@@nextPlayer incRow in ServerSide Before Increment@@@@\t" + incRow);
@@ -258,7 +260,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        incRow.set(0);
+        // incRow.set(0);
         i = 0;
         String roomId = getRoomId(session);
         List<WebSocketSession> roomSessions = rooms.get(roomId);
