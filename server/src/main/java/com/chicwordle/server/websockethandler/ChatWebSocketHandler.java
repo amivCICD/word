@@ -66,17 +66,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             if (!currentPlayerMap.containsKey(session)) {
                 currentPlayerMap.put(session, user);
             }
-            System.out.println("username: " + username + " SessionId Payload:\t" + payload);
+            System.out.println("username: " + username + "\nSessionId Payload:\t" + payload);
 
-            currentPlayerMap.forEach((player, json) -> {
-                System.out.println("session\t" + player + "\njson\t" + json);
-            });
-            System.out.println("----------------------");
-            roomSessions.forEach(s -> {
-                JSONObject dbg = currentPlayerMap.get(s);
-                System.out.println("Room session: " + s.getId() + " -> " + (dbg != null ? dbg.toString() : "null"));
-            });
-            System.out.println("----------------------");
+            getPlayers();
+
 
             JSONObject playerDataPayload = new JSONObject()
                 .put("type", "updatePlayerState")
@@ -105,11 +98,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     }).collect(Collectors.toList()));
                     // System.out.println("playerDataPayload\t" + playerDataPayload.toString());
                     System.out.println("Payload size: " + playerDataPayload.toString().getBytes(StandardCharsets.UTF_8).length + " bytes");
+                    System.out.println("----------currentPlayerMap.get(s)------------");
+                    roomSessions.forEach(s -> {
+                        JSONObject dbg = currentPlayerMap.get(s);
+                        System.out.println("Room session: " + s.getId() + " -> " + (dbg != null ? dbg.toString() : "null"));
+                    });
+                    System.out.println("---------^currentPlayerMap.get(s)^-----------");
 
-            for(WebSocketSession s : roomSessions) { // when this is turned off, we don't swap users
-                synchronized (session) {
-                    if (session.isOpen()) {
-                        session.sendMessage(new TextMessage(playerDataPayload.toString()));
+            for(WebSocketSession s : roomSessions) { // 09 04 2025 when we dont broadcast to all, then players dont swap, but we also dont crash the server...
+                synchronized (s) {
+                    if (s.isOpen()) {
+                        s.sendMessage(new TextMessage(playerDataPayload.toString()));
                     }
                 }
             }
@@ -188,6 +187,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("serverWordOfTheDay", newGameWord);
             newGameWotdMap.put(session, newGameWotdObject);
 
+            // currentPlayerMap.clear(); // 09 04 2025 added to test, then removed!
             matrixArrayMap.clear();
             keyboardStateMap.clear();
             incRow.set(0);
