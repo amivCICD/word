@@ -19,6 +19,7 @@ public class WordDefinitionFetch implements WordDefinitionInterface {
     public WordDefinitionFetch(String wotd) {
         this.wotd = wotd;
     }
+
     @Override
     public List<String> getDefinition() {
         return wotd_definition;

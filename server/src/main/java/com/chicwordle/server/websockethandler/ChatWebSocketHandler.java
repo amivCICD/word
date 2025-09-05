@@ -18,10 +18,12 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.chicwordle.server.services.NewGameWordService;
 
+
 @Component
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private NewGameWordService newGameWordService;
+
 
     private final Map<String, List<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> currentPlayerMap = new ConcurrentHashMap<>();
@@ -30,6 +32,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final Map<WebSocketSession, JSONObject> keyboardStateMap = new ConcurrentHashMap<>();
     private final AtomicInteger incRow = new AtomicInteger(0);
     private int i = 0;
+
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -182,6 +185,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             String userWhoClicked = msg.getString("userWhoClicked");
             String newGameWord = newGameWordService.getNewGameWord();
             System.out.println("@@@@@@@@@@@ngword in websockerHandler@@@@@@@@\t" + newGameWord + "\t@@@@@@@@");
+
 
             JSONObject newGameWotdObject = new JSONObject()
                 .put("serverWordOfTheDay", newGameWord);

@@ -38,6 +38,7 @@ public class ServerController {
 
 		WordDefinitionFetch wordDefinitionFetch = new WordDefinitionFetch(word);
 		try {
+			// wordDefinitionFetch.fetchDefinition();
 			wordDefinitionFetch.fetchDefinition();
 			List<String> wordDefinition = wordDefinitionFetch.getDefinition();
 			response.put("wordDefinition", wordDefinition);
