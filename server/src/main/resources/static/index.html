@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" scroll-behavior="smooth" class="h-screen sm:h-screen bg-white bg-[url('/cozy_blanket.webp')] bg-cover bg-no-repeat m-0 p-1 pb-10">
+<html lang="en" scroll-behavior="smooth" class="h-screen bg-white m-0">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,13 +7,13 @@
     <link rel="icon" href="./assets/favicon-yxfIvqst.ico" type="image/x-icon">
     <title>Chic Wordle</title>
 
-    <script type="module" crossorigin src="./assets/main-BMsjQrYH.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/window_api_url-Dfp1MLwI.js">
-    <link rel="stylesheet" crossorigin href="./assets/window_api_url-CH8Q33jS.css">
+    <script type="module" crossorigin src="./assets/main-Dkb4jJoV.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/window_api_url-DxKiEW3V.js">
+    <link rel="stylesheet" crossorigin href="./assets/window_api_url-JBLfLs2k.css">
   </head>
-  <body>
+  <body class="bg-[url('/cozy_blanket.webp')] bg-cover bg-no-repeat">
     <div id="app" class="bg-transparent w-full h-full sm:w-1/2 mx-auto">
-      <div class="bg-transparent p-1 sm:p-4 flex flex-row  items-center justify-start">
+      <div class="bg-transparent p-1 sm:p-4 flex flex-row items-center justify-start pb-14">
 
         <div class="drawer w-fit sm:hidden mb-1">
           <input id="my-drawer" type="checkbox" class="drawer-toggle" />
@@ -109,16 +109,19 @@
         <kbd class="kbd text-pink-200 bg-black h-20">M</kbd>
         <kbd id="backspace" class="kbd text-pink-200 bg-black font-bold w-16 sm:w-[73px] hover:cursor-pointer h-20">&lBarr;</kbd>
       </div>
-      <div class="items-center justify-center pt-6 sm:mt-5 pb-24 hidden sm:flex sm:flex-col gap-4">
+      <!-- <div class="items-center justify-center pt-6 sm:mt-5 pb-20 hidden sm:flex sm:flex-col gap-4"> -->
+      <div class="items-center justify-center pt-6 sm:mt-5 pb-20 flex flex-col gap-8">
         <div id="startNewGameBtn" class="startNewGame btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black hidden">Start New Game</div>
-
-        <a href="./multi_player/">
-          <div class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">
+        <div class="flex items-center justify-center">
+          <a href="./multi_player/">
+            <div class="btn p-2 rounded-md font-bold text-xl text-pink-300 bg-black">
               Play Multiplayer
-          </div>
-        </a>
+            </div>
+          </a>
+        </div>
 
       </div>
+
     </div>
 
 

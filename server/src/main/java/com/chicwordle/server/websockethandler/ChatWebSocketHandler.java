@@ -242,6 +242,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
+        if (msg.getString("type").equals("ping")) {
+            System.out.println("pong");
+        }
 
         if (msg.getString("type").equals("userleaving")) {
             currentPlayerMap.remove(session);
@@ -270,7 +273,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
     }
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         // incRow.set(0);
         i = 0;
         String roomId = getRoomId(session);
@@ -286,7 +289,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         keyboardStateMap.remove(session);
         newGameWotdMap.remove(session);
 
-        System.out.println("Session disconnected: " + session.getId());
+        System.out.println("Session disconnected: " + session.getId() + ", reason=" + status.getReason());
     }
     private String getRoomId(WebSocketSession session) {
         String query = session.getUri().getQuery();
