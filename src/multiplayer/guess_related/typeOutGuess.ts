@@ -144,7 +144,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
                 updateType: "nextPlayer",
                 currentPlayer: JSON.stringify(currentPlayer),
                 nextPlayer: JSON.stringify(nextPlayer),
-                incRow: JSON.stringify(state.incRow),
+                incRow: JSON.stringify(state.incRow % 6),
                 didQuit: JSON.stringify(false)
                 // incRow: JSON.stringify(state.row)
             }));
@@ -157,7 +157,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
                 updateType: "nextPlayer",
                 currentPlayer: JSON.stringify(players[0]),
                 nextPlayer: JSON.stringify(players[0]),
-                incRow: JSON.stringify(state.incRow),
+                incRow: JSON.stringify(state.incRow % 6),
                 didQuit: JSON.stringify(true)
                 // incRow: JSON.stringify(state.row)
                 // incRow: state.incRow

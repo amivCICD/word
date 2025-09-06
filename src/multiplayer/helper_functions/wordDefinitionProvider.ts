@@ -1,9 +1,10 @@
 import { getGameState } from "../socket_related/initialize_web_socket";
 
-export function wordDefinitionProvider() {
+export function wordDefinitionProvider() { // 09 04 2025
     const typeOutGuessGameState = getGameState();
     const definitions = typeOutGuessGameState.wordDefinition;
     const paragraphs = document.querySelectorAll('.wordDefinition');
+    console.log("definitions in WordDefinitionProvider()", definitions);
 
     if (definitions.length >= 1) {
         paragraphs.forEach(p => {

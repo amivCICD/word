@@ -283,7 +283,8 @@
                     updateType: "resetGameState",
                     resetGameState: resetGameState, // || reset: true
                     wordOfTheDay: typeOutGuessGameState.wordOfTheDay,
-                    wordDefinition: typeOutGuessGameState.wordDefinition,
+                    // wordDefinition: resetGameState.wordDefinition,
+                    wordDefinition: typeOutGuessGameState.wordDefinition, // 09 04 2025 should it be this?
                     wordOfTheDayLetters: typeOutGuessGameState.wordOfTheDayLetters,
                     gameOver: gameOver,
                     userWhoClicked: user,
@@ -292,7 +293,7 @@
                   }));
                   typeOutGuess(null, resetGameState, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
                   resetGameState.setResetFalse();
-                  wordDefinitionProvider();
+                  // wordDefinitionProvider(); 09 05 2025 moved to resetGameState in initialize_web_sockets.ts
                 }
               } catch (error) {
                 console.error(error);
@@ -305,11 +306,11 @@
       document.addEventListener('keydown', e => {
         let localCurrentPlayerId = setLocalCurrentPlayer();
         const playerState = getPlayerState();
-        const gameState = getGameState();
         // console.log("INDEX.HTML gameState.currentPlayer\t", gameState.currentPlayer);
         // let globalCurrentPlayer = JSON.parse(gameState.currentPlayer);
-        console.log("INDEX.HTML gameState\t", gameState)
+        const gameState = getGameState();
         let globalCurrentPlayer = gameState.currentPlayer;
+        console.log("INDEX.HTML gameState\t", gameState)
         console.log("globalCurrentPlayer\t", globalCurrentPlayer)
         // console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer); // 08 28 2025 come back to this later to check why null when users leave
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
@@ -334,16 +335,21 @@
           }
         });
         typeOutGuess(filteredValue, no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
-
-
       }); // initial listener
 
       const allKeysExceptBSEnter = Array.from(document.querySelectorAll('.kbd')).filter((key) => {
         return key.id.toLowerCase() !== "enter" && key.id.toLowerCase() !== "backspace"; // added to lowercase 02 23 2025
       });
       allKeysExceptBSEnter.forEach((keys) => {
+        let localCurrentPlayerId = setLocalCurrentPlayer();
+        const gameState = getGameState();
+        let globalCurrentPlayer = gameState.currentPlayer;
         keys.addEventListener('click', e => {
-          if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
+          if (window.textMessageOnly
+          || window.usernameInputOnly
+          || !window.WEB_SOCKET_READY
+          || !window.initialPromptReady
+          || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
             return;
           }
           let letter = e.target.innerHTML;
@@ -361,7 +367,14 @@
       });
 
       document?.getElementById('backspace').addEventListener('click', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
+        let localCurrentPlayerId = setLocalCurrentPlayer();
+        const gameState = getGameState();
+        let globalCurrentPlayer = gameState.currentPlayer;
+        if (window.textMessageOnly
+        || window.usernameInputOnly
+        || !window.WEB_SOCKET_READY
+        || !window.initialPromptReady
+        || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
           return;
         }
 
@@ -369,7 +382,14 @@
         typeOutGuess("BACKSPACE", no_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);
       });
       document?.getElementById('enter').addEventListener('click', e => {
-        if (window.textMessageOnly || window.usernameInputOnly || !window.WEB_SOCKET_READY || !window.initialPromptReady) {
+        let localCurrentPlayerId = setLocalCurrentPlayer();
+        const gameState = getGameState();
+        let globalCurrentPlayer = gameState.currentPlayer;
+        if (window.textMessageOnly
+        || window.usernameInputOnly
+        || !window.WEB_SOCKET_READY
+        || !window.initialPromptReady
+        || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
           return;
         }
 

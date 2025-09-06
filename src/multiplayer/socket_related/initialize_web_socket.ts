@@ -8,6 +8,7 @@ import { newUserJoiningMessage, userLeavingMessage } from "../chat_related/newUs
 import { swapPlayersFrontEnd } from "../guess_related/typeOutGuess";
 import { typeOutGuess } from "../guess_related/typeOutGuess";
 import { startLoadingSpinner, stopLoadingSpinner } from "../helper_functions/loadingSpinners";
+import { wordDefinitionProvider } from "../helper_functions/wordDefinitionProvider";
 
 
 
@@ -81,7 +82,7 @@ export function initializeSocket(roomId) {
         return socket;
     }
     if (socket) {
-        // cleanupSocket();
+        cleanupSocket();
         socket.close();
     }
 
@@ -93,14 +94,14 @@ export function initializeSocket(roomId) {
         newUserJoiningMessage();
         window.WEB_SOCKET_READY = true;
         document.dispatchEvent(new Event("websocket-ready"));
-        // stopLoadingSpinner();
+        stopLoadingSpinner(0);
 
-        // if(heartBeatInterval) clearInterval(heartBeatInterval);
-        // heartBeatInterval = window.setInterval(() => {
-        //     if (socket?.readyState === WebSocket.OPEN) {
-        //         socket.send(JSON.stringify({ type: "ping" }));
-        //     }
-        // }, 15000);
+        if(heartBeatInterval) clearInterval(heartBeatInterval);
+        heartBeatInterval = window.setInterval(() => {
+            if (socket?.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "ping" }));
+            }
+        }, 15000);
     };
     socket.onmessage = e => {
         let eventData = JSON.parse(e.data);
@@ -124,31 +125,31 @@ export function initializeSocket(roomId) {
     }
     socket.onclose = (e) => {
         console.log("Disconnected...\t", e.code, e.reason);
-        // cleanupSocket();
-        // scheduleReconnect(roomId);
+        window.WEB_SOCKET_READY = false;
+        cleanupSocket();
+        scheduleReconnect(roomId);
     };
     socket.onerror = (e) => console.error("Websocket Error:\t", e);
     return socket;
 }
-// function scheduleReconnect(roomId: string) {
-//     if (reconnectTimeout) clearTimeout(reconnectTimeout);
-//     reconnectTimeout = window.setTimeout(() => {
-//         console.log("Attempting Reconnect...");
-//         initializeSocket(roomId);
-//     }, 2000);
-//     stopLoadingSpinner();
-// }
-// function cleanupSocket() {
-//     if(heartBeatInterval) {
-//         clearInterval(heartBeatInterval);
-//         heartBeatInterval = null;
-//     }
-//     if(reconnectTimeout) {
-//         clearTimeout(reconnectTimeout);
-//         reconnectTimeout = null;
-//     }
-//     stopLoadingSpinner();
-// }
+function scheduleReconnect(roomId: string) {
+    if (reconnectTimeout) clearTimeout(reconnectTimeout);
+    if (window.WEB_SOCKET_READY === true) return;
+    reconnectTimeout = window.setTimeout(() => {
+        console.log("Attempting Reconnect...");
+        initializeSocket(roomId);
+    }, 2000);
+}
+function cleanupSocket() {
+    if(heartBeatInterval) {
+        clearInterval(heartBeatInterval);
+        heartBeatInterval = null;
+    }
+    if(reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+    }
+}
 
 export function getSocket() {
     if (!socket) {
@@ -275,6 +276,9 @@ function updatePlayerState(data) {
         console.log("data from addPlayer\t", data);
         console.log("data from addPlayer data.playerCount\t", data.playerCount);
         // console.log("data.playerCount.incRow\t", data.playerCount);
+        if (data.playerCount) {
+            allPlayers = [...data?.playerCount];
+        }
 
         if (Array.isArray(data.playerCount)) {
             const incomingPlayers = JSON.stringify(data.playerCount);
@@ -331,6 +335,7 @@ function updatePlayerState(data) {
                 const localUserData = JSON.parse(localUser);
                 const localUserId = localUserData.userId.toString();
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
+                typeOutGuessGameState.incRow = currentPlayer.incRow; // 09 04 2025 this hack temporarily works
                 console.log("currentPlayer.incRow\t", currentPlayer.incRow);
 
                 // typeOutGuessGameState.incRow = currentPlayer.incRow - 1; // this hack temporarily works
@@ -393,6 +398,7 @@ function updatePlayerState(data) {
         console.log("JSON.parse(data.currentPlayer)\t", d1);
         console.log("JSON.parse(data.nextPlayer)\t", d2);
         typeOutGuessGameState.currentPlayer = JSON.parse(data.currentPlayer); // this MOVES TO our next player: MUST have
+        // typeOutGuessGameState.incRow = d1.incRow;
         // typeOutGuessGameState.incRow = d1.incRow;
         // typeOutGuessGameState.currentPlayer.incRow = JSON.parse(data.currentPlayer.incRow);
         // 03 26 2025 - 12:16 AM
@@ -463,6 +469,9 @@ onMessage((e) => {
         // state.resetGameState = new ResetGameState(data.reset, data.wordOfTheDay);
         typeOutGuessGameState.resetGameState = data.resetGameState.reset;
         typeOutGuessGameState.wordOfTheDay = data.wordOfTheDay;
+        console.log("data.resetGameState.wordDefinition\t", data.resetGameState.wordDefinition);
+        console.log("data.wordDefinition\t", data.wordDefinition);
+        // typeOutGuessGameState.wordDefinition = data.resetGameState.wordDefinition; 09 04 2025 old word definition state is being held
         typeOutGuessGameState.wordDefinition = data.wordDefinition;
         typeOutGuessGameState.wordOfTheDayLetters = data.wordOfTheDayLetters;
         // state.gameOver =  data.gameOver;
@@ -480,6 +489,7 @@ onMessage((e) => {
         typeOutGuessGameState.checkCompletionStatus.hideRevealStartBtn(true);
         typeOutGuessGameState.gameOver.setGameOverFalse();
         // allPlayers = []; 09 04 2025, what does this do if added
+        wordDefinitionProvider();
 
         const hard_reset = { reset: true };
         typeOutGuess(null, hard_reset, typeOutGuessGameState.wordOfTheDay, typeOutGuessGameState.wordOfTheDayLetters);

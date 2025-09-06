@@ -4,15 +4,21 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
+    09 05 2025 - Notes regarding LIVE mobile test:
+                ♣ on app change, session gets disconnected (aggressively on iOS), stalls server until refresh.
+                ♣ when user rejoins session, incRow is +1 extra and they are on the incorrect line, one time they were on row 0
+
     09 04 2025 - temporary HACK on line 336 in initialize_web_sockets.ts
                 ♣ incRow is going off of index.html gamestate (row)
                 ♣ when user leaves, we are calling swapPlayers() (to swap back to player, but it does incRow on swap?)
                 ♣ JSON.parse(data.currentPlayer) in init_web_socket.ts 393 has a huge data load even after new game start (probably a redrawn blank state)
-                ♣
+                ♣ wordDefinition state isnt matching between users on game restart. (sound familiar?) NOTE: is it because you click the OTHER new game button e.g. MODAL
+                        NOTE: is it really the state that is inaccurate, or that you already have it embedded in the modal?
+                ♣ add ping pong, otherwise (when live), session disconnects after 60 seconds, temporary 5 minutes added, but doesnt matter, its a cloudflare 100 second timeout
 
     09 01 2025 - (in live)
                 ♣ incRow is getting screwed up when a user joins and rejoins
-                ♣ user can type when it is not their turn
+                ♣ user can type when it is not their turn CHECK √
                 ♣ server crashes on large payloads of UI data
                 ♣ investigate if two users in different rooms can change the word of day and if we need to store that word per room
     08 31 2925 - when user joins toward end of match, game over does not fire if they miss all characters...(I believe because server was crashing)
