@@ -52,6 +52,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         List<WebSocketSession> roomSessions = rooms.get(roomId);
 
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("addPlayer")) {
+            // if (matrixArrayMap.isEmpty()) {
+            //     incRow.set(0); // test
+            //     System.out.println("Set incRow to\t" + incRow.get() + "reason: Empty matrixArray.");
+            // }
             String payload = session.getId();
             String username = msg.getString("username");
             System.out.println("@@@@username from addPlayer\t" + username);
@@ -77,6 +81,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             JSONObject playerDataPayload = new JSONObject()
                 .put("type", "updatePlayerState")
                 .put("updateType", "addPlayer")
+                .put("serverIncRow", incRow.get())
                 // .put("sessionId", session.getId())
                 // .put("username", username)
                 // .put("userId", userId)
@@ -135,37 +140,42 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
         }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("nextPlayer")) {
-
-            String frontEndIncRow = msg.getString("incRow");
-            // if (msg.getString("didQuit").equals("false")) {
+            boolean didQuit = msg.optBoolean("didQuit", false);
+            int frontEndIncRow = msg.getInt("incRow");
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\t" + didQuit);
+            if (!didQuit) {
                 System.out.println("@@@@nextPlayer frontEndIncRow in ServerSide@@@@\t" + frontEndIncRow);
                 System.out.println("@@@@nextPlayer incRow in ServerSide Before Increment@@@@\t" + incRow);
                 incRow.set(incRow.incrementAndGet() % 6);
                 System.out.println("@@@@nextPlayer incRow in ServerSide@@@@\t" + incRow);
-            // }
+            }
             // we are calling this when a player leaves in order to move to next player, and therefore incrementing twice, but front end doesnt stick with this inc row
             // happens in typeout guess, the player_swap()
 
             ////////////////
-            String currentPlayer = msg.getString("currentPlayer");
-            String nextPlayer = msg.getString("nextPlayer");
+            // String currentPlayer = msg.getString("currentPlayer");
+            // String nextPlayer = msg.getString("nextPlayer");
             ////////////////////
-            // JSONObject currentPlayer = new JSONObject(msg.getString("currentPlayer"));
-            // JSONObject nextPlayer = new JSONObject(msg.getString("nextPlayer"));
+            JSONObject currentPlayer = msg.getJSONObject("currentPlayer");
+            currentPlayer.put("incRow", incRow.get());
+            JSONObject nextPlayer = msg.getJSONObject("nextPlayer");
+            nextPlayer.put("incRow", incRow.get());
 
-            JSONObject current_and_next_player = new JSONObject()
-                .put("currentPlayer", currentPlayer)
-                .put("incRow", incRow.get())
-                .put("nextPlayer", nextPlayer);
+            System.out.println("currentPlayer incRow\t" + currentPlayer.get("incRow"));
+
+            // JSONObject current_and_next_player = new JSONObject() // 09 06 2025 commented out
+            //     .put("currentPlayer", currentPlayer)
+            //     .put("incRow", incRow.get())
+            //     .put("nextPlayer", nextPlayer);
             // currentPlayerMap.put(session, current_and_next_player);
 
             JSONObject currentPlayers = new JSONObject()
                 .put("type", "updatePlayerState")
-                .put("updateType", "nextPlayer")
+                .put("updateType", "processNextPlayer")
                 .put("sessionId", session.getId())
-                .put("incRow", incRow.get())
-                .put("currentPlayer", currentPlayer)
-                .put("nextPlayer", nextPlayer);
+                .put("serverIncRow", incRow.get())
+                .put("serverCurrentPlayer", currentPlayer)
+                .put("serverNextPlayer", nextPlayer);
 
             String playerMessage = currentPlayers.toString();
             for(WebSocketSession s : roomSessions) {
@@ -274,14 +284,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        // incRow.set(0);
         i = 0;
         String roomId = getRoomId(session);
         List<WebSocketSession> roomSessions = rooms.get(roomId);
         if (roomSessions != null) {
             roomSessions.remove(session);
             if(roomSessions.isEmpty()) {
+                incRow.set(0);
                 rooms.remove(roomId);
+                System.out.println("All users left session\t" + roomId + "\n incRow reset to\t" + incRow.get());
             }
         }
         currentPlayerMap.remove(session);
