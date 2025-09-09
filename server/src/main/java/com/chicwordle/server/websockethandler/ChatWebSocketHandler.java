@@ -121,13 +121,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                     });
                     System.out.println("---------^currentPlayerMap.get(s)^-----------");
 
-            for(WebSocketSession s : roomSessions) { // 09 04 2025 when we dont broadcast to all, then players dont swap, but we also dont crash the server...
-                synchronized (s) {
-                    if (s.isOpen()) {
-                        s.sendMessage(new TextMessage(playerDataPayload.toString()));
-                    }
-                }
-            }
+            // for(WebSocketSession s : roomSessions) { // 09 04 2025 when we dont broadcast to all, then players dont swap, but we also dont crash the server...
+            //     synchronized (s) {
+            //         if (s.isOpen()) {
+            //             s.sendMessage(new TextMessage(playerDataPayload.toString()));
+            //         }
+            //     }
+            // }
         }
         if (msg.getString("type").equals("updatePlayerState") && msg.getString("updateType").equals("getSyncedKeyboardCSS")) {
             JSONObject keyboardState = keyboardStateMap.get(session);

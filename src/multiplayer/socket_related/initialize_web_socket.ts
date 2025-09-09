@@ -283,7 +283,17 @@ async function updatePlayerState(data) {
                 const res = await fetch(`http://localhost:1985/api/getgamestate?roomId=${roomId}`);
                 if (res.ok) {
                     const newGameState = await res.json();
-                    console.log("newGameState\t", newGameState);
+                    // console.log("newGameState\t", newGameState);
+                    if (Array.isArray(newGameState.playerCount)) {
+                        // newGameState.playerCount.forEach((player) => {
+                        //     console.log("player being added to allPlayers", player)
+                        //     allPlayers.push(player);
+                        // });
+                        allPlayers = [...newGameState.playerCount];
+                        console.log("allPlayers.length after forEach\t", allPlayers.length);
+                        console.log("allPlayers after forEach\t", allPlayers);
+                        // setPlayerState(allPlayers);
+                    }
                 }
             } catch (error) {
                 console.error(error);
@@ -292,32 +302,34 @@ async function updatePlayerState(data) {
 
 
 
-        console.log("data from addPlayer\t", data);
-        console.log("data from addPlayer data.serverIncRow\t", data.serverIncRow);
-        console.log("data from addPlayer data.playerCount\t", data.playerCount);
+        // console.log("data from addPlayer\t", data);
+        // console.log("data from addPlayer data.serverIncRow\t", data.serverIncRow);
+        // console.log("data from addPlayer data.playerCount\t", data.playerCount);
         // console.log("data.playerCount.incRow\t", data.playerCount);
         // if (data.playerCount) { // 09 06 2025 commented out, probably not necessary, other version below works fine
         //     allPlayers = [...data?.playerCount];
         // }
 
-        if (Array.isArray(data.playerCount)) {
-            const incomingPlayers = JSON.stringify(data.playerCount);
-            const currentPlayers = JSON.stringify(allPlayers);
-            // console.log("incomingPlayers\t", incomingPlayers);
-            // console.log("currentPlayers\t", currentPlayers);
-            if (incomingPlayers !== currentPlayers) {
-                console.log("We hit incomingPlayers do not match currentPlayers")
-                allPlayers.length = 0;
-                data.playerCount?.forEach((player) => {
-                    allPlayers.push(player);
-                });
-            }
+        // if (Array.isArray(data.playerCount)) {
+            // const incomingPlayers = JSON.stringify(data.playerCount);
+            // const currentPlayers = JSON.stringify(allPlayers);
+            // // console.log("incomingPlayers\t", incomingPlayers);
+            // // console.log("currentPlayers\t", currentPlayers);
+            // if (incomingPlayers !== currentPlayers) {
+            //     console.log("We hit incomingPlayers do not match currentPlayers")
+            //     allPlayers.length = 0;
+            //     data.playerCount?.forEach((player) => {
+            //         allPlayers.push(player);
+            //     });
+            // }
+
+
             // allPlayers = [...data.playerCount]; 09 03 2025 testing this
             if (!allPlayers.find(player => player.isFirstPlayer)) {
                 // state.incRow = parseInt(data.playerCount[0].incRow);
                 // console.log("(when addPlayer called) state.incRow\t", state.incRow);
                 // console.log("@@@@@@@@DATA.PLAYERCOUNT\t", data.playerCount);
-                // console.log("It does NOT see a players.isFirstPlayer");
+                console.log("It does NOT see a players.isFirstPlayer");
                 allPlayers[0].isFirstPlayer = true;
                 allPlayers[0].currentPlayerIndex = 0;
                 allPlayers[0].wasInitialFirstPlayer = true;
@@ -331,8 +343,7 @@ async function updatePlayerState(data) {
                 userTurn.innerHTML = `<div class="text-xl text-black font-bold flex flex-col">${currentPlayer.username}</div>`;
                 // console.log("currentPlayer MATRIX ARRAY\t", JSON.parse(currentPlayer.wordRowArrayState));
                 // console.log("currentPlayer wordArrayState\t", currentPlayer);
-            }
-            else if (allPlayers.find(player => player.isFirstPlayer === true)) {
+            } else if (allPlayers.find(player => player.isFirstPlayer === true)) {
                 console.log("It sees a players.isFirstPlayer");
 
                 // state.incRow = newIncRow;
@@ -356,9 +367,11 @@ async function updatePlayerState(data) {
                 const localUserData = JSON.parse(localUser);
                 const localUserId = localUserData.userId.toString();
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
-                console.log("currentPlayer in addPlayer\t", currentPlayer)
+                console.log("currentPlayer in addPlayer\t", currentPlayer);
                 // typeOutGuessGameState.incRow = typeOutGuessGameState.row; // 09 04 2025 this did not work, since row restarts
-                typeOutGuessGameState.incRow = data.serverIncRow; // 09 04 2025 this hack temporarily works
+                // typeOutGuessGameState.incRow = data.serverIncRow; // 09 04 2025 this hack temporarily works // 09 09 2025, now the server isnt sending down state, so we cannot use
+                // console.log("data.serverIncRow\t", data.serverIncRow)
+                typeOutGuessGameState.incRow = currentPlayer.incRow; // 09 09 2025 new hack
                 console.log("currentPlayer.incRow\t", currentPlayer.incRow);
 
                 // typeOutGuessGameState.incRow = currentPlayer.incRow - 1; // this hack temporarily works
@@ -389,21 +402,8 @@ async function updatePlayerState(data) {
                     });
                 }
             }
-            // const localUser = localStorage.getItem("username");
-            // const localUserData = JSON.parse(localUser);
-            // const localUserId = localUserData.userId.toString();
-            // const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
 
-        }
-
-        const localUserInfo = localStorage.getItem("username");
-        const userInfo = JSON.parse(localUserInfo);
-        if (allPlayers) {
-            const mySessionId = allPlayers.filter(player => player.userId === userInfo.userId.toString());
-        }
-    } else if (data.updateType === "removePlayer") {
-        allPlayers?.filter(player => player.userId !== data.userId);
-
+        // }
     } else if (data.updateType === "updatePlayerScore") {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
@@ -421,14 +421,19 @@ async function updatePlayerState(data) {
         if (data.serverCurrentPlayer && data.serverNextPlayer) {
             d1 = data.serverCurrentPlayer;
             d2 = data.serverNextPlayer;
-            console.log("JSON.parse(data.currentPlayer)\t", d1);
-            console.log("JSON.parse(data.nextPlayer)\t", d2);
+            console.log("d1 = data.serverCurrentPlayer\t", d1);
+            console.log("d2 = data.serverNextPlayer\t", d2);
         }
         if (data?.serverIncRow) {
             console.log("JSON.parse(data.serverIncRow)\t", data?.serverIncRow);
         }
+        const ap = getPlayerState();
+        const currentPlayer = ap.find(player => player.isFirstPlayer);
+        console.log("@@currentPlayer according to allPlayers\t", currentPlayer);
+        console.log("@@currentPlayer according to serverCurrentPlayer\t", d1);
         // typeOutGuessGameState.row = data.serverIncRow;
         // typeOutGuessGameState.incRow = d2.incRow; // 09 06 2025
+        // typeOutGuessGameState.currentPlayer = currentPlayer; // this MOVES TO our next player: MUST have TESTTTTTTTTTTTT
         typeOutGuessGameState.currentPlayer = d1; // this MOVES TO our next player: MUST have
         // typeOutGuessGameState.incRow = d1.incRow;
         // typeOutGuessGameState.incRow = d1.incRow;
@@ -469,15 +474,7 @@ async function updatePlayerState(data) {
 onMessage((e) => {
     const typeOutGuessGameState = getGameState();
     const data = JSON.parse(e);
-    if (data.updateType === "addPlayer") {
-
-    } else if (data.updateType === "removePlayer") { // whoever sees two players first?
-        console.log('playerState AFTER REMOVE PLAYER \t', player);
-    } else if (data.updateType === "checkForTwoPlayers" && allPlayers.length >= 2) {
-
-    } else if (data.updateType === "checkCompletionStatus") {
-
-    } else if (data.updateType === "resetGameState") {
+    if (data.updateType === "resetGameState") {
         // console.log("typeOutGuessGameState.wordOfTheDay IN RESET GAME STATE AFTER GAME OVER\t", typeOutGuessGameState.wordOfTheDay);
         // console.log("state.currentPlayer IN RESET GAME STATE AFTER GAME OVER\t", typeOutGuessGameState.currentPlayer);
         typeOutGuessGameState.wordRowArrayState = [

@@ -105,8 +105,13 @@ export function syncKeyboardCSS(updatedKeyboardState: []) {
     }));
 }
 
+export function playerLeftSwapPlayer(state, playerHasLeft, playerHasLeftData) {
+
+}
+
 export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeftData) {
     let players = getPlayerState();
+    console.log("players in swapPlayersFrontEnd\t", players)
     if (playerHasLeft) {
         let indexOfLeaver = players.findIndex(player => player.userId === playerHasLeftData.userId);
         players.splice(indexOfLeaver, 1);
@@ -118,14 +123,16 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
 
             // do we need to re-set players here after splicing? 09 06 2025
             // console.log("players before\t", players);
-            setPlayerState(players);
             // const newPlayers = getPlayerState();
             // console.log("players after\t", newPlayers);
+            setPlayerState(players); //09 09 2025, testing removal, and it seems to swap players better now?
         }
     }
 
     const localUserInfo = JSON.parse(localStorage.getItem("username"));
     const localUserId = localUserInfo.userId.toString();
+    console.log("players\t", players)
+    console.log("players.length\t", players.length)
 
     if (players.length > 1) {
         let cp = players.find(player => player.isFirstPlayer);
@@ -140,17 +147,19 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         const currentPlayer = players[nextPlayerIndex]; // new next player
         const nextPlayer = players[currentPlayerIndex]; // player after..
         // state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
-        // console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
-        // console.log("nextPlayer\t", nextPlayer);
+        console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
+        console.log("nextPlayer\t", nextPlayer);
 
         // console.log("players before\t", players);
         // setPlayerState(players);
         // const newPlayers = getPlayerState();
         // console.log("players after\t", newPlayers);
 
-        console.log("cp.userId\t", cp.userId);
-        console.log("localUserId\t", localUserId);
-        console.log("cp.userId === localUserId\t", cp.userId === localUserId);
+        // console.log("cp.userId\t", cp.userId);
+        // console.log("localUserId\t", localUserId);
+        // console.log("cp.userId === localUserId\t", cp.userId === localUserId);
+
+        console.log("state.incRow in typeOutGuess.ts\t", state.incRow)
 
         if (cp.userId === localUserId) { // ??
             sendMessage(JSON.stringify({
@@ -158,7 +167,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
                 updateType: "nextPlayer",
                 currentPlayer: currentPlayer,
                 nextPlayer: nextPlayer,
-                incRow: state.incRow % 6,
+                incRow: state.incRow,
                 didQuit: playerHasLeft
                 // incRow: JSON.stringify(state.row)
             }));
@@ -171,7 +180,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
                 updateType: "nextPlayer",
                 currentPlayer: players[0],
                 nextPlayer: players[0],
-                incRow: state.incRow % 6,
+                incRow: state.incRow,
                 didQuit: playerHasLeft
                 // incRow: JSON.stringify(state.row)
                 // incRow: state.incRow

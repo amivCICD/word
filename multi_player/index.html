@@ -309,7 +309,7 @@
         // let globalCurrentPlayer = JSON.parse(gameState.currentPlayer);
         const gameState = getGameState();
         let globalCurrentPlayer = gameState.currentPlayer;
-        console.log("INDEX.HTML gameState\t", gameState)
+        // console.log("INDEX.HTML gameState\t", gameState);
         // console.log("globalCurrentPlayer\t", globalCurrentPlayer)
         // console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer); // 08 28 2025 come back to this later to check why null when users leave
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
@@ -326,7 +326,7 @@
         }
         let filteredValue = checkInputValues(e.key.toUpperCase());
         const typeOutGuessGameState = getGameState();
-        console.log("typeOutGuessGameState.incRow\t", typeOutGuessGameState.incRow);
+        // console.log("typeOutGuessGameState.incRow\t", typeOutGuessGameState.incRow);
 
         document.querySelectorAll('.kbd').forEach((keys) => {
           if (filteredValue === keys.innerHTML) {
