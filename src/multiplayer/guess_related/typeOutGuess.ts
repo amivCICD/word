@@ -1,5 +1,5 @@
 import { appendGuess } from "./appendGuess.ts";
-import { sendMessage, getGameState, getPlayerState } from "../socket_related/initialize_web_socket.ts";
+import { sendMessage, getGameState, getPlayerState, setPlayerState } from "../socket_related/initialize_web_socket.ts";
 
 
 export async function typeOutGuess( // used mostly in index.html
@@ -109,12 +109,18 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
     let players = getPlayerState();
     if (playerHasLeft) {
         let indexOfLeaver = players.findIndex(player => player.userId === playerHasLeftData.userId);
-        let nextIndex = (indexOfLeaver + 1) % players.length;
         players.splice(indexOfLeaver, 1);
         if (players.length > 0) {
+            let nextIndex = (indexOfLeaver + 1) % players.length; // 09 06 2025 moved to here
             if (nextIndex >= players.length) nextIndex = 0;
             players[nextIndex].isFirstPlayer = true;
             // console.log("players[nextIndex]\t", players[nextIndex]);
+
+            // do we need to re-set players here after splicing? 09 06 2025
+            // console.log("players before\t", players);
+            setPlayerState(players);
+            // const newPlayers = getPlayerState();
+            // console.log("players after\t", newPlayers);
         }
     }
 
@@ -137,15 +143,23 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         // console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
         // console.log("nextPlayer\t", nextPlayer);
 
+        // console.log("players before\t", players);
+        // setPlayerState(players);
+        // const newPlayers = getPlayerState();
+        // console.log("players after\t", newPlayers);
+
+        console.log("cp.userId\t", cp.userId);
+        console.log("localUserId\t", localUserId);
+        console.log("cp.userId === localUserId\t", cp.userId === localUserId);
 
         if (cp.userId === localUserId) { // ??
             sendMessage(JSON.stringify({
                 type: "updatePlayerState",
                 updateType: "nextPlayer",
-                currentPlayer: JSON.stringify(currentPlayer),
-                nextPlayer: JSON.stringify(nextPlayer),
-                incRow: JSON.stringify(state.incRow % 6),
-                didQuit: JSON.stringify(false)
+                currentPlayer: currentPlayer,
+                nextPlayer: nextPlayer,
+                incRow: state.incRow % 6,
+                didQuit: playerHasLeft
                 // incRow: JSON.stringify(state.row)
             }));
         }
@@ -155,10 +169,10 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
             sendMessage(JSON.stringify({
                 type: "updatePlayerState",
                 updateType: "nextPlayer",
-                currentPlayer: JSON.stringify(players[0]),
-                nextPlayer: JSON.stringify(players[0]),
-                incRow: JSON.stringify(state.incRow % 6),
-                didQuit: JSON.stringify(true)
+                currentPlayer: players[0],
+                nextPlayer: players[0],
+                incRow: state.incRow % 6,
+                didQuit: playerHasLeft
                 // incRow: JSON.stringify(state.row)
                 // incRow: state.incRow
             }));

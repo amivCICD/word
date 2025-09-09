@@ -81,7 +81,7 @@ export function initializeSocket(roomId) {
     if (socket && socket.readyState === WebSocket.OPEN && currentRoomId === roomId) {
         return socket;
     }
-    if (socket) {
+    if (socket && socket.readyState !== WebSocket.CLOSED && socket.readyState !== WebSocket.CLOSING) {
         cleanupSocket();
         socket.close();
     }
@@ -91,10 +91,10 @@ export function initializeSocket(roomId) {
     socket = new WebSocket(`${wsProtocol}://${prodURL}/chat?room=${roomId}`);
     socket.onopen = () => {
         console.log("Connected to web socket!");
-        newUserJoiningMessage();
         window.WEB_SOCKET_READY = true;
         document.dispatchEvent(new Event("websocket-ready"));
         stopLoadingSpinner(0);
+        newUserJoiningMessage();
 
         if(heartBeatInterval) clearInterval(heartBeatInterval);
         heartBeatInterval = window.setInterval(() => {
@@ -186,6 +186,9 @@ export function getAllTextMessageState() {
 export function getPlayerState() {
     return allPlayers;
 }
+export function setPlayerState(adjustedPlayers: []) {
+    allPlayers = [...adjustedPlayers];
+}
 export function getCurrentArrowOfRowArrays(): [][] {
     const rows = document.querySelectorAll('.word-row');
     const arrayOfRows = Array.from(rows);
@@ -260,7 +263,7 @@ function updateGameState(data) {
     }
 }
 
-function updatePlayerState(data) {
+async function updatePlayerState(data) {
     let typeOutGuessGameState = getGameState();
     if (data.updateType === "setCurrentPlayer") {
         player = {
@@ -273,19 +276,37 @@ function updatePlayerState(data) {
         }
         allPlayers = [player];
     } else if (data.updateType === "addPlayer") {
+        const params = new URLSearchParams(window.location.search);
+        const roomId = params.get("room");
+        if (roomId) {
+            try {
+                const res = await fetch(`http://localhost:1985/api/getgamestate?roomId=${roomId}`);
+                if (res.ok) {
+                    const newGameState = await res.json();
+                    console.log("newGameState\t", newGameState);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+
         console.log("data from addPlayer\t", data);
+        console.log("data from addPlayer data.serverIncRow\t", data.serverIncRow);
         console.log("data from addPlayer data.playerCount\t", data.playerCount);
         // console.log("data.playerCount.incRow\t", data.playerCount);
-        if (data.playerCount) {
-            allPlayers = [...data?.playerCount];
-        }
+        // if (data.playerCount) { // 09 06 2025 commented out, probably not necessary, other version below works fine
+        //     allPlayers = [...data?.playerCount];
+        // }
 
         if (Array.isArray(data.playerCount)) {
             const incomingPlayers = JSON.stringify(data.playerCount);
             const currentPlayers = JSON.stringify(allPlayers);
-            console.log("incomingPlayers\t", incomingPlayers);
-            console.log("currentPlayers\t", currentPlayers);
+            // console.log("incomingPlayers\t", incomingPlayers);
+            // console.log("currentPlayers\t", currentPlayers);
             if (incomingPlayers !== currentPlayers) {
+                console.log("We hit incomingPlayers do not match currentPlayers")
                 allPlayers.length = 0;
                 data.playerCount?.forEach((player) => {
                     allPlayers.push(player);
@@ -335,7 +356,9 @@ function updatePlayerState(data) {
                 const localUserData = JSON.parse(localUser);
                 const localUserId = localUserData.userId.toString();
                 const currentPlayer = allPlayers.find(player => player.isFirstPlayer);
-                typeOutGuessGameState.incRow = currentPlayer.incRow; // 09 04 2025 this hack temporarily works
+                console.log("currentPlayer in addPlayer\t", currentPlayer)
+                // typeOutGuessGameState.incRow = typeOutGuessGameState.row; // 09 04 2025 this did not work, since row restarts
+                typeOutGuessGameState.incRow = data.serverIncRow; // 09 04 2025 this hack temporarily works
                 console.log("currentPlayer.incRow\t", currentPlayer.incRow);
 
                 // typeOutGuessGameState.incRow = currentPlayer.incRow - 1; // this hack temporarily works
@@ -384,7 +407,7 @@ function updatePlayerState(data) {
     } else if (data.updateType === "updatePlayerScore") {
         allPlayers = allPlayers?.map(player =>
             player.userId === data.userId ? { ...player, score: { letters: [...player.score.letters, data.letter]}} : player);
-    } else if (data.updateType === "nextPlayer") { // 09 04 2025 handled in typeOutGuess.ts
+    } else if (data.updateType === "processNextPlayer") { // 09 04 2025 handled in typeOutGuess.ts
         const typeOutGuessGameState = getGameState();
         // console.log("JSON.parse(data.currentPlayer)\t", JSON.parse(data.currentPlayer));
         // console.log("JSON.parse(data.nextPlayer)\t", JSON.parse(data.nextPlayer));
@@ -392,12 +415,21 @@ function updatePlayerState(data) {
         //////////////08 31 2025 leave these off, was changing the inc row dramatically
         // state.incRow = JSON.parse(data.incRow);
         // state.currentPlayer.incRow = data.incRow;
-        //////////////////////////
-        const d1 = JSON.parse(data.currentPlayer);
-        const d2 = JSON.parse(data.nextPlayer);
-        console.log("JSON.parse(data.currentPlayer)\t", d1);
-        console.log("JSON.parse(data.nextPlayer)\t", d2);
-        typeOutGuessGameState.currentPlayer = JSON.parse(data.currentPlayer); // this MOVES TO our next player: MUST have
+        ////////////////////////// 09 06 2025 ALL is working at the moment, serverIncRow is keeping things consistent, and setting current player from server is as well
+        console.log("nextPlayer Data\t", data)
+        let d1, d2;
+        if (data.serverCurrentPlayer && data.serverNextPlayer) {
+            d1 = data.serverCurrentPlayer;
+            d2 = data.serverNextPlayer;
+            console.log("JSON.parse(data.currentPlayer)\t", d1);
+            console.log("JSON.parse(data.nextPlayer)\t", d2);
+        }
+        if (data?.serverIncRow) {
+            console.log("JSON.parse(data.serverIncRow)\t", data?.serverIncRow);
+        }
+        // typeOutGuessGameState.row = data.serverIncRow;
+        // typeOutGuessGameState.incRow = d2.incRow; // 09 06 2025
+        typeOutGuessGameState.currentPlayer = d1; // this MOVES TO our next player: MUST have
         // typeOutGuessGameState.incRow = d1.incRow;
         // typeOutGuessGameState.incRow = d1.incRow;
         // typeOutGuessGameState.currentPlayer.incRow = JSON.parse(data.currentPlayer.incRow);

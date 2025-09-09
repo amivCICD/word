@@ -1,10 +1,11 @@
 import { getGameState } from "../socket_related/initialize_web_socket";
 
 export function wordDefinitionProvider() { // 09 04 2025
+    const failureModal = document.getElementById("failureModal");
+    failureModal?.close(); // get rid of all modals, so it doesnt show the new word definition and confuse people...
     const typeOutGuessGameState = getGameState();
     const definitions = typeOutGuessGameState.wordDefinition;
     const paragraphs = document.querySelectorAll('.wordDefinition');
-    console.log("definitions in WordDefinitionProvider()", definitions);
 
     if (definitions.length >= 1) {
         paragraphs.forEach(p => {

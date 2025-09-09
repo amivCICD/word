@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     arrayOfRowArrays = arrayOfDivRows();
 });
 document.addEventListener("websocket-ready", () => {
-    stopLoadingSpinner(2000);
+    stopLoadingSpinner(0);
     onMessage(async (messageData) => {
         const state = getGameState();
         state.arrayOfRowArrays = arrayOfRowArrays;

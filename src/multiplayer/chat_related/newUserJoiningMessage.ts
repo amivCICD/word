@@ -15,6 +15,8 @@ export function newUserJoiningMessage() {
             username: username,
             userId: userId.toString(),
         }));
+        console.log("newUserJoining: state.row\t", state.row)
+        console.log("newUserJoining: state.incRow\t", state.incRow)
 
         sendMessage(JSON.stringify({
             type: "updatePlayerState",
@@ -24,6 +26,7 @@ export function newUserJoiningMessage() {
             score: { letters: [] },
             wordRowArrayState: JSON.stringify(state.wordRowArrayState),
             keyboardState: JSON.stringify(getCurrentKeyboardState().map((key) => ({ class: key.className.value }))),
+            row: state.row
             // incRow: state.incRow // the server is handling incRow, shouldnt need this 03 31 2025
             // gameState: JSON.stringify(state)
             // matrixArray: JSON.stringify(state.matrixArray) // was working, moving to above 03 05 2025

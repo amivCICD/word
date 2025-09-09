@@ -16,6 +16,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.chicwordle.server.services.GameStateService;
 import com.chicwordle.server.services.NewGameWordService;
 
 
@@ -23,7 +24,13 @@ import com.chicwordle.server.services.NewGameWordService;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private NewGameWordService newGameWordService;
+    private final GameStateService gameStateService;
 
+    public ChatWebSocketHandler(GameStateService gameStateService) {
+        this.gameStateService = gameStateService;
+    }
+    // JSONObject newState = new JSONObject().put(...);
+    // gameStateService.updateGameState(roomId, newState);
 
     private final Map<String, List<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, JSONObject> currentPlayerMap = new ConcurrentHashMap<>();
@@ -56,6 +63,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             //     incRow.set(0); // test
             //     System.out.println("Set incRow to\t" + incRow.get() + "reason: Empty matrixArray.");
             // }
+
             String payload = session.getId();
             String username = msg.getString("username");
             System.out.println("@@@@username from addPlayer\t" + username);
@@ -76,7 +84,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             System.out.println("username: " + username + "\nSessionId Payload:\t" + payload);
 
             getPlayers();
-
 
             JSONObject playerDataPayload = new JSONObject()
                 .put("type", "updatePlayerState")
@@ -104,6 +111,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                             .put("keyboardState", keyboardInfo != null ? keyboardInfo.optString("keyboardState", "[]") : "[]")
                             .put("isFirstPlayer", currentPlayerInfo != null && currentPlayerInfo.optBoolean("isFirstPlayer", false));
                     }).collect(Collectors.toList()));
+                    gameStateService.updateGameState(roomId, playerDataPayload);
                     // System.out.println("playerDataPayload\t" + playerDataPayload.toString());
                     System.out.println("Payload size: " + playerDataPayload.toString().getBytes(StandardCharsets.UTF_8).length + " bytes");
                     System.out.println("----------currentPlayerMap.get(s)------------");
@@ -176,8 +184,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 .put("serverIncRow", incRow.get())
                 .put("serverCurrentPlayer", currentPlayer)
                 .put("serverNextPlayer", nextPlayer);
-
             String playerMessage = currentPlayers.toString();
+            System.out.println("@processNextPlayer.Payload size: " + playerMessage.getBytes(StandardCharsets.UTF_8).length + " bytes");
             for(WebSocketSession s : roomSessions) {
                 synchronized (s) {
                     if (s.isOpen()) {

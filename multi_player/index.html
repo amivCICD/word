@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" scroll-behavior="smooth" class="h-screen sm:h-screen bg-white bg-[url('/cozy_blanket.webp')] bg-size[full] bg-no-repeat m-0 p-1 pb-10">
+<html lang="en" scroll-behavior="smooth" class="min-h-screen sm:min-h-screen bg-white bg-[url('/cozy_blanket.webp')] bg-cover bg-no-repeat m-0 p-1 pb-10">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,6 @@
     <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <title>Chic Wordle MultiPlayer</title>
-
   </head>
   <body>
     <div id="app" class="bg-transparent w-full h-full sm:w-1/2 mx-auto">
@@ -311,7 +310,7 @@
         const gameState = getGameState();
         let globalCurrentPlayer = gameState.currentPlayer;
         console.log("INDEX.HTML gameState\t", gameState)
-        console.log("globalCurrentPlayer\t", globalCurrentPlayer)
+        // console.log("globalCurrentPlayer\t", globalCurrentPlayer)
         // console.log("INDEX.HTML globalCurrentPlayer\t", globalCurrentPlayer); // 08 28 2025 come back to this later to check why null when users leave
         // let globalCurrentPlayer = playerState.find(player => player.isFirstPlayer === true);
 
@@ -341,15 +340,15 @@
         return key.id.toLowerCase() !== "enter" && key.id.toLowerCase() !== "backspace"; // added to lowercase 02 23 2025
       });
       allKeysExceptBSEnter.forEach((keys) => {
-        let localCurrentPlayerId = setLocalCurrentPlayer();
-        const gameState = getGameState();
-        let globalCurrentPlayer = gameState.currentPlayer;
         keys.addEventListener('click', e => {
+          let localCurrentPlayerId = setLocalCurrentPlayer();
+          const gameState = getGameState();
+          let globalCurrentPlayer = gameState.currentPlayer;
           if (window.textMessageOnly
           || window.usernameInputOnly
           || !window.WEB_SOCKET_READY
           || !window.initialPromptReady
-          || globalCurrentPlayer.userId !== localCurrentPlayerId.toString()) {
+          || globalCurrentPlayer?.userId !== localCurrentPlayerId.toString()) {
             return;
           }
           let letter = e.target.innerHTML;

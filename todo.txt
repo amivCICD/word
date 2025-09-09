@@ -3,24 +3,26 @@
     add credit to confetti
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
+    09 08 2025 - on 2nd game, one player got disconnected, but more importantly, nextPlayer was called twice, increasing incRow twice
 
     09 05 2025 - Notes regarding LIVE mobile test:
                 ♣ on app change, session gets disconnected (aggressively on iOS), stalls server until refresh.
-                ♣ when user rejoins session, incRow is +1 extra and they are on the incorrect line, one time they were on row 0
-
-    09 04 2025 - temporary HACK on line 336 in initialize_web_sockets.ts
-                ♣ incRow is going off of index.html gamestate (row)
-                ♣ when user leaves, we are calling swapPlayers() (to swap back to player, but it does incRow on swap?)
-                ♣ JSON.parse(data.currentPlayer) in init_web_socket.ts 393 has a huge data load even after new game start (probably a redrawn blank state)
-                ♣ wordDefinition state isnt matching between users on game restart. (sound familiar?) NOTE: is it because you click the OTHER new game button e.g. MODAL
-                        NOTE: is it really the state that is inaccurate, or that you already have it embedded in the modal?
-                ♣ add ping pong, otherwise (when live), session disconnects after 60 seconds, temporary 5 minutes added, but doesnt matter, its a cloudflare 100 second timeout
+                ♣ when user rejoins session, incRow is +1 extra and they are on the incorrect line, one time they were on row 0 CHECK √
+                ♣ SO, when users leave, it triggers nextPlayer which increments the incRow! CHECK √
+                ♣ Biggest issue: we are somehow stacking the state up so large on 3 player it overloads...lets try to broadcast only to the new user...
+    09 04 2025 - temporary HACK on line 336 in initialize_web_sockets.ts (fix: sent over proper player from server) CHECK √
+                ♣ incRow is going off of index.html gamestate (row) CHECK √
+                ♣ when user leaves, we are calling swapPlayers() (to swap back to player, but it does incRow on swap?) CHECK √
+                ♣ JSON.parse(data.currentPlayer) in init_web_socket.ts 393 has a huge data load even after new game start (probably a redrawn blank state?)
+                ♣ wordDefinition state isnt matching between users on game restart. (sound familiar?) NOTE: is it because you click the OTHER new game button e.g. MODAL CHECK √
+                        NOTE: is it really the state that is inaccurate, or that you already have it embedded in the modal? CHECK √
+                ♣ add ping pong, otherwise (when live), session disconnects after 60 seconds, temporary 5 minutes added, but doesnt matter, its a cloudflare 100 second timeout CHECK √
 
     09 01 2025 - (in live)
-                ♣ incRow is getting screwed up when a user joins and rejoins
-                ♣ user can type when it is not their turn CHECK √
                 ♣ server crashes on large payloads of UI data
+                ♣ incRow is getting screwed up when a user joins and rejoins CHECK √
                 ♣ investigate if two users in different rooms can change the word of day and if we need to store that word per room
+                ♣ user can type when it is not their turn CHECK √
     08 31 2925 - when user joins toward end of match, game over does not fire if they miss all characters...(I believe because server was crashing)
     08 31 2925 - keyboard state was left over on a server error, to only 1 player, even after game restart
     08 30 2025 - add "HINT" button, provides dictionary definition, perhaps uses word in a sentence
