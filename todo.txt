@@ -3,7 +3,10 @@
     add credit to confetti
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
-    09 08 2025 - on 2nd game, one player got disconnected, but more importantly, nextPlayer was called twice, increasing incRow twice
+
+    09 09 2025 - player swapping is working fine, if user leaves during other players turn, they rejoin with proper incRow, test the opposite
+    09 08 2025 - on 2nd game, one player got disconnected, but more importantly, nextPlayer was called twice, increasing incRow twice CHECK √
+                 09 09 2025 I believe this was caused by having duplicate players in allPlayers, from forEach, instead of overwriting the array [...incoming]
 
     09 05 2025 - Notes regarding LIVE mobile test:
                 ♣ on app change, session gets disconnected (aggressively on iOS), stalls server until refresh.

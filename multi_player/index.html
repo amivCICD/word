@@ -214,7 +214,7 @@
           }
           if (fetchWord.ok) {
             const wotd = await fetchWord.json();
-            console.log("wotd\t", wotd);
+            // console.log("wotd\t", wotd);
             resetGameState = new ResetGameState(true, wotd.word, wotd.wordDefinition);
             resetGameState.setResetFalse();
             typeOutGuessGameState.wordOfTheDay = resetGameState.wordOfTheDay;

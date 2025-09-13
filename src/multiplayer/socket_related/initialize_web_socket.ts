@@ -79,6 +79,7 @@ let allPlayers = [];
 export function initializeSocket(roomId) {
     startLoadingSpinner(false);
     if (socket && socket.readyState === WebSocket.OPEN && currentRoomId === roomId) {
+        stopLoadingSpinner(1000);
         return socket;
     }
     if (socket && socket.readyState !== WebSocket.CLOSED && socket.readyState !== WebSocket.CLOSING) {
@@ -93,7 +94,7 @@ export function initializeSocket(roomId) {
         console.log("Connected to web socket!");
         window.WEB_SOCKET_READY = true;
         document.dispatchEvent(new Event("websocket-ready"));
-        stopLoadingSpinner(0);
+        // stopLoadingSpinner(1000);
         newUserJoiningMessage();
 
         if(heartBeatInterval) clearInterval(heartBeatInterval);
@@ -370,9 +371,11 @@ async function updatePlayerState(data) {
                 console.log("currentPlayer in addPlayer\t", currentPlayer);
                 // typeOutGuessGameState.incRow = typeOutGuessGameState.row; // 09 04 2025 this did not work, since row restarts
                 // typeOutGuessGameState.incRow = data.serverIncRow; // 09 04 2025 this hack temporarily works // 09 09 2025, now the server isnt sending down state, so we cannot use
-                // console.log("data.serverIncRow\t", data.serverIncRow)
-                typeOutGuessGameState.incRow = currentPlayer.incRow; // 09 09 2025 new hack
-                console.log("currentPlayer.incRow\t", currentPlayer.incRow);
+                // console.log("data.serverIncRow in addPlayer\t", data.serverIncRow);
+                typeOutGuessGameState.incRow = currentPlayer.incRow; // 09 09 2025 new hack // 09 13 2025 adding + 1 did not work
+
+                console.log("currentPlayer.incRow\t", currentPlayer.serverIncRow);
+                // console.log("currentPlayer.wordRowArrayState\t", currentPlayer.wordRowArrayState);
 
                 // typeOutGuessGameState.incRow = currentPlayer.incRow - 1; // this hack temporarily works
                 const currentRowArrayState = getCurrentArrowOfRowArrays();
@@ -390,6 +393,7 @@ async function updatePlayerState(data) {
                             });
                         });
                     }
+                    allPlayers.forEach(player => player.wordRowArrayState = []);
                 }
                 const kbState = JSON.parse(currentPlayer.keyboardState);
                 if (localUserId !== currentPlayer.userId && kbState.length > 1) {
@@ -401,6 +405,7 @@ async function updatePlayerState(data) {
                         }
                     });
                 }
+                allPlayers.forEach(player => player.keyboardState = []);
             }
 
         // }
@@ -551,6 +556,7 @@ onMessage((e) => {
         joinedChat.appendChild(div);
         const textMessages = document.getElementById("textMessages");
         textMessages.scrollTo(0, textMessages.scrollHeight);
+        console.log(`${data.username} has left the game!`);
     }
 }); // initial join if they exist
 

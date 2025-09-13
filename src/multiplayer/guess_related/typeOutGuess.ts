@@ -41,7 +41,7 @@ export async function typeOutGuess( // used mostly in index.html
 
 
     if (state.letterCount === 5 && userInput === "ENTER" && state.guess !== "ENTER") {
-        console.log("gameStateParam.reset\t", gameStateParam.reset)
+        // console.log("gameStateParam.reset\t", gameStateParam.reset);
         sendMessage(JSON.stringify({
             type: "updateGameState",
             updateType: "guessAttempt",
@@ -111,7 +111,7 @@ export function playerLeftSwapPlayer(state, playerHasLeft, playerHasLeftData) {
 
 export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeftData) {
     let players = getPlayerState();
-    console.log("players in swapPlayersFrontEnd\t", players)
+    // console.log("players in swapPlayersFrontEnd\t", players);
     if (playerHasLeft) {
         let indexOfLeaver = players.findIndex(player => player.userId === playerHasLeftData.userId);
         players.splice(indexOfLeaver, 1);
@@ -122,7 +122,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
             // console.log("players[nextIndex]\t", players[nextIndex]);
 
             // do we need to re-set players here after splicing? 09 06 2025
-            // console.log("players before\t", players);
+            console.log("players after splice (playerHasLeft)\t", players);
             // const newPlayers = getPlayerState();
             // console.log("players after\t", newPlayers);
             setPlayerState(players); //09 09 2025, testing removal, and it seems to swap players better now?
@@ -131,8 +131,8 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
 
     const localUserInfo = JSON.parse(localStorage.getItem("username"));
     const localUserId = localUserInfo.userId.toString();
-    console.log("players\t", players)
-    console.log("players.length\t", players.length)
+    // console.log("players\t", players);
+    // console.log("players.length\t", players.length);
 
     if (players.length > 1) {
         let cp = players.find(player => player.isFirstPlayer);
@@ -147,8 +147,8 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         const currentPlayer = players[nextPlayerIndex]; // new next player
         const nextPlayer = players[currentPlayerIndex]; // player after..
         // state.currentPlayer = currentPlayer; // we need to set state.currentPlayer perhaps in onMessage, so it updates, because incRow is not updating for state.currentPlayer...
-        console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
-        console.log("nextPlayer\t", nextPlayer);
+        // console.log("currentPlayer\t", currentPlayer); // this is seeing the next and current
+        // console.log("nextPlayer\t", nextPlayer);
 
         // console.log("players before\t", players);
         // setPlayerState(players);
@@ -159,7 +159,7 @@ export function swapPlayersFrontEnd(state, playerHasLeft: boolean, playerHasLeft
         // console.log("localUserId\t", localUserId);
         // console.log("cp.userId === localUserId\t", cp.userId === localUserId);
 
-        console.log("state.incRow in typeOutGuess.ts\t", state.incRow)
+        console.log("state.incRow in typeOutGuess.ts\t", state.incRow);
 
         if (cp.userId === localUserId) { // ??
             sendMessage(JSON.stringify({

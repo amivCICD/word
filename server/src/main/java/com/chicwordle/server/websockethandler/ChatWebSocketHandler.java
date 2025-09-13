@@ -104,6 +104,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                             .put("username", currentPlayerInfo != null ? currentPlayerInfo.optString("username", "") : "")
                             .put("userId", currentPlayerInfo != null ? currentPlayerInfo.optString("userId", "") : "")
                             .put("incRow", incRow.get())
+                            .put("serverIncRow", incRow.get())
                             // .put("incRow", currentPlayerInfo != null ? currentPlayerInfo.optInt("incRow", 0) : 0)
                             // .put("incRow", currentPlayerInfo != null ? currentPlayerInfo.getInt("incRow") : 0)
                             .put("addPlayerWOTD", newGameWord != null ? newGameWord.optString("serverWordOfTheDay", "") : "")
@@ -170,6 +171,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             nextPlayer.put("incRow", incRow.get());
 
             System.out.println("currentPlayer incRow\t" + currentPlayer.get("incRow"));
+            // System.out.println("currentPlayer keyboardState\t" + currentPlayer.get("keyboardState"));
 
             // JSONObject current_and_next_player = new JSONObject() // 09 06 2025 commented out
             //     .put("currentPlayer", currentPlayer)
