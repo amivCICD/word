@@ -80,6 +80,12 @@ let roomActionsBound = false;
 let lastTerminalSignature: string | null = null;
 let lastHighlightedPlayerId: string | null = null;
 let lastPlayerOrder: string[] = [];
+let chatReconnectTimer: number | null = null;
+let chatReconnectAttempts = 0;
+let activeChatRoomId: string | null = null;
+let suppressChatReconnect = false;
+
+const MAX_CHAT_RECONNECT_ATTEMPTS = 5;
 
 function normalizeSnapshot(snapshot: RoomSnapshot): RoomSnapshot {
   return {
@@ -318,6 +324,7 @@ function renderLanding(defaultRoomId = getRecentRoomId() ?? generateRoomId(), in
   if (!app) return;
   currentRenderedRoomId = null;
   latestSnapshot = null;
+  teardownChatSocket();
   app.className = "bg-transparent w-full min-h-screen sm:w-1/2 mx-auto p-0 sm:p-1 pb-10";
   app.innerHTML = roomChooserMarkup(defaultRoomId, invited);
   bindLandingControls();
@@ -336,6 +343,7 @@ function renderGameShell() {
 
 function renderError(message: string) {
   if (!app) return;
+  teardownChatSocket();
   app.className = "bg-transparent w-full min-h-screen sm:w-1/2 mx-auto p-4 sm:p-6";
   app.innerHTML = `
     <div class="bg-white/80 border border-red-600 rounded-md p-6 text-center text-black">
@@ -550,6 +558,23 @@ function showLandingToast(message: string) {
   }, 4000);
 }
 
+function showTransientToast(message: string, tone: "info" | "error" = "info", duration = 2500) {
+  const toastContainer = document.getElementById("toastContainer");
+  if (!toastContainer) {
+    return;
+  }
+
+  const toast = document.createElement("div");
+  toast.className = tone === "error"
+    ? "alert border border-red-500 bg-white text-red-500 shadow-lg"
+    : "alert border border-pink-300 bg-white text-black shadow-lg";
+  toast.innerHTML = `<span class="font-bold">${message}</span>`;
+  toastContainer.appendChild(toast);
+  window.setTimeout(() => {
+    toast.remove();
+  }, duration);
+}
+
 function renderOrUpdateGame(snapshot: RoomSnapshot) {
   const roomChanged = currentRenderedRoomId !== snapshot.roomId;
   if (roomChanged) {
@@ -565,25 +590,35 @@ function renderOrUpdateGame(snapshot: RoomSnapshot) {
 }
 
 function connectChat(roomId: string) {
-  if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-    const currentUrl = new URL(chatSocket.url);
-    if (currentUrl.searchParams.get("room") === roomId) {
-      return;
-    }
-    chatSocket.close();
+  if (activeChatRoomId === roomId && chatSocket && (chatSocket.readyState === WebSocket.OPEN || chatSocket.readyState === WebSocket.CONNECTING)) {
+    return;
   }
 
+  teardownChatSocket();
+  activeChatRoomId = roomId;
+  suppressChatReconnect = false;
+  chatReconnectAttempts = 0;
+  openChatSocket(roomId, true);
+}
+
+function openChatSocket(roomId: string, announceJoin: boolean) {
   const user = ensureLocalPlayer();
   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
   chatSocket = new WebSocket(`${protocol}://${REFRACTOR_WS_HOST}/ws/chat?room=${roomId}`);
 
   chatSocket.addEventListener("open", () => {
-    chatSocket?.send(JSON.stringify({
-      type: "join",
-      username: user.username,
-      userId: user.userId,
-      message: `${user.username} joined the room`,
-    } satisfies ChatEnvelope));
+    chatReconnectAttempts = 0;
+    clearChatReconnectTimer();
+    if (announceJoin) {
+      chatSocket?.send(JSON.stringify({
+        type: "join",
+        username: user.username,
+        userId: user.userId,
+        message: `${user.username} joined the room`,
+      } satisfies ChatEnvelope));
+    } else {
+      showTransientToast("Chat reconnected.", "info", 1500);
+    }
   });
 
   chatSocket.addEventListener("message", (event) => {
@@ -591,6 +626,52 @@ function connectChat(roomId: string) {
     appendChatMessage(envelope);
     maybeShowJoinToast(envelope);
   });
+
+  chatSocket.addEventListener("close", () => {
+    if (suppressChatReconnect || !activeChatRoomId || latestSnapshot?.roomId !== activeChatRoomId) {
+      return;
+    }
+
+    if (chatReconnectAttempts >= MAX_CHAT_RECONNECT_ATTEMPTS) {
+      clearChatReconnectTimer();
+      chatSocket = null;
+      showTransientToast("Chat disconnected. Refresh or rejoin if you want chat back.", "error", 4000);
+      return;
+    }
+
+    const attemptNumber = chatReconnectAttempts + 1;
+    const delay = Math.min(1000 * attemptNumber, 4000);
+    clearChatReconnectTimer();
+    showTransientToast(`Chat reconnecting... (${attemptNumber}/${MAX_CHAT_RECONNECT_ATTEMPTS})`, "info", 1800);
+    chatReconnectTimer = window.setTimeout(() => {
+      chatReconnectAttempts += 1;
+      if (activeChatRoomId && latestSnapshot?.roomId === activeChatRoomId) {
+        openChatSocket(activeChatRoomId, false);
+      }
+    }, delay);
+  });
+
+  chatSocket.addEventListener("error", () => {
+    // Retry scheduling is owned by the close handler to avoid duplicate timers.
+  });
+}
+
+function clearChatReconnectTimer() {
+  if (chatReconnectTimer != null) {
+    window.clearTimeout(chatReconnectTimer);
+    chatReconnectTimer = null;
+  }
+}
+
+function teardownChatSocket() {
+  suppressChatReconnect = true;
+  clearChatReconnectTimer();
+  if (chatSocket && (chatSocket.readyState === WebSocket.OPEN || chatSocket.readyState === WebSocket.CONNECTING)) {
+    chatSocket.close();
+  }
+  chatSocket = null;
+  activeChatRoomId = null;
+  chatReconnectAttempts = 0;
 }
 
 function connectGameplay(roomId: string) {
