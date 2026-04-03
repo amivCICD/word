@@ -4,6 +4,10 @@
         https://gist.github.com/Benhawkins18/898cb83207d330cf93f40032e4fa53cd - https://gist.github.com/Benhawkins18
         https://codepen.io/flyagen/pen/QWMqgyR?editors=1111
 
+    09 14 2025 - on round 5 (live version), state did not sync up, was blank (2nd rejoin), perhaps when you cleared the Arrays after appending state.
+               - maybe we need to send next player via JSON from server instead of handling it on the front end, hoping it magically sync up...
+               - also on Safari, player was not even able to join game...
+
     09 09 2025 - player swapping is working fine, if user leaves during other players turn, they rejoin with proper incRow, test the opposite
     09 08 2025 - on 2nd game, one player got disconnected, but more importantly, nextPlayer was called twice, increasing incRow twice CHECK √
                  09 09 2025 I believe this was caused by having duplicate players in allPlayers, from forEach, instead of overwriting the array [...incoming]

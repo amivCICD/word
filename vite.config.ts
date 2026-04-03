@@ -18,6 +18,10 @@ function customRoutingPlugin() {
           console.log("Rewriting to /multi_player/index.html for:", url);
           req.url = `/multi_player/index.html${url.includes('?') ? url.substring(url.indexOf('?')) : ''}`;
         }
+        if (url.startsWith('/multi_player_refactor/') && !url.endsWith('/multi_player_refactor/index.html')) {
+          console.log("Rewriting to /multi_player_refactor/index.html for:", url);
+          req.url = `/multi_player_refactor/index.html${url.includes('?') ? url.substring(url.indexOf('?')) : ''}`;
+        }
         next();
       });
     }
@@ -36,12 +40,14 @@ export default defineConfig(({ mode }) => {
     plugins: [customRoutingPlugin()],
     build: {
       outDir: mode === "production"
-        ? resolve(__dirname, "./server/src/main/resources/static")
+        ? resolve(__dirname, "./server_refactor/src/main/resources/static")
         : "dist",
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html'),
           multi_player: resolve(__dirname, 'multi_player/index.html'),
+          single_player_refactor: resolve(__dirname, 'single_player_refactor/index.html'),
+          multi_player_refactor: resolve(__dirname, 'multi_player_refactor/index.html'),
         }
       },
       define: {

@@ -9,6 +9,7 @@ import { swapPlayersFrontEnd } from "../guess_related/typeOutGuess";
 import { typeOutGuess } from "../guess_related/typeOutGuess";
 import { startLoadingSpinner, stopLoadingSpinner } from "../helper_functions/loadingSpinners";
 import { wordDefinitionProvider } from "../helper_functions/wordDefinitionProvider";
+import { windowAPIURL } from "../window_initializers/window_api_url";
 
 
 
@@ -281,7 +282,7 @@ async function updatePlayerState(data) {
         const roomId = params.get("room");
         if (roomId) {
             try {
-                const res = await fetch(`http://localhost:1985/api/getgamestate?roomId=${roomId}`);
+                const res = await fetch(`${windowAPIURL}/api/getgamestate?roomId=${roomId}`);
                 if (res.ok) {
                     const newGameState = await res.json();
                     // console.log("newGameState\t", newGameState);

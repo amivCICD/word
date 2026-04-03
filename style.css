@@ -1648,6 +1648,48 @@ html {
   min-width: 4rem;
 }
 
+.swap {
+  position: relative;
+  display: inline-grid;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  place-content: center;
+  cursor: pointer;
+}
+
+.swap > * {
+  grid-column-start: 1;
+  grid-row-start: 1;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-property: transform, opacity;
+}
+
+.swap input {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
+.swap .swap-on,
+.swap .swap-indeterminate,
+.swap input:indeterminate ~ .swap-on {
+  opacity: 0;
+}
+
+.swap input:checked ~ .swap-off,
+.swap-active .swap-off,
+.swap input:indeterminate ~ .swap-off {
+  opacity: 0;
+}
+
+.swap input:checked ~ .swap-on,
+.swap-active .swap-on,
+.swap input:indeterminate ~ .swap-indeterminate {
+  opacity: 1;
+}
+
 .table {
   position: relative;
   width: 100%;
@@ -3018,8 +3060,16 @@ html:has(.drawer-toggle:checked) {
   position: absolute;
 }
 
+.left-1\/2 {
+  left: 50%;
+}
+
 .right-2 {
   right: 0.5rem;
+}
+
+.top-1\/2 {
+  top: 50%;
 }
 
 .top-2 {
@@ -3096,6 +3146,11 @@ html:has(.drawer-toggle:checked) {
   display: none;
 }
 
+.size-16 {
+  width: 4rem;
+  height: 4rem;
+}
+
 .h-12 {
   height: 3rem;
 }
@@ -3128,8 +3183,16 @@ html:has(.drawer-toggle:checked) {
   min-height: 100%;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
 .w-16 {
   width: 4rem;
+}
+
+.w-24 {
+  width: 6rem;
 }
 
 .w-64 {
@@ -3161,9 +3224,29 @@ html:has(.drawer-toggle:checked) {
   flex-grow: 0;
 }
 
+.-translate-x-1\/4 {
+  --tw-translate-x: -25%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.-translate-y-1\/4 {
+  --tw-translate-y: -25%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .rotate-90 {
   --tw-rotate: 90deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 @keyframes wiggle {
@@ -3236,6 +3319,10 @@ html:has(.drawer-toggle:checked) {
 
 .gap-4 {
   gap: 1rem;
+}
+
+.gap-8 {
+  gap: 2rem;
 }
 
 .gap-\[1px\] {
@@ -3358,6 +3445,11 @@ html:has(.drawer-toggle:checked) {
   padding: 1rem;
 }
 
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -3367,8 +3459,16 @@ html:has(.drawer-toggle:checked) {
   padding-bottom: 2.5rem;
 }
 
+.pb-14 {
+  padding-bottom: 3.5rem;
+}
+
 .pb-2 {
   padding-bottom: 0.5rem;
+}
+
+.pb-20 {
+  padding-bottom: 5rem;
 }
 
 .pb-24 {
@@ -3462,11 +3562,6 @@ html:has(.drawer-toggle:checked) {
   color: rgb(249 168 212 / var(--tw-text-opacity));
 }
 
-.text-pink-500 {
-  --tw-text-opacity: 1;
-  color: rgb(236 72 153 / var(--tw-text-opacity));
-}
-
 .text-red-500 {
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity));
@@ -3477,8 +3572,16 @@ html:has(.drawer-toggle:checked) {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.opacity-25 {
+  opacity: 0.25;
+}
+
 .opacity-50 {
   opacity: 0.5;
+}
+
+.opacity-75 {
+  opacity: 0.75;
 }
 
 .blur {
@@ -3530,8 +3633,8 @@ html:has(.drawer-toggle:checked) {
     height: 4rem;
   }
 
-  .sm\:h-screen {
-    height: 100vh;
+  .sm\:min-h-screen {
+    min-height: 100vh;
   }
 
   .sm\:w-1\/2 {
@@ -3544,6 +3647,10 @@ html:has(.drawer-toggle:checked) {
 
   .sm\:w-\[73px\] {
     width: 73px;
+  }
+
+  .sm\:flex-row {
+    flex-direction: row;
   }
 
   .sm\:flex-col {
@@ -3566,5 +3673,15 @@ html:has(.drawer-toggle:checked) {
   .sm\:text-xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:w-80 {
+    width: 20rem;
+  }
+
+  .lg\:justify-between {
+    justify-content: space-between;
   }
 }

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en" class="min-h-screen m-0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../style.css" type="text/css" />
+    <link rel="stylesheet" href="../index.css" type="text/css" />
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow-y: scroll !important;
+        scrollbar-gutter: stable !important;
+        background-image: url('/cozy_blanket.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      html:has(#gameOverModal[open]) {
+        overflow-y: scroll !important;
+        scrollbar-gutter: stable !important;
+      }
+
+      body {
+        min-height: 100vh;
+        background-attachment: fixed;
+        overflow-x: hidden;
+      }
+
+      #gameOverModal,
+      #gameOverModal::backdrop,
+      #gameOverModal .modal-box {
+        animation: none !important;
+      }
+
+      #gameOverModal {
+        padding: 0 !important;
+      }
+
+      .btn-static,
+      .btn-static:hover,
+      .btn-static:focus,
+      .btn-static:active {
+        animation: none !important;
+        transform: none !important;
+      }
+
+      .current-cell-spinner {
+        position: relative;
+      }
+
+      .current-cell-trace {
+        position: absolute;
+        inset: -2px;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .current-cell-trace svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .current-cell-trace rect {
+        fill: none;
+        stroke: rgb(249 168 212);
+        stroke-width: 3;
+        stroke-linecap: square;
+        stroke-linejoin: miter;
+        stroke-dasharray: 14 268;
+        animation: current-cell-trace 1.9s linear infinite;
+      }
+
+      @keyframes current-cell-trace {
+        from {
+          stroke-dashoffset: 282;
+        }
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+    </style>
+    <title>Chic Wordle Multiplayer Refactor</title>
+  </head>
+  <body>
+    <div id="app" class="bg-transparent w-full min-h-screen sm:w-1/2 mx-auto p-0 sm:p-1 pb-10">
+      <div class="bg-white/70 border border-black rounded-md p-6 text-center text-black">
+        <h1 class="text-2xl sm:text-4xl font-bold italic">WORDLE</h1>
+        <p class="mt-4 font-semibold">Loading multiplayer refactor...</p>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script type="module" src="../src_refactor/multi_player/main.ts"></script>
+  </body>
+</html>

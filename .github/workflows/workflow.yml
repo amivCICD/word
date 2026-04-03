@@ -1,25 +1,46 @@
-name: Stop, Build & Run updated container
+name: Build And Deploy Chic Wordle
 
 on:
   push:
     branches: [ "master" ]
 
 jobs:
-  stop_build_run:
-    runs-on: self-hosted
-    env:
-      IMAGE_NAME: chicwordle
-      PORT: 1985
-      DIR: c:\users\server\documents\servedtunnels\word
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build Image
+        run: docker build -t artimusmaximus/chicwordle:latest .
+
+      - name: Push Image
+        run: docker push artimusmaximus/chicwordle:latest
+
+  stop_and_run:
+    runs-on: self-hosted
+    needs: build
+
+    env:
+      IMAGE: artimusmaximus/chicwordle:latest
+      CONTAINER: chicwordle
+      PORT: 1985
+
+    steps:
+      - name: Pull latest image
+        run: docker pull $IMAGE
+
       - name: Shut down current container
         run: |
-          docker ps -q --filter "ancestor=artimusmaximus/${{env.IMAGE_NAME}}:latest" | xargs -r docker stop
-          echo "Stopping container ${{env.IMAGE_NAME}}" 
-      - name: pull updated container
-        run: docker pull artimusmaximus/${{env.IMAGE_NAME}}:latest
+          docker stop $CONTAINER || true
+          docker rm $CONTAINER || true
+
       - name: Start new container
-        run: docker run -d -p ${{env.PORT}}:${{env.PORT}} artimusmaximus/${{env.IMAGE_NAME}}:latest
+        run: docker run -d --name $CONTAINER -p $PORT:$PORT $IMAGE
+
+      - name: Cleanup old Images
+        run: docker image prune -af
